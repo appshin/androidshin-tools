@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Play closed testing: 12 testers for 14 days, explained | Mr.AndroidShin</title>
+<meta name="description" content="What the Google Play 12-testers, 14-day closed testing requirement actually means, who it applies to, how to set it up, and the engagement mistakes that get production access rejected.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/google-play-closed-testing-12-testers.html">
+<meta property="og:title" content="Google Play closed testing: 12 testers for 14 days, explained">
+<meta property="og:description" content="Who the rule applies to, how to set it up, and why apps still get rejected after 14 days.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · Play Console</p>
+  <h1>Google Play closed testing: 12 testers for 14 days, explained</h1>
+
+  <p>If you created a Google Play developer account recently, you can't just push your first app to production. Google makes you run a closed test first — and the number that trips everyone up is <b>12 testers for 14 days</b>. Here's exactly what that means, who it applies to, and the part most guides skip: why plenty of apps still get rejected after the two weeks are up.</p>
+
+  <div class="callout">
+    <p><b>The rule:</b> before you can apply for production access, run a closed test with at least <b>12 testers</b> who have been opted in for the <b>last 14 days continuously</b>.</p>
+    <p><b>Who it applies to:</b> personal developer accounts created <b>after 13 November 2023</b>. Organization accounts and older personal accounts are exempt.</p>
+  </div>
+
+  <h2>Who actually has to do this</h2>
+  <p>This is a per-account rule, not a per-app policy for everyone. It only applies to <b>personal</b> developer accounts opened after 13 November 2023. If your account is registered as an organization (a legal business entity), or it's a personal account created before that date, you can publish straight to production without the closed-test gate. The requirement is a one-time unlock: once an account has earned production access through any qualifying app, you don't repeat the 14-day test for future updates to that same app — though each brand-new app on a gated account still needs its own qualifying closed test.</p>
+
+  <h2>Where the numbers come from</h2>
+  <p>When Google introduced the policy in late 2023 the threshold was 20 testers. On 11 December 2024 it was lowered to <b>12</b>, after developers pushed back that 20 committed testers was hard for solo devs to find. The 14-day duration never changed. That's why you'll still see older tutorials and videos saying "20 testers" — the count is out of date, but everything else about how those guides describe the process still holds.</p>
+
+  <h2>What "opted in for 14 days continuously" means</h2>
+  <p>Three details matter here, and getting any of them wrong resets your clock:</p>
+  <ul>
+    <li><b>Opted in, not just invited.</b> A tester counts only after they open your opt-in link and accept. Sending twelve invitations does nothing until twelve people actually join.</li>
+    <li><b>Twelve unique Google accounts on real devices.</b> Emulators, duplicate accounts and bot farms don't count and can flag your account for policy violations. Use real phones.</li>
+    <li><b>The window is continuous.</b> The count Google checks is how many testers have been opted in for the last 14 days without a gap. Opting out drops someone from the count; a tester who leaves and rejoins doesn't carry their earlier days forward.</li>
+  </ul>
+  <p class="note">Uninstalling the app is not the same as opting out — a tester opts out only through the testing web link. So an uninstall doesn't formally break your count, but see the engagement section below for why silent uninstalls still hurt you.</p>
+
+  <h2>How to set it up</h2>
+  <ol>
+    <li>Build and upload a <b>signed App Bundle</b> (<code>.aab</code>) to a closed testing track: <b>Test and release → Testing → Closed testing</b> in the Play Console.</li>
+    <li>Create a tester list — email addresses directly, or a Google Group you control — and add your 12+ people.</li>
+    <li>Finish the store listing and required policy sections so the release can be reviewed.</li>
+    <li>Submit the release. After Google approves it, share the <b>opt-in link</b> with your testers and have each one accept it.</li>
+    <li>Let the 14 days run with testers actively using the app, then apply for production from the dashboard.</li>
+  </ol>
+
+  <div class="callout">
+    <p>Recruit a <b>buffer above 12</b> — aim for 15 or more. If one or two people drift away or opt out mid-window, you don't want to slip under the line on day 13.</p>
+  </div>
+
+  <h2>Why apps still get rejected after 14 days</h2>
+  <p>This is the part that surprises people. Hitting "12 testers, 14 days" on paper doesn't guarantee approval, because Google also looks at <b>engagement</b>, not just installs. If twelve people install on day one and never open the app again, reviewers read that as testing that didn't really happen, and you get the dreaded "more testing required" reply. To avoid it:</p>
+  <ul>
+    <li>Ask testers to actually <b>open and use</b> the app across the two weeks, not just install it once.</li>
+    <li>Ship <b>two or three small updates</b> during the window — fix a minor bug, tweak a screen. It signals you're using the test for its purpose.</li>
+    <li>When you apply, the <b>production access questionnaire</b> asks what feedback you got and what you changed. Give specific answers; "the app is fine, no issues" is a common trigger for rejection.</li>
+  </ul>
+  <p>After you apply, Google reviews the submission and emails the account owner — usually within about 7 days, sometimes longer. If it comes back as insufficient, you keep testing and reapply.</p>
+
+  <h2>The short version</h2>
+  <div class="callout">
+    <p><b>12+ real testers</b>, opted in and engaged, for <b>14 continuous days</b>, then apply — with honest questionnaire answers and a couple of real updates along the way. Recruit extra, use real devices, and don't go silent for two weeks.</p>
+  </div>
+
+  <p class="note">Policy details and the current tester count can change; before a launch, confirm the specifics on Google's official Play Console Help page for testing requirements.</p>
+
+  <div class="related">
+    <p>Related: <a href="/android-app-bundle-missing-translations.html">Fix missing translations in an App Bundle</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a> · <a href="/admob-ecpm-calculator.html">AdMob eCPM &amp; revenue calculator</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
