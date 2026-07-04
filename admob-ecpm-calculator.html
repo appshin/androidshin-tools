@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdMob eCPM & Ad Revenue Calculator | Mr.AndroidShin</title>
+<meta name="description" content="Estimate mobile ad revenue and eCPM. Project daily, monthly and yearly earnings from DAU, impressions per user, fill rate and eCPM — and calculate eCPM from earnings and impressions. Free, no sign-up.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/admob-ecpm-calculator.html">
+<meta property="og:title" content="AdMob eCPM & Ad Revenue Calculator">
+<meta property="og:description" content="Project ad revenue from DAU, impressions and eCPM, and calculate eCPM from earnings.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- ADSENSE: paste your loader script here after approval -->
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+
+  .hero{padding:34px 0 6px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.5rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:62ch;margin:0 0 8px}
+
+  .section-label{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:26px 0 12px;display:flex;align-items:center;gap:12px}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:18px 18px 4px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:16px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .field .with{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+  .field .with .pre{display:flex;align-items:center;padding:0 12px;color:var(--muted);font-family:var(--mono);border-right:1px solid var(--line)}
+  .field input{width:100%;background:transparent;border:0;color:var(--text);font-family:var(--mono);font-size:1.15rem;padding:12px 14px;outline:none}
+  .field .suf{display:flex;align-items:center;padding:0 12px;color:var(--muted);font-family:var(--mono);border-left:1px solid var(--line)}
+  select{background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:var(--mono);font-size:1rem;padding:12px 14px;outline:none}
+  .curbar{display:flex;justify-content:flex-end;margin-bottom:14px}
+
+  .outs{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0 6px}
+  .out{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .out .label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .out .val{font-family:var(--mono);font-size:1.2rem;color:var(--text)}
+  .out.primary{border-color:var(--accent);background:linear-gradient(180deg,rgba(255,180,84,.07),transparent)}
+  .out.primary .val{color:var(--accent);font-size:1.5rem}
+  .copy{flex:none;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:.8rem;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .copy:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .copy.done{color:#7BE0A3;border-color:#7BE0A3}
+
+  .note{font-size:.8rem;color:var(--muted);margin:10px 2px 0;line-height:1.5}
+  .adslot{border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center;padding:14px;margin:26px 0;font-family:var(--mono);font-size:.75rem}
+
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin:20px 0 6px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+
+  @media (min-width:640px){.grid2{grid-template-columns:1fr 1fr}.outs{grid-template-columns:repeat(3,1fr)}.outs.two{grid-template-columns:1fr 1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Android · Monetization</p>
+    <h1>AdMob eCPM &amp; Revenue Calculator</h1>
+    <p class="sub">Project ad earnings from your traffic, or work out eCPM from earnings and impressions. Everything runs in your browser — no sign-up.</p>
+  </section>
+
+  <div class="curbar">
+    <label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-family:var(--mono);font-size:.85rem">
+      Currency
+      <select id="cur" aria-label="Currency symbol">
+        <option value="$" selected>$ USD</option>
+        <option value="₩">₩ KRW</option>
+        <option value="€">€ EUR</option>
+        <option value="£">£ GBP</option>
+        <option value="¥">¥ JPY</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="section-label">1 · Revenue projection</div>
+  <div class="panel">
+    <div class="grid2">
+      <div class="field">
+        <label for="dau">Daily active users (DAU)</label>
+        <div class="with"><input id="dau" type="number" min="0" step="100" value="1000" inputmode="numeric"></div>
+      </div>
+      <div class="field">
+        <label for="ipu">Ad impressions per user / day</label>
+        <div class="with"><input id="ipu" type="number" min="0" step="1" value="4" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="fill">Fill rate</label>
+        <div class="with"><input id="fill" type="number" min="0" max="100" step="1" value="100" inputmode="decimal"><span class="suf">%</span></div>
+      </div>
+      <div class="field">
+        <label for="ecpm">eCPM</label>
+        <div class="with"><span class="pre" id="cpre1">$</span><input id="ecpm" type="number" min="0" step="0.1" value="2.50" inputmode="decimal"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="outs">
+    <div class="out primary">
+      <div><div class="label">Daily revenue</div><div class="val" id="outDaily">$10.00</div></div>
+      <button class="copy" data-target="outDaily">Copy</button>
+    </div>
+    <div class="out">
+      <div><div class="label">Monthly (×30)</div><div class="val" id="outMonthly">$300.00</div></div>
+      <button class="copy" data-target="outMonthly">Copy</button>
+    </div>
+    <div class="out">
+      <div><div class="label">Yearly (×365)</div><div class="val" id="outYearly">$3,650.00</div></div>
+      <button class="copy" data-target="outYearly">Copy</button>
+    </div>
+  </div>
+  <p class="note" id="imprNote">Daily ad impressions: 4,000</p>
+
+  <!-- ADSENSE SLOT 1 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <div class="section-label">2 · Calculate eCPM</div>
+  <div class="panel">
+    <div class="grid2">
+      <div class="field">
+        <label for="earn">Estimated earnings</label>
+        <div class="with"><span class="pre" id="cpre2">$</span><input id="earn" type="number" min="0" step="0.01" value="50" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label for="impr">Ad impressions</label>
+        <div class="with"><input id="impr" type="number" min="0" step="100" value="20000" inputmode="numeric"></div>
+      </div>
+    </div>
+  </div>
+  <div class="outs two">
+    <div class="out primary">
+      <div><div class="label">eCPM</div><div class="val" id="outEcpm">$2.50</div></div>
+      <button class="copy" data-target="outEcpm">Copy</button>
+    </div>
+    <div class="out">
+      <div><div class="label">Revenue per 1,000 impressions</div><div class="val" id="outRpm">$2.50</div></div>
+      <button class="copy" data-target="outRpm">Copy</button>
+    </div>
+  </div>
+
+  <!-- ADSENSE SLOT 2 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <section class="content">
+    <h2>What eCPM means</h2>
+    <p><b>eCPM</b> (effective cost per mille) is the estimated earnings for every 1,000 ad impressions. It rolls up all ad formats and pricing models — including impression-based and click-based ads — into one comparable number. The formula is simple:</p>
+    <p><code>eCPM = (earnings ÷ impressions) × 1000</code></p>
+    <p>And to project revenue from traffic:</p>
+    <p><code>revenue = impressions × eCPM ÷ 1000</code></p>
+    <p>where <code>impressions = DAU × impressions per user × fill rate</code>.</p>
+
+    <h3>A realistic word of caution</h3>
+    <p>These figures are planning estimates, not guarantees. Real eCPM swings widely with the user's country, the ad format (rewarded and interstitial usually pay more than banners), seasonality (Q4 is higher), fill rate, and mediation setup. Traffic from the US and Western Europe typically earns several times more per impression than traffic from many other regions. Treat the output as a range, and validate against your actual AdMob reports.</p>
+
+    <h3>Tips to raise eCPM</h3>
+    <ul>
+      <li>Use higher-value formats (rewarded, native, interstitial) where they fit the experience.</li>
+      <li>Add mediation so multiple networks compete for each impression.</li>
+      <li>Keep fill rate high and place ads where they are actually viewable.</li>
+      <li>Segment by geography — the same app can have very different eCPM per country.</li>
+    </ul>
+
+    <h2>FAQ</h2>
+    <details><summary>What's the difference between eCPM and RPM?</summary><p>They are calculated the same way — earnings per 1,000 units — but RPM (page/session RPM) is often used for web/pages, while eCPM is the standard term for ad impressions in apps.</p></details>
+    <details><summary>Is fill rate the same as impressions?</summary><p>No. Fill rate is the share of ad requests that actually return an ad. If you request 5,000 ads and 4,500 are filled, the fill rate is 90%. Only filled ads become impressions.</p></details>
+    <details><summary>Why is my real revenue different from this estimate?</summary><p>Because eCPM is not fixed. It changes daily with demand, geography, format and season. Use your own recent eCPM from AdMob for the closest projection.</p></details>
+    <details><summary>Does this tool send my numbers anywhere?</summary><p>No. All math runs locally in your browser and nothing is uploaded.</p></details>
+  </section>
+
+  <!-- ADSENSE SLOT 3 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var cur=$('cur');
+  function sym(){return cur.value;}
+  function money(n){
+    if(!isFinite(n)) return '—';
+    return sym()+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function intf(n){return isFinite(n)?Math.round(n).toLocaleString():'—';}
+  function num(id){var v=parseFloat($(id).value);return isNaN(v)?0:v;}
+  function set(id,v){$(id).textContent=v;}
+
+  function calc(){
+    // currency prefixes
+    $('cpre1').textContent=sym(); $('cpre2').textContent=sym();
+    // projection
+    var dau=num('dau'), ipu=num('ipu'), fill=num('fill')/100, ecpm=num('ecpm');
+    var dailyImpr=dau*ipu*fill;
+    var daily=dailyImpr*ecpm/1000;
+    set('outDaily',money(daily));
+    set('outMonthly',money(daily*30));
+    set('outYearly',money(daily*365));
+    $('imprNote').textContent='Daily ad impressions: '+intf(dailyImpr);
+    // eCPM calc
+    var earn=num('earn'), impr=num('impr');
+    var e = impr>0 ? earn/impr*1000 : NaN;
+    set('outEcpm',money(e));
+    set('outRpm',money(e));
+  }
+  ['dau','ipu','fill','ecpm','earn','impr'].forEach(function(id){$(id).addEventListener('input',calc);});
+  cur.addEventListener('change',calc);
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var t=$(btn.dataset.target).textContent;
+      navigator.clipboard.writeText(t).then(function(){
+        var o=btn.textContent;btn.textContent='Copied';btn.classList.add('done');
+        setTimeout(function(){btn.textContent=o;btn.classList.remove('done');},1200);
+      });
+    });
+  });
+  $('yr').textContent=new Date().getFullYear();
+  calc();
+})();
+</script>
+</body>
+</html>
