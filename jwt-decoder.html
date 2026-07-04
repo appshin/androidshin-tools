@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JWT Decoder — read header &amp; payload | Mr.AndroidShin</title>
+<meta name="description" content="Decode a JSON Web Token (JWT) in your browser to read its header and payload, with expiry and issued-at times shown as readable dates. Runs locally, nothing is sent to a server.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/jwt-decoder.html">
+<meta property="og:title" content="JWT Decoder — read header & payload">
+<meta property="og:description" content="Decode a JWT's header and payload locally in your browser. No upload.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- ADSENSE: paste your loader script here after approval -->
+<style>
+  :root{--bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;--text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;--ok:#7BE0A3;--err:#FF7B7B;--radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 6px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.5rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:62ch;margin:0 0 14px}
+  .warn{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:12px 14px;margin:0 0 16px;color:var(--text);font-size:.9rem}
+  textarea{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--line);border-radius:14px;color:var(--text);font-family:var(--mono);font-size:.9rem;line-height:1.5;padding:14px;outline:none;resize:vertical;word-break:break-all}
+  textarea:focus{border-color:var(--accent)}
+  .toolbar{display:flex;gap:8px;margin:12px 0}
+  .btn{background:var(--surface2);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:.85rem;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .status{font-family:var(--mono);font-size:.85rem;margin:6px 2px;min-height:1.2em}
+  .status.err{color:var(--err)}
+  .part{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+  .part h3{font-family:var(--disp);font-weight:600;font-size:1rem;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .chip{font-family:var(--mono);font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}
+  .chip.h{color:#C99BFF;border-color:#C99BFF}.chip.p{color:var(--accent-2);border-color:var(--accent-2)}.chip.s{color:var(--muted)}
+  pre{margin:0;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;white-space:pre-wrap;word-break:break-word;line-height:1.5}
+  .times{margin-top:10px;border-top:1px solid var(--line);padding-top:10px;font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+  .times b{color:var(--text)}
+  .exp-ok{color:var(--ok)}.exp-bad{color:var(--err)}
+  .adslot{border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center;padding:14px;margin:26px 0;font-family:var(--mono);font-size:.75rem}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+  <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Dev · Auth</p>
+    <h1>JWT Decoder</h1>
+    <p class="sub">Paste a JSON Web Token to read its header and payload. Decoding runs entirely in your browser.</p>
+    <div class="warn">This tool <b>decodes</b> a token — it does not verify the signature (that needs your secret). Decoding is not decryption: anyone can read a JWT payload. Don't paste production tokens you wouldn't want visible on your screen.</div>
+
+    <textarea id="jwt" spellcheck="false" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiJTaGluIiwiaWF0IjoxNzUxNjAwMDAwLCJleHAiOjE3NTE2MDM2MDB9.signature"></textarea>
+    <div class="toolbar">
+      <button class="btn" id="paste">Paste</button>
+      <button class="btn" id="sample">Sample</button>
+      <button class="btn" id="clear">Clear</button>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div id="out"></div>
+  </section>
+
+  <!-- ADSENSE SLOT 1 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <section class="content">
+    <h2>What a JWT contains</h2>
+    <p>A JSON Web Token has three parts separated by dots: <code>header.payload.signature</code>. The header and payload are Base64URL-encoded JSON — readable by anyone. The signature is what proves the token wasn't tampered with, and verifying it requires the signing key. This tool shows you the first two parts and leaves the signature untouched.</p>
+    <h2>Common payload claims</h2>
+    <ul>
+      <li><code>sub</code> — subject (usually the user ID)</li>
+      <li><code>iat</code> — issued-at time (Unix seconds)</li>
+      <li><code>exp</code> — expiry time (Unix seconds)</li>
+      <li><code>nbf</code> — not-valid-before time</li>
+      <li><code>iss</code> / <code>aud</code> — issuer and audience</li>
+    </ul>
+    <h2>FAQ</h2>
+    <details><summary>Is my token sent anywhere?</summary><p>No. The token is decoded locally in your browser and never leaves the page.</p></details>
+    <details><summary>Why isn't the signature verified?</summary><p>Verification requires the secret or public key that signed the token, which only your backend should hold. This tool intentionally stays a decoder.</p></details>
+    <details><summary>Can I read an encrypted JWT (JWE)?</summary><p>No. Standard JWTs are signed, not encrypted, so their payload is readable. A JWE is encrypted and cannot be read without the key.</p></details>
+  </section>
+
+  <!-- ADSENSE SLOT 2 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+</main>
+
+<footer><div class="wrap foot">
+  <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+  <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+</div></footer>
+
+<script>
+(function(){
+  var jwt=document.getElementById('jwt'), out=document.getElementById('out'), status=document.getElementById('status');
+  function b64urlToJson(seg){
+    var s=seg.replace(/-/g,'+').replace(/_/g,'/');
+    while(s.length%4)s+='=';
+    var bin=atob(s);
+    var utf8=decodeURIComponent(bin.split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join(''));
+    return JSON.parse(utf8);
+  }
+  function fmtTime(sec){
+    var d=new Date(sec*1000);
+    return d.toLocaleString()+'  ·  '+d.toUTCString();
+  }
+  function block(cls,label,obj){
+    return '<div class="part"><h3><span class="chip '+cls+'">'+label+'</span></h3><pre>'+
+      escapeHtml(JSON.stringify(obj,null,2))+'</pre></div>';
+  }
+  function escapeHtml(s){return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function decode(){
+    var t=jwt.value.trim();
+    out.innerHTML=''; status.className='status'; status.textContent='';
+    if(!t){return;}
+    var parts=t.split('.');
+    if(parts.length<2){status.className='status err';status.textContent='✗ Not a JWT — expected header.payload.signature';return;}
+    var html='';
+    try{ html+=block('h','HEADER', b64urlToJson(parts[0])); }
+    catch(e){status.className='status err';status.textContent='✗ Header is not valid Base64URL JSON';return;}
+    var payload;
+    try{ payload=b64urlToJson(parts[1]); html+=block('p','PAYLOAD', payload); }
+    catch(e){status.className='status err';status.textContent='✗ Payload is not valid Base64URL JSON';return;}
+    // times
+    var now=Math.floor(Date.now()/1000), tlines='';
+    if(payload.iat) tlines+='<div><b>iat</b> (issued): '+fmtTime(payload.iat)+'</div>';
+    if(payload.nbf) tlines+='<div><b>nbf</b> (not before): '+fmtTime(payload.nbf)+'</div>';
+    if(payload.exp){
+      var expired=payload.exp<now;
+      tlines+='<div><b>exp</b> (expires): '+fmtTime(payload.exp)+' <span class="'+(expired?'exp-bad':'exp-ok')+'">'+(expired?'· EXPIRED':'· valid')+'</span></div>';
+    }
+    if(tlines) html+='<div class="part"><div class="times">'+tlines+'</div></div>';
+    // signature
+    html+='<div class="part"><h3><span class="chip s">SIGNATURE</span></h3><pre>'+(parts[2]?escapeHtml(parts[2]):'(none)')+'\n\n<span style="color:var(--muted)">Not verified — verification needs the signing key.</span></pre></div>';
+    out.innerHTML=html;
+  }
+  jwt.addEventListener('input',decode);
+  document.getElementById('paste').addEventListener('click',function(){
+    if(navigator.clipboard&&navigator.clipboard.readText){navigator.clipboard.readText().then(function(t){jwt.value=t;decode();});}
+  });
+  document.getElementById('sample').addEventListener('click',function(){
+    jwt.value='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiJNci5BbmRyb2lkU2hpbiIsImlhdCI6MTc1MTYwMDAwMCwiZXhwIjoxNzUxNjAzNjAwfQ.abc123signature';
+    decode();
+  });
+  document.getElementById('clear').addEventListener('click',function(){jwt.value='';decode();jwt.focus();});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
