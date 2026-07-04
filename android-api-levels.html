@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android API Level ↔ Version ↔ Codename Lookup | Mr.AndroidShin</title>
+<meta name="description" content="Searchable Android API level reference: map any API level to its Android version, codename, and Build.VERSION_CODES constant — from API 19 up to API 37 (Android 17, Cinnamon Bun). Free, no sign-up.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/android-api-levels.html">
+<meta property="og:title" content="Android API Level ↔ Version ↔ Codename Lookup">
+<meta property="og:description" content="Map any Android API level to its version, codename and VERSION_CODES constant. Searchable.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- ADSENSE: paste your loader script here after approval -->
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 6px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.5rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:62ch;margin:0 0 20px}
+  .search{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:var(--mono);font-size:1.05rem;padding:13px 16px;outline:none;margin-bottom:16px}
+  .search:focus{border-color:var(--accent)}
+  .tablewrap{border:1px solid var(--line);border-radius:var(--radius);overflow:auto;background:var(--surface)}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.9rem;min-width:560px}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--muted);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;background:var(--surface2)}
+  td.api{color:var(--accent);font-weight:700}
+  td.code{color:var(--text)}
+  .const{color:var(--accent-2)}
+  .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted)}
+  .tag.latest{color:#7BE0A3;border-color:#7BE0A3}
+  tr:hover td{background:rgba(124,197,255,.05)}
+  .empty{padding:20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.9rem}
+  .adslot{border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center;padding:14px;margin:26px 0;font-family:var(--mono);font-size:.75rem}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Android · Reference</p>
+    <h1>API Level ↔ Version ↔ Codename</h1>
+    <p class="sub">Type an API level, an Android version, or a codename to find the match — including the <code>Build.VERSION_CODES</code> constant you use in code. Current through API 37 (Android 17, Cinnamon Bun).</p>
+    <input class="search" id="q" type="search" placeholder="Search: 34, Android 14, Tiramisu, UPSIDE_DOWN_CAKE…" aria-label="Search API levels" autocomplete="off">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>API</th><th>Android</th><th>Codename</th><th>VERSION_CODES</th><th>Year</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>No match. Try an API number, version, or codename.</div>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT 1 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <section class="content">
+    <h2>How API levels work</h2>
+    <p>Every Android platform release has an integer <b>API level</b> that identifies its framework revision. You reference it in <code>build.gradle</code> through <code>minSdk</code>, <code>targetSdk</code> and <code>compileSdk</code>, and in code through <code>Build.VERSION.SDK_INT</code> compared against a <code>Build.VERSION_CODES</code> constant. For example, an Android 14 check reads <code>if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)</code>.</p>
+    <p>Google retired public dessert names after Android 9 (Pie), but AOSP kept the alphabetical codenames internally — Quince Tart, Red Velvet Cake, Snow Cone, Tiramisu, Upside Down Cake, Vanilla Ice Cream, Baklava, Cinnamon Bun.</p>
+
+    <h2>FAQ</h2>
+    <details><summary>What API level is Android 14?</summary><p>API level 34, codename Upside Down Cake, constant <code>UPSIDE_DOWN_CAKE</code>.</p></details>
+    <details><summary>What is the latest Android API level?</summary><p>API 37 — Android 17, internal codename Cinnamon Bun — which reached stable in June 2026. API 36 is Android 16 (Baklava).</p></details>
+    <details><summary>What minSdk should I choose?</summary><p>It's a trade-off between reach and maintenance. Many teams sit around API 24–26 today; check current device distribution and see the <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk guide</a>.</p></details>
+  </section>
+
+  <!-- ADSENSE SLOT 2 -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // [api, android, codename, VERSION_CODES, year, isLatest]
+  var data=[
+    [37,'Android 17','Cinnamon Bun','—','2026',true],
+    [36,'Android 16','Baklava','BAKLAVA','2025',false],
+    [35,'Android 15','Vanilla Ice Cream','VANILLA_ICE_CREAM','2024',false],
+    [34,'Android 14','Upside Down Cake','UPSIDE_DOWN_CAKE','2023',false],
+    [33,'Android 13','Tiramisu','TIRAMISU','2022',false],
+    [32,'Android 12L','Snow Cone v2','S_V2','2022',false],
+    [31,'Android 12','Snow Cone','S','2021',false],
+    [30,'Android 11','Red Velvet Cake','R','2020',false],
+    [29,'Android 10','Quince Tart','Q','2019',false],
+    [28,'Android 9','Pie','P','2018',false],
+    [27,'Android 8.1','Oreo','O_MR1','2017',false],
+    [26,'Android 8.0','Oreo','O','2017',false],
+    [25,'Android 7.1','Nougat','N_MR1','2016',false],
+    [24,'Android 7.0','Nougat','N','2016',false],
+    [23,'Android 6.0','Marshmallow','M','2015',false],
+    [22,'Android 5.1','Lollipop','LOLLIPOP_MR1','2015',false],
+    [21,'Android 5.0','Lollipop','LOLLIPOP','2014',false],
+    [19,'Android 4.4','KitKat','KITKAT','2013',false]
+  ];
+  var rows=document.getElementById('rows'), empty=document.getElementById('empty'), q=document.getElementById('q');
+  function render(f){
+    f=(f||'').trim().toLowerCase();
+    rows.innerHTML='';var n=0;
+    data.forEach(function(d){
+      var hay=(d[0]+' '+d[1]+' '+d[2]+' '+d[3]+' '+d[4]).toLowerCase();
+      if(f && hay.indexOf(f)===-1) return;
+      n++;
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td class="api">'+d[0]+(d[5]?' <span class="tag latest">latest</span>':'')+'</td>'+
+                   '<td class="code">'+d[1]+'</td>'+
+                   '<td>'+d[2]+'</td>'+
+                   '<td class="const">'+d[3]+'</td>'+
+                   '<td class="mult">'+d[4]+'</td>';
+      rows.appendChild(tr);
+    });
+    empty.hidden=n>0;
+  }
+  q.addEventListener('input',function(){render(q.value);});
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  render('');
+})();
+</script>
+</body>
+</html>

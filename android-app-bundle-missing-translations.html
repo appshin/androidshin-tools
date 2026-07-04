@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fix missing translations in an Android App Bundle | Mr.AndroidShin</title>
+<meta name="description" content="Strings show in English instead of the device language after switching to an Android App Bundle (AAB)? Here's why language splitting causes it and how to fix it with bundle.language.enableSplit.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/android-app-bundle-missing-translations.html">
+<meta property="og:title" content="Fix missing translations in an Android App Bundle">
+<meta property="og:description" content="Why AAB language splitting hides your translations, and how to fix it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- ADSENSE: paste your loader script here after approval -->
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.4rem);line-height:1.14;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:32px 0 8px;letter-spacing:-.01em}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · App Bundle</p>
+  <h1>Fix missing translations in an Android App Bundle</h1>
+
+  <p>You shipped a fully translated app for years as an APK. You switch to the Android App Bundle (AAB) that Google Play now requires, and suddenly testers report the app showing English on a Korean or Spanish device — even though the <code>values-ko</code> and <code>values-es</code> resources are right there in the project. Nothing is wrong with your translations. This is language splitting.</p>
+
+  <h2>Why it happens</h2>
+  <p>An App Bundle lets Google Play generate optimized APKs per device, and one of the dimensions it splits on is language. With splitting on, Play delivers only the language resources that match the device's system language at install time, as separate configuration splits. That is exactly what makes downloads smaller. The problem shows up when a language split is not delivered or activated the way you expect — for example, when the device language isn't one Play chose to install, or when your setup or a sideloaded/universal build doesn't pull the split. The result: the app falls back to the default (usually English) even though the translation exists in your source.</p>
+
+  <h2>The fix: turn off language splitting</h2>
+  <p>If you'd rather ship every language inside the base APK — so translations are always present regardless of how the app is delivered — disable the language split in your module's <code>build.gradle</code>:</p>
+
+<pre>android {
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+}</pre>
+
+  <div class="callout">
+    <p>With <code>enableSplit = false</code>, all languages are bundled together and every user gets the full set of translations. The trade-off is a slightly larger download, since unused languages ship too.</p>
+  </div>
+
+  <h2>When to use it</h2>
+  <ul>
+    <li><b>Use it</b> when your app is small, your translations are just strings (not heavy assets), and reliable localization matters more than shaving a few hundred kilobytes.</li>
+    <li><b>Think twice</b> if you localize large assets per language; there, keeping splits on genuinely reduces size, and it's better to solve the delivery issue than to bundle everything.</li>
+  </ul>
+
+  <h2>Verify the fix</h2>
+  <ol>
+    <li>Rebuild the AAB after adding the config.</li>
+    <li>Generate the APKs Play would serve and inspect them, or test through Play's internal testing track rather than a raw universal APK.</li>
+    <li>Switch the test device's system language and confirm the UI follows.</li>
+  </ol>
+  <p>If translations now appear across languages without depending on which split got installed, the change worked. Keep the setting in version control so a future bundle rebuild doesn't silently re-enable splitting.</p>
+
+  <h2>A note on testing sideloaded builds</h2>
+  <p>A universal APK built from a bundle behaves differently from Play-delivered splits. If you only ever test a sideloaded build, you may see a language issue that real Play installs don't have — or miss one that they do. Test the way users actually receive the app: through a Play testing track.</p>
+
+  <div class="related">
+    <p>Related: <a href="/android-api-levels.html">Android API level lookup</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>minSdk vs targetSdk vs compileSdk, explained | Mr.AndroidShin</title>
+<meta name="description" content="A clear, practical explanation of minSdk, targetSdk and compileSdk in Android Gradle: what each one controls, how they differ, and how to choose sensible values.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/minsdk-targetsdk-compilesdk.html">
+<meta property="og:title" content="minSdk vs targetSdk vs compileSdk, explained">
+<meta property="og:description" content="What each SDK setting controls in Android Gradle, and how to choose values.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- ADSENSE: paste your loader script here after approval -->
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · Gradle</p>
+  <h1>minSdk vs targetSdk vs compileSdk, explained</h1>
+
+  <p>These three settings sit a few lines apart in your module's <code>build.gradle</code>, they all take an API level, and they are constantly confused for one another. They answer three completely different questions. Here is the short version, then the detail.</p>
+
+  <div class="callout">
+    <p><b>minSdk</b> = the oldest Android that can install your app. <b>targetSdk</b> = the newest Android whose behaviors you've tested and opted into. <b>compileSdk</b> = the SDK version your code is built against.</p>
+  </div>
+
+<pre>android {
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 24
+        targetSdk = 36
+    }
+}</pre>
+
+  <h2>compileSdk — what you build against</h2>
+  <p>compileSdk is the version of the Android SDK the compiler uses. It decides which APIs your code can even see and call. If you want to reference an API introduced in Android 16, your compileSdk must be at least 36. It has no direct effect on which devices can run the app, and it is never shipped inside the APK — it is purely a build-time setting. The practical rule: keep compileSdk on the latest stable API so you can use current APIs and get up-to-date lint checks. It should be greater than or equal to targetSdk.</p>
+
+  <h2>targetSdk — the behaviors you opted into</h2>
+  <p>targetSdk tells the system, "I have tested my app against the behavior changes up to this API level." Android uses it for backward compatibility: when your app runs on a device newer than your targetSdk, the OS may keep older behaviors so nothing breaks. When you raise targetSdk, you take on the behavior changes of every version up to it — new permission models, background limits, and so on — which is why bumping it needs testing, not just a number change.</p>
+  <p>targetSdk is also the value Google Play enforces. Play requires apps to target a recent API level to be published or updated, on an annual schedule tied to the latest major release. Because the exact required level and deadline move each year, check the current Google Play target API level requirement before a release rather than trusting a fixed number.</p>
+
+  <h2>minSdk — the floor for installation</h2>
+  <p>minSdk is the lowest API level a device can have and still install your app. Set it too low and you support ancient devices at the cost of extra compatibility work and larger code; set it too high and you exclude real users. This is a reach-versus-effort decision: check the current device version distribution for your audience, then pick the lowest level that still covers a worthwhile share without dragging down maintenance. Many teams today sit somewhere around API 24–26, but the right floor depends on your market.</p>
+
+  <h2>How they relate</h2>
+  <ul>
+    <li><code>minSdk ≤ targetSdk ≤ compileSdk</code> — this ordering should always hold.</li>
+    <li>compileSdk and targetSdk are usually the same on an up-to-date app; minSdk sits lower.</li>
+    <li>Calling an API above minSdk is fine — just guard it with a version check (<code>Build.VERSION.SDK_INT</code>) or an annotation so older devices don't crash.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Rule of thumb: <b>compileSdk = latest stable</b>, <b>targetSdk = latest stable you've tested</b>, <b>minSdk = as low as your audience needs</b>.</p>
+  </div>
+
+  <div class="related">
+    <p>Related: <a href="/android-api-levels.html">Android API level ↔ version ↔ codename lookup</a> · <a href="/dp-sp-px-converter.html">dp / sp / px converter</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
