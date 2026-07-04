@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://androidshin.dev/sitemap.xml
