@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android Dev Tools — Jetpack Compose, AdMob & Gradle helpers | Mr.AndroidShin</title>
+<meta name="description" content="Fast, no-signup tools and guides for Android developers: Jetpack Compose color converter, dp/sp/px, AdMob revenue estimator, Gradle version checks and more. Built by a solo Android developer.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://REPLACE-WITH-YOUR-DOMAIN/">
+
+<meta property="og:title" content="Android Dev Tools — Mr.AndroidShin">
+<meta property="og:description" content="Free tools and guides for Android & Jetpack Compose developers. No sign-up.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     ADSENSE: paste your loader script here after approval, e.g.
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+     ============================================================ -->
+
+<style>
+  :root{
+    --bg:#0B0E14; --surface:#151A24; --surface2:#1E2531; --line:#2A3444;
+    --text:#E7EAF0; --muted:#8B94A7; --accent:#FFB454; --accent-2:#7CC5FF;
+    --radius:16px; --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;
+    --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}
+  nav a:hover{color:var(--text);text-decoration:none}
+
+  .hero{padding:48px 0 26px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5.4vw,3rem);line-height:1.08;margin:0 0 14px}
+  .hero p{color:var(--muted);max-width:58ch;margin:0;font-size:1.05rem}
+
+  .section-label{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:34px 0 14px;display:flex;align-items:center;gap:12px}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .card{
+    display:block;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;transition:border-color .15s, transform .15s;color:var(--text);
+  }
+  a.card:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px)}
+  .card .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .card h3{font-family:var(--disp);font-weight:600;font-size:1.18rem;margin:0 0 6px;letter-spacing:-.01em}
+  .card p{color:var(--muted);margin:0;font-size:.92rem}
+  .card.soon{opacity:.62}
+  .pill{font-family:var(--mono);font-size:.62rem;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted);letter-spacing:.08em}
+  .pill.live{color:#7BE0A3;border-color:#7BE0A3}
+
+  .adslot{border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center;padding:14px;margin:30px 0;font-family:var(--mono);font-size:.75rem}
+
+  .about{padding:10px 0 40px}
+  .about h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:24px 0 8px}
+  .about p{color:#C7CDDA}
+  .about code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+
+  @media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="brand">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></div>
+    <nav>
+      <a href="#tools">Tools</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <p class="eyebrow">By a solo Android developer</p>
+    <h1>Small, fast tools for<br>Android &amp; Jetpack Compose.</h1>
+    <p>No sign-up, no clutter. Convert colors, size up your builds, and sort out Gradle versions — the everyday chores, done in one tap. Built and battle-tested while shipping real apps to Google Play.</p>
+  </section>
+
+  <div class="section-label" id="tools">Live tools</div>
+  <div class="grid">
+    <a class="card" href="/compose-color-converter.html">
+      <div class="k"><span class="pill live">Live</span> Color</div>
+      <h3>Jetpack Compose Color Converter</h3>
+      <p>HEX to <code style="color:var(--accent)">Color(0xFF…)</code>, plus XML, RGBA, HSL, an alpha slider and a WCAG contrast check.</p>
+    </a>
+  </div>
+
+  <!-- ADSENSE SLOT (between sections) -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <div class="section-label">Coming soon</div>
+  <div class="grid">
+    <div class="card soon">
+      <div class="k"><span class="pill">Soon</span> Layout</div>
+      <h3>dp / sp / px Converter</h3>
+      <p>Convert between density-independent units across every screen density bucket.</p>
+    </div>
+    <div class="card soon">
+      <div class="k"><span class="pill">Soon</span> Revenue</div>
+      <h3>AdMob eCPM Estimator</h3>
+      <p>Estimate ad revenue from impressions, fill rate and eCPM by region.</p>
+    </div>
+    <div class="card soon">
+      <div class="k"><span class="pill">Soon</span> Build</div>
+      <h3>AGP · Kotlin · Compose Version Check</h3>
+      <p>Find a compatible set of Gradle plugin, Kotlin and Compose compiler versions.</p>
+    </div>
+    <div class="card soon">
+      <div class="k"><span class="pill">Soon</span> Reference</div>
+      <h3>API Level ↔ Version Lookup</h3>
+      <p>Map an Android API level to its version number and codename, and back.</p>
+    </div>
+  </div>
+
+  <section class="about">
+    <h2>Why these tools exist</h2>
+    <p>Every one of these started as a chore I hit while building and publishing my own Android apps — pasting a hex into a <code>Color(0xFF…)</code> literal, checking whether a color passed contrast, working out which Kotlin version a Compose compiler wants. Instead of searching each time, I turned them into small single-purpose pages that load fast, run entirely in your browser, and never ask you to sign in. New tools land here as I build them.</p>
+  </section>
+
+  <!-- ADSENSE SLOT (end) -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

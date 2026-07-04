@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jetpack Compose Color Converter — Hex to Color(0xFF…) | Mr.AndroidShin</title>
+<meta name="description" content="Convert any HEX color to a Jetpack Compose Color(0xFF…) value instantly. Also outputs Android XML, RGB, RGBA and HSL, with an alpha slider, live preview and a WCAG contrast check. Free, no sign-up.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://REPLACE-WITH-YOUR-DOMAIN/compose-color-converter.html">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Jetpack Compose Color Converter — Hex to Color(0xFF…)">
+<meta property="og:description" content="Paste a HEX color, copy the Jetpack Compose Color(0xFF…) value. Plus XML, RGB, HSL, alpha and a contrast check.">
+<meta property="og:type" content="website">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     ADSENSE: paste your loader script here after approval, e.g.
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+     ============================================================ -->
+
+<style>
+  :root{
+    --bg:#0B0E14; --surface:#151A24; --surface2:#1E2531; --line:#2A3444;
+    --text:#E7EAF0; --muted:#8B94A7; --accent:#FFB454; --accent-2:#7CC5FF;
+    --radius:16px; --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;
+    --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--text);font-family:var(--body);
+    line-height:1.6;font-size:16px;
+  }
+  a{color:var(--accent-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+  /* header */
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}
+  nav a:hover{color:var(--text);text-decoration:none}
+
+  /* hero tool */
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:60ch;margin:0 0 24px}
+
+  /* the signature: a live color stage that becomes the chosen color */
+  .stage{
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    display:grid;grid-template-columns:1fr;background:var(--surface);
+  }
+  .swatch{
+    min-height:190px;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:18px 20px;transition:background-color .18s ease, color .18s ease;gap:12px;flex-wrap:wrap;
+  }
+  .swatch .tag{font-family:var(--mono);font-size:.82rem;opacity:.85}
+  .contrast{font-family:var(--mono);font-size:.82rem;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .contrast b{font-weight:700}
+  .badge{border:1px solid currentColor;border-radius:999px;padding:2px 9px;font-size:.72rem}
+
+  .controls{padding:18px 20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .hexfield{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px;flex:1;min-width:210px}
+  .hexfield span{font-family:var(--mono);color:var(--muted);font-size:1.1rem}
+  .hexfield input{
+    background:transparent;border:0;color:var(--text);font-family:var(--mono);font-size:1.15rem;
+    padding:12px 8px;width:100%;letter-spacing:.06em;text-transform:uppercase;outline:none;
+  }
+  input[type=color]{
+    -webkit-appearance:none;appearance:none;width:52px;height:48px;border:1px solid var(--line);
+    border-radius:12px;background:transparent;cursor:pointer;padding:4px;
+  }
+  input[type=color]::-webkit-color-swatch{border:0;border-radius:8px}
+  input[type=color]::-moz-color-swatch{border:0;border-radius:8px}
+
+  .alpha{display:flex;align-items:center;gap:10px;width:100%;font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+  .alpha input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+  .alpha output{color:var(--text);min-width:44px;text-align:right}
+
+  /* outputs */
+  .outs{display:grid;grid-template-columns:1fr;gap:12px;margin:22px 0 6px}
+  .out{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .out .label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .out .val{font-family:var(--mono);font-size:1rem;color:var(--text);word-break:break-all}
+  .out.primary{border-color:var(--accent);background:linear-gradient(180deg,rgba(255,180,84,.07),transparent)}
+  .out.primary .val{color:var(--accent)}
+  .copy{
+    flex:none;background:var(--surface2);border:1px solid var(--line);color:var(--text);
+    font-family:var(--mono);font-size:.8rem;padding:8px 12px;border-radius:9px;cursor:pointer;transition:.15s;
+  }
+  .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .copy:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .copy.done{color:#7BE0A3;border-color:#7BE0A3}
+
+  /* ad slot */
+  .adslot{border:1px dashed var(--line);border-radius:12px;color:var(--muted);
+    text-align:center;padding:14px;margin:26px 0;font-family:var(--mono);font-size:.75rem}
+
+  /* content */
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin:20px 0 6px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+
+  @media (min-width:640px){
+    .outs{grid-template-columns:1fr 1fr}
+    .out.primary{grid-column:1 / -1}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="brand">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></div>
+    <nav>
+      <a href="#tool">Tool</a>
+      <a href="#learn">Guide</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="tool">
+    <p class="eyebrow">Android · Jetpack Compose</p>
+    <h1>Jetpack Compose Color Converter</h1>
+    <p class="sub">Paste a HEX value and copy the exact <code style="color:var(--accent)">Color(0xFF…)</code> you drop into Compose. Get XML, RGB, RGBA and HSL too — with an alpha slider, live preview and a WCAG contrast check.</p>
+
+    <div class="stage">
+      <div class="swatch" id="swatch" style="background:#3DDC84;color:#04120A">
+        <span class="tag" id="swatchHex">#3DDC84</span>
+        <div class="contrast" id="contrast"></div>
+      </div>
+
+      <div class="controls">
+        <label class="hexfield" aria-label="HEX color value">
+          <span>#</span>
+          <input id="hex" value="3DDC84" maxlength="8" inputmode="text" autocomplete="off" spellcheck="false" aria-label="Enter HEX color">
+        </label>
+        <input type="color" id="picker" value="#3DDC84" aria-label="Pick a color">
+        <div class="alpha">
+          <label for="alpha">Alpha</label>
+          <input type="range" id="alpha" min="0" max="100" value="100" aria-label="Alpha percentage">
+          <output id="alphaOut">100%</output>
+        </div>
+      </div>
+    </div>
+
+    <div class="outs" id="outs">
+      <div class="out primary">
+        <div>
+          <div class="label">Jetpack Compose</div>
+          <div class="val" id="outCompose">Color(0xFF3DDC84)</div>
+        </div>
+        <button class="copy" data-target="outCompose">Copy</button>
+      </div>
+      <div class="out">
+        <div>
+          <div class="label">Android XML</div>
+          <div class="val" id="outXml">#FF3DDC84</div>
+        </div>
+        <button class="copy" data-target="outXml">Copy</button>
+      </div>
+      <div class="out">
+        <div>
+          <div class="label">Compose (floats)</div>
+          <div class="val" id="outFloat">Color(0.24f, 0.86f, 0.52f, 1f)</div>
+        </div>
+        <button class="copy" data-target="outFloat">Copy</button>
+      </div>
+      <div class="out">
+        <div>
+          <div class="label">RGBA</div>
+          <div class="val" id="outRgba">rgba(61, 220, 132, 1)</div>
+        </div>
+        <button class="copy" data-target="outRgba">Copy</button>
+      </div>
+      <div class="out">
+        <div>
+          <div class="label">HSL</div>
+          <div class="val" id="outHsl">hsl(146, 70%, 55%)</div>
+        </div>
+        <button class="copy" data-target="outHsl">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT 1 (in-content, below the fold of the tool) -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+  <section class="content" id="learn">
+    <h2>How the conversion works</h2>
+    <p>Jetpack Compose stores a color as a single packed integer written in <b>ARGB</b> order: alpha first, then red, green and blue. That is why a Compose color literal looks like <code>Color(0xFFRRGGBB)</code> — the leading <code>FF</code> is the alpha channel at full opacity. If you only have a standard 6‑digit web hex like <code>#3DDC84</code>, you prepend the alpha byte yourself, and this tool does it for you. Move the alpha slider and the <code>FF</code> is replaced with the matching hex byte, so 50% opacity becomes <code>0x80</code>.</p>
+
+    <h3>Drop it straight into your composable</h3>
+<pre>import androidx.compose.ui.graphics.Color
+
+val brand = Color(0xFF3DDC84)
+
+Surface(color = brand) {
+    Text("Hello", color = Color.White)
+}</pre>
+    <p>Prefer channel floats? The <b>Compose (floats)</b> field gives you <code>Color(red, green, blue, alpha)</code> with each channel in the 0f–1f range, which is handy when you are animating a color or computing it at runtime rather than hard‑coding a literal.</p>
+
+    <h3>Alpha byte reference</h3>
+    <p>Common opacity values as the leading hex byte: 100% = <code>FF</code>, 75% = <code>BF</code>, 50% = <code>80</code>, 25% = <code>40</code>, 10% = <code>1A</code>, 0% = <code>00</code>. The slider above computes any value in between.</p>
+
+    <h3>Contrast and accessibility</h3>
+    <p>The preview shows the WCAG contrast ratio of your color against black and white text, plus whether it passes AA for normal body text (a ratio of at least 4.5:1). Checking this early saves you from shipping a button label nobody can read.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Why does Compose use 0xFF instead of just the hex?</summary>
+      <p>The <code>0x</code> marks the value as hexadecimal in Kotlin, and the first two digits are the alpha channel. Without a leading alpha byte the color would be treated as fully transparent, so a fully opaque color needs <code>0xFF</code> in front of the RGB portion.</p>
+    </details>
+    <details>
+      <summary>Can I paste an 8‑digit hex with alpha?</summary>
+      <p>Yes. If you enter eight digits the tool reads them as <code>AARRGGBB</code> and syncs the alpha slider to match, so an existing Compose value round‑trips cleanly.</p>
+    </details>
+    <details>
+      <summary>Does this send my colors anywhere?</summary>
+      <p>No. Every conversion runs locally in your browser. Nothing is uploaded and there is no sign‑up.</p>
+    </details>
+    <details>
+      <summary>What is the difference between the XML and Compose values?</summary>
+      <p>Android View XML uses <code>#AARRGGBB</code> strings inside <code>colors.xml</code>, while Compose uses the <code>Color(0x…)</code> literal in Kotlin. Both encode the same ARGB bytes; only the syntax differs.</p>
+    </details>
+  </section>
+
+  <!-- ADSENSE SLOT 2 (end of content) -->
+  <div class="adslot">Ad slot — insert your AdSense unit here</div>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var hex=document.getElementById('hex'),
+      picker=document.getElementById('picker'),
+      alpha=document.getElementById('alpha'),
+      alphaOut=document.getElementById('alphaOut'),
+      swatch=document.getElementById('swatch'),
+      swatchHex=document.getElementById('swatchHex'),
+      contrast=document.getElementById('contrast');
+
+  function clampHexInput(v){
+    v=v.replace(/[^0-9a-fA-F]/g,'').toUpperCase().slice(0,8);
+    return v;
+  }
+  function parse(v){
+    // returns {r,g,b,a} a in 0..255, or null
+    v=v.replace(/^#/,'');
+    if(v.length===3) v=v.split('').map(function(c){return c+c;}).join('');
+    if(v.length===6) return {r:h2(v,0),g:h2(v,2),b:h2(v,4),a:null};
+    if(v.length===8) return {a:h2(v,0),r:h2(v,2),g:h2(v,4),b:h2(v,6)};
+    return null;
+  }
+  function h2(s,i){return parseInt(s.substr(i,2),16);}
+  function pad(n){n=Math.round(n).toString(16).toUpperCase();return n.length<2?'0'+n:n;}
+  function lum(r,g,b){
+    var a=[r,g,b].map(function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
+    return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
+  }
+  function ratio(l1,l2){var hi=Math.max(l1,l2),lo=Math.min(l1,l2);return (hi+0.05)/(lo+0.05);}
+  function toHsl(r,g,b){
+    r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h,s,l=(mx+mn)/2;
+    if(mx===mn){h=s=0;}else{var d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);
+      switch(mx){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}h/=6;}
+    return [Math.round(h*360),Math.round(s*100),Math.round(l*100)];
+  }
+  function set(id,txt){document.getElementById(id).textContent=txt;}
+
+  function render(r,g,b,a255){
+    var aByte=pad(a255), rgbHex=pad(r)+pad(g)+pad(b);
+    var argb='0x'+aByte+rgbHex;
+    set('outCompose','Color('+argb+')');
+    set('outXml','#'+aByte+rgbHex);
+    set('outFloat','Color('+(r/255).toFixed(2)+'f, '+(g/255).toFixed(2)+'f, '+(b/255).toFixed(2)+'f, '+(a255/255).toFixed(2)+'f)');
+    set('outRgba','rgba('+r+', '+g+', '+b+', '+(a255/255).toFixed(2)+')');
+    var hsl=toHsl(r,g,b); set('outHsl','hsl('+hsl[0]+', '+hsl[1]+'%, '+hsl[2]+'%)');
+
+    var bg='#'+rgbHex;
+    var L=lum(r,g,b), cWhite=ratio(L,1), cBlack=ratio(L,0);
+    var onDark=cWhite>=cBlack, textCol=onDark?'#FFFFFF':'#000000';
+    swatch.style.background=bg; swatch.style.color=textCol;
+    swatchHex.textContent='#'+rgbHex;
+    var best=Math.max(cWhite,cBlack).toFixed(2);
+    var pass=Math.max(cWhite,cBlack)>=4.5;
+    contrast.innerHTML='<b>'+best+':1</b>'+
+      '<span class="badge">'+(pass?'AA pass':'AA fail')+'</span>'+
+      '<span style="opacity:.7">'+(onDark?'use light text':'use dark text')+'</span>';
+  }
+
+  function fromHex(sync){
+    var c=parse(hex.value);
+    if(!c) return;
+    var a = c.a===null ? Math.round(alpha.value*2.55) : c.a;
+    if(c.a!==null){ alpha.value=Math.round(c.a/2.55); alphaOut.textContent=alpha.value+'%'; }
+    if(sync!==false){ picker.value='#'+pad(c.r)+pad(c.g)+pad(c.b); }
+    render(c.r,c.g,c.b,a);
+  }
+
+  hex.addEventListener('input',function(){hex.value=clampHexInput(hex.value);fromHex();});
+  picker.addEventListener('input',function(){
+    var v=picker.value.replace('#','').toUpperCase();
+    hex.value=v; fromHex(false);
+  });
+  alpha.addEventListener('input',function(){alphaOut.textContent=alpha.value+'%';fromHex();});
+
+  // copy buttons
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var txt=document.getElementById(btn.dataset.target).textContent;
+      navigator.clipboard.writeText(txt).then(function(){
+        var old=btn.textContent;btn.textContent='Copied';btn.classList.add('done');
+        setTimeout(function(){btn.textContent=old;btn.classList.remove('done');},1200);
+      });
+    });
+  });
+
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  fromHex();
+})();
+</script>
+</body>
+</html>
