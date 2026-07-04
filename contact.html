@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Mr.AndroidShin Dev Tools</title>
+<meta name="description" content="Get in touch with Mr.AndroidShin Dev Tools — suggestions, corrections, and tool requests for Android and Jetpack Compose developers.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/contact.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.65;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:0 0 18px}
+  p{color:#C7CDDA;margin:0 0 18px}
+  .cards{display:grid;grid-template-columns:1fr;gap:14px;margin:24px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .card .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .card .v{font-family:var(--mono);font-size:1.05rem;color:var(--text);word-break:break-all}
+  .card .v a{color:var(--accent)}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:30px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+  @media(min-width:560px){.cards{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Contact</p>
+  <h1>Get in touch</h1>
+  <p>Found a bug, spotted something wrong in a tool, or want a tool that doesn't exist yet? I'd like to hear it. The fastest way to reach me is email.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="k">Email</div>
+      <div class="v"><a href="mailto:contact@androidshin.dev">contact@androidshin.dev</a></div>
+    </div>
+    <div class="card">
+      <div class="k">GitHub</div>
+      <div class="v"><a href="https://github.com/appshin" rel="noopener" target="_blank">github.com/appshin</a></div>
+    </div>
+  </div>
+
+  <p>I read every message but can't always reply immediately — thanks for your patience. Feature requests that would help other Android developers are especially welcome and often become the next tool on the site.</p>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
