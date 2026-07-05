@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: my app shipped in English only (App Bundle language split) | Mr.AndroidShin</title>
+<meta name="description" content="A real debugging story: translations were all there and worked in debug, but the released Android App Bundle served English only. What I ruled out, the actual cause, and the one-line Gradle fix.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-aab-english-only-language-split.html">
+<meta property="og:title" content="Debugging log: my app shipped in English only">
+<meta property="og:description" content="Translations worked in debug but the released App Bundle served English only. The cause, and the one-line fix.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · App Bundle</p>
+  <h1>My app shipped in English only — and the translations were right there</h1>
+
+  <p>This one cost me the better part of two days, so I'm writing it down. I had an app fully translated across a dozen languages. Every <code>res/values-xx</code> folder was in place, the strings were correct, and on my own phone in debug it switched languages perfectly. Then I released the App Bundle, changed my phone to Korean, installed from the Play track — and got <b>English</b>. Not a fallback here and there. Everything, in English.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Google Play splits an App Bundle by language and delivers only the resources for the device's locale. When that split misbehaves, the device falls back to your base (English) strings. Turning language splitting off in <code>build.gradle</code> makes every language ship together and fixes it.</p>
+  </div>
+
+  <h2>What I wasted time on first</h2>
+  <p>Because it worked in debug, my instinct was that the translations themselves were broken. They weren't. Here's what I checked that turned out to be fine — so you can skip it:</p>
+  <ul>
+    <li><b>The <code>values-xx</code> folders.</b> All present, correctly named, no typos in the locale qualifiers.</li>
+    <li><b>The device locale.</b> The phone really was set to another language; other apps localized correctly.</li>
+    <li><b>Missing keys.</b> Every string existed in every language file. This wasn't a per-string fallback.</li>
+    <li><b>Debug builds.</b> A debug APK installs every resource at once, so it localizes fine — which is exactly why the bug hides until you go through a bundle.</li>
+  </ul>
+  <p>That last point is the trap. A debug build is a single APK with all languages inside, so it can never reproduce the problem. The bug only appears once Play takes your <code>.aab</code> and splits it.</p>
+
+  <h2>The actual cause: per-language splitting</h2>
+  <p>An Android App Bundle isn't what lands on the user's device. Play generates split APKs from it and delivers only the ones the device needs — including a <b>language split</b> that ships just the device-locale strings to keep the download small. In theory the right language arrives; in practice, if that split doesn't get applied the way you expect, the device is left with only the base resources, which for most of us means English.</p>
+
+  <h2>The fix: turn language splitting off</h2>
+  <p>The reliable fix is to tell the bundle not to split by language, so every translation is packaged together. In your module's <code>build.gradle</code>:</p>
+<pre>android {
+    bundle {
+        language {
+            // Don't split by language — ship every locale in the base
+            enableSplit = false
+        }
+    }
+}</pre>
+  <p>After this, the released build carries all languages and localizes correctly regardless of how Play assembles the splits. The trade-off is a slightly larger download, since users get every language instead of just theirs. For an app with normal-sized string files that difference is tiny, and correct localization is worth far more than a few kilobytes.</p>
+
+  <h3>One more thing that bit me: resource shrinking</h3>
+  <p>While chasing this I also hit resource stripping removing localized resources it thought were unused. If you're minifying, make sure shrinking isn't eating your translations. Building with <code>minifyEnabled false</code> confirmed the strings survived; if you keep minification on, verify your keep rules so localized resources aren't dropped.</p>
+
+  <h2>How to verify before you ship again</h2>
+  <p>Don't trust a debug build here. Reproduce the real delivery instead:</p>
+  <ul>
+    <li>Upload to an internal or closed testing track and install <b>through Play</b>, then switch your device language. That's the true end-to-end test.</li>
+    <li>Or generate the split APKs locally from your <code>.aab</code> with bundletool and install the set, so you exercise the same splitting Play does — not a single universal APK, which papers over the bug.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Rule of thumb: if localization works in debug but not from a release bundle, suspect the <b>language split</b> first — not your translation files.</p>
+  </div>
+
+  <p class="note">This is the war-story version. For the tight, copy-paste reference, see the companion guide below.</p>
+
+  <div class="related">
+    <p>Related: <a href="/android-app-bundle-missing-translations.html">Fix missing translations in an App Bundle (the concise guide)</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

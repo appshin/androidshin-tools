@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: don't ship real AdMob IDs in a closed test | Mr.AndroidShin</title>
+<meta name="description" content="Closed-test traffic is real traffic to AdMob. Using live ad unit IDs while you and your testers tap around can flag your account for invalid activity. Use Google's demo units or register test devices — with the official test IDs and a build-config pattern.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-real-admob-ids-in-testing.html">
+<meta property="og:title" content="Don't ship real AdMob IDs in a closed test">
+<meta property="og:description" content="Closed-test taps on live ads are real traffic. Use demo units or test devices so you don't get flagged for invalid activity.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · AdMob</p>
+  <h1>Don't ship real AdMob ad unit IDs in a closed test</h1>
+
+  <p>When I put a few apps into closed testing, I did the obvious-seeming thing: built the release bundle with my real AdMob ad unit IDs, uploaded it, and had testers poke around. It felt safe — it's "just testing," right? It isn't. To AdMob, a tap on a live ad unit is a real click, no matter which testing track served it. That's exactly the behavior that gets accounts flagged for invalid activity.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> closed-test traffic is real traffic. Never let yourself or your testers tap live ads. Use Google's <b>demo ad unit IDs</b> during development, and for release builds you test through Play, register the devices as <b>test devices</b> so they see test ads instead.</p>
+  </div>
+
+  <h2>Why this matters</h2>
+  <p>AdMob's whole system runs on the assumption that impressions and clicks come from genuine users. Clicks generated by you, your friends, or a tester group don't fit that, and Google's own guidance is blunt about it: if you rack up clicks on your own ads outside of test mode, you risk having your account flagged for invalid activity. For a solo developer, an AdMob suspension can take down monetization across every app at once. It is not worth risking over a testing convenience.</p>
+
+  <h2>Use Google's demo ad units in development</h2>
+  <p>Google publishes demo ad units that always return test creatives, aren't tied to your account, and generate no billable traffic — so they're safe to tap. For Android the common ones are:</p>
+<pre>Banner        ca-app-pub-3940256099942544/6300978111
+Interstitial  ca-app-pub-3940256099942544/1033173712
+Rewarded      ca-app-pub-3940256099942544/5224354917</pre>
+  <p>Google also provides demo units for app-open, native, and rewarded-interstitial formats, plus a sample App ID, on its official test-ads page. Ads served through these show a small <b>Test Ad</b> label, which is your confirmation that no real traffic is being recorded.</p>
+
+  <div class="callout">
+    <p><b>Before you publish, swap these back to your own ad unit IDs.</b> Shipping demo units to production means you show test ads to real users and earn nothing.</p>
+  </div>
+
+  <h2>The pattern I use now: swap by build type</h2>
+  <p>To make it impossible to forget, drive the IDs off the build type so debug never touches live units. A minimal Kotlin example:</p>
+<pre>val bannerAdUnitId = if (BuildConfig.DEBUG) {
+    "ca-app-pub-3940256099942544/6300978111"   // Google demo (test)
+} else {
+    "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"    // your real unit
+}</pre>
+  <p>Even cleaner is to put the values in <code>buildConfigField</code> entries per build type, so the right ID is baked in at compile time and there's no runtime branch to get wrong.</p>
+
+  <h2>But closed testing uses a release build…</h2>
+  <p>Here's the wrinkle that tripped me up. A closed test runs your <b>release</b> build — the same artifact you'll promote to production, with your real IDs in it. You can't just compile test IDs into it, or you'd ship test ads to production. The right move for that case is to <b>register the test devices</b>:</p>
+  <ul>
+    <li>Add your own and your testers' devices as test devices — via the AdMob UI, or programmatically with the SDK's request configuration. Emulators are treated as test devices automatically.</li>
+    <li>With a device registered, your live ad units render test ads (with the Test Ad label) on that device, so no real impressions or clicks are recorded even though the build carries production IDs.</li>
+    <li>Tell your testers plainly: don't tap ads unless they see the Test Ad label.</li>
+  </ul>
+
+  <h2>The takeaway</h2>
+  <div class="callout">
+    <p>Treat every pre-production tap as real. <b>Demo units</b> for day-to-day development, <b>registered test devices</b> for release builds you test through Play, and real ad unit IDs only in the version that reaches actual users.</p>
+  </div>
+
+  <p class="note">Ad-network policies change; before a launch, confirm the current test-ad guidance and demo unit IDs on Google's official AdMob documentation.</p>
+
+  <div class="related">
+    <p>Related: <a href="/admob-ecpm-calculator.html">AdMob eCPM &amp; revenue calculator</a> · <a href="/google-play-closed-testing-12-testers.html">Closed testing: 12 testers for 14 days</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
