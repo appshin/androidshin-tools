@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8" />
+<meta name="theme-color" content="#0a0e1a" />
+<link rel="canonical" href="https://androidshin.dev/videos.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>appshin — 앱 소개 영상 / App Videos</title>
+<meta name="description" content="혼자 만든 앱들의 소개 영상. / Promo videos for apps I build solo." />
+<meta property="og:title" content="appshin — 앱 소개 영상 / App Videos" />
+<meta property="og:description" content="시인 시리즈부터 게임까지, 앱 소개 영상 모음." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --bg:#0a0e1a; --bg-2:#0d1322; --glass:rgba(255,255,255,.045); --glass-strong:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.16);
+    --text:#eef2f8; --muted:#8a93a6; --faint:#5a6477;
+    --aurora-1:#2dd4bf; --aurora-2:#7c5cfc; --aurora-3:#f472b6; --maxw:900px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;overflow-x:hidden;
+    position:relative;-webkit-font-smoothing:antialiased;padding:0 20px 64px}
+  .aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% -10%,var(--bg-2) 0%,var(--bg) 60%)}
+  .aurora span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.4;will-change:transform}
+  .aurora .a1{width:380px;height:380px;top:-120px;left:-80px;background:var(--aurora-1);animation:drift1 18s ease-in-out infinite}
+  .aurora .a2{width:320px;height:320px;top:-60px;right:-100px;background:var(--aurora-2);animation:drift2 22s ease-in-out infinite}
+  .aurora .a3{width:260px;height:260px;top:160px;left:40%;background:var(--aurora-3);opacity:.28;animation:drift3 26s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.1)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.08)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.12)}}
+
+  .langbar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:20;
+    display:inline-flex;padding:4px;gap:2px;border-radius:999px;border:1px solid var(--border-strong);
+    background:rgba(13,19,34,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 6px 22px rgba(0,0,0,.35)}
+  .langbar button{border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;
+    color:var(--muted);background:transparent;padding:7px 16px;border-radius:999px;transition:.15s}
+  .langbar button.active{color:#0a0e1a;background:linear-gradient(135deg,var(--aurora-1),var(--aurora-2))}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-top:72px}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;
+    font-size:14px;font-weight:600;margin-bottom:18px;padding:8px 14px;border:1px solid var(--border);
+    border-radius:999px;background:var(--glass);transition:.15s}
+  .back:hover{color:var(--text);border-color:var(--border-strong)}
+  .head{text-align:center;margin-bottom:30px}
+  .head h1{font-size:26px;font-weight:800;letter-spacing:-.03em}
+  .head p{color:var(--muted);font-size:15px;margin-top:8px}
+
+  .group{margin-bottom:40px}
+  .group-h{display:flex;align-items:center;gap:10px;margin:0 4px 16px}
+  .group-h .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .group-h h2{font-size:17px;font-weight:800;letter-spacing:-.02em}
+  .group-h .sub{color:var(--faint);font-size:13px;font-weight:600}
+  .group-h .getbtn{margin-left:auto;font-size:12.5px;font-weight:700;color:#0a0e1a;text-decoration:none;
+    padding:6px 13px;border-radius:999px;background:linear-gradient(135deg,var(--aurora-1),var(--aurora-2));
+    white-space:nowrap;transition:transform .12s}
+  .group-h .getbtn:active{transform:scale(.95)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+  .card{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:var(--glass);
+    transition:border-color .15s,transform .15s}
+  .card:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+  .vwrap{position:relative;width:100%;aspect-ratio:9/16;background:#05070d;cursor:pointer;overflow:hidden}
+  .vwrap video{width:100%;height:100%;object-fit:cover;display:block;background:#05070d}
+  .vwrap .play{position:absolute;inset:0;display:grid;place-items:center;z-index:2;
+    background:linear-gradient(180deg,rgba(5,7,13,.05),rgba(5,7,13,.35));transition:opacity .2s}
+  .vwrap .play svg{width:54px;height:54px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));opacity:.95}
+  .vwrap.playing .play{opacity:0;pointer-events:none}
+  .card .meta{padding:11px 13px 13px}
+  .card .meta .t{font-size:13.5px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
+  .card .meta .d{font-size:11.5px;color:var(--muted);margin-top:3px}
+
+  .note{margin-top:8px;padding:14px 16px;border:1px dashed var(--border-strong);border-radius:14px;
+    background:var(--glass);color:var(--muted);font-size:13px;line-height:1.5}
+  .note b{color:var(--text)}
+  .placeholder{display:grid;place-items:center;aspect-ratio:9/16;color:var(--faint);
+    font-size:12.5px;text-align:center;padding:14px;line-height:1.5;
+    background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px)}
+
+  .foot{text-align:center;color:var(--faint);font-size:12.5px;margin-top:40px}
+  @media(max-width:520px){ .grid{grid-template-columns:repeat(2,1fr);gap:12px} .head h1{font-size:22px} }
+</style>
+</head>
+<body>
+<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+
+<div class="langbar">
+  <button id="lang-ko" class="active" onclick="setLang('ko')">한국어</button>
+  <button id="lang-en" onclick="setLang('en')">English</button>
+</div>
+
+<div class="wrap">
+  <a class="back" href="./hub.html">← <span data-i="back">앱 목록으로</span></a>
+  <div class="head">
+    <h1 data-i="title">🎬 앱 소개 영상</h1>
+    <p data-i="sub">영상을 눌러 재생하세요. 마음에 들면 바로 앱을 받을 수 있어요.</p>
+  </div>
+  <div id="groups"></div>
+  <div class="foot" data-i="foot">made by 신욱중 · appshin</div>
+</div>
+
+<script>
+/* ── 영상 데이터 ──
+   각 그룹 = 앱(또는 전체). videos[]에 각 영상.
+   file: /videos/ 폴더의 파일명(확장자 제외). ko/en 있으면 언어전환 시 자동 교체.
+   yt: 유튜브 ID를 넣으면 로컬파일 대신 유튜브로 임베드(대역폭 0). 나중에 전환용.        */
+const GROUPS = [
+  {
+    app_ko:"Second Memories", app_en:"Second Memories",
+    tag_ko:"시인 시리즈 · 그리운 이와 다시 나누는 대화", tag_en:"Poet series · Talk with someone you miss",
+    accent:"#f472b6", pkg:"com.secondmemoriesserver",
+    videos:[
+      { file_ko:"sm_promo_ko", file_en:"sm_promo_en", t_ko:"Second Memories 소개", t_en:"Second Memories", d_ko:"그리운 이와 다시", d_en:"Talk again" },
+      { file_ko:"sm_hero_ko", file_en:"sm_hero_en", t_ko:"역사 속 영웅과", t_en:"Meet a hero", d_ko:"위인과의 대화", d_en:"Talk with legends" },
+      { file_ko:"sm_fan_ko", file_en:"sm_fan_en", t_ko:"별이 된 스타와", t_en:"A star who left us", d_ko:"그 사람을 다시", d_en:"Reunite with them" },
+      { file_ko:"sm_yoondongju_ko", file_en:"sm_yoondongju_en", t_ko:"윤동주 — 서시", t_en:"Yoon Dong-ju", d_ko:"별 헤는 밤", d_en:"Korea's beloved poet" },
+      { file_ko:"sm_kimsowol_ko", file_en:"sm_kimsowol_en", t_ko:"김소월 — 진달래꽃", t_en:"Kim Sowol — Azaleas", d_ko:"이별의 정한", d_en:"A poem of parting" },
+      { file_ko:"sm_shakespeare_ko", file_en:"sm_shakespeare_en", t_ko:"셰익스피어 — 소네트 18", t_en:"Shakespeare — Sonnet 18", d_ko:"영원히 남는 말", d_en:"Words that never fade" },
+      { file_ko:"sm_poe_ko", file_en:"sm_poe_en", t_ko:"에드거 앨런 포 — 갈까마귀", t_en:"Edgar Allan Poe — The Raven", d_ko:"Nevermore", d_en:"Quoth the Raven" },
+    ]
+  },
+  {
+    app_ko:"appshin 전체 소개", app_en:"All apps",
+    tag_ko:"앱 7개를 한 곳에", tag_en:"7 apps in one place",
+    accent:"#7c5cfc", pkg:null, link:"./hub.html",
+    videos:[
+      { file_ko:"hub_linkhub_ko", file_en:"hub_linkhub_en", t_ko:"링크 허브 소개", t_en:"Link hub", d_ko:"탭 한 번이면", d_en:"One tap" },
+      { file_ko:"hub_5apps", file_en:"hub_5apps", t_ko:"appshin 앱 모음", t_en:"appshin apps", d_ko:"5개 앱 하이라이트", d_en:"5-app highlight" },
+    ]
+  },
+  {
+    app_ko:"뽁뽁이 BubblePop!", app_en:"BubblePop!",
+    tag_ko:"순서대로 터뜨리는 뽁뽁이", tag_en:"Endlessly satisfying bubble wrap",
+    accent:"#2dd4bf", pkg:"com.androidshin.bubblewrap",
+    videos:[
+      { file_ko:"bubblepop_ko", file_en:"bubblepop_en", t_ko:"뽁뽁이 소개", t_en:"BubblePop!", d_ko:"순서대로 터뜨리는 손맛", d_en:"Satisfying bubble pops" },
+    ]
+  },
+  {
+    app_ko:"Bubble Connect 3D", app_en:"Bubble Connect 3D",
+    tag_ko:"3D 버블 연결 퍼즐", tag_en:"A satisfying 3D bubble puzzle",
+    accent:"#14b8a6", pkg:"com.appshin.bubbleconnect3d",
+    videos:[
+      { file_ko:"bubbleconnect_ko", file_en:"bubbleconnect_en", t_ko:"Bubble Connect 3D 소개", t_en:"Bubble Connect 3D", d_ko:"3D 버블 연결 퍼즐", d_en:"3D bubble puzzle" },
+    ]
+  },
+];
+
+let LANG = "ko";
+try{ const s=localStorage.getItem("appshin_lang"); if(s) LANG=s; }catch(e){}
+if((navigator.language||"").toLowerCase().startsWith("en") && !safeGet()) LANG="en";
+function safeGet(){ try{return localStorage.getItem("appshin_lang");}catch(e){return null;} }
+
+const I18N = {
+  ko:{ back:"앱 목록으로", title:"🎬 앱 소개 영상", sub:"영상을 눌러 재생하세요. 마음에 들면 바로 앱을 받을 수 있어요.",
+       get:"앱 받기", foot:"made by 신욱중 · appshin", ph:"영상 준비 중", playall:"" },
+  en:{ back:"Back to apps", title:"🎬 App Videos", sub:"Tap a video to play. Like it? Get the app right away.",
+       get:"Get app", foot:"made by 신욱중 · appshin", ph:"Video coming soon", playall:"" },
+};
+const PLAY_URL = (pkg)=>"https://play.google.com/store/apps/details?id="+pkg;
+
+function render(){
+  const box=document.getElementById("groups"); box.innerHTML="";
+  GROUPS.forEach(g=>{
+    const app = LANG==="ko"?g.app_ko:g.app_en;
+    const tag = LANG==="ko"?g.tag_ko:g.tag_en;
+    const sec=document.createElement("div"); sec.className="group";
+    const gh=document.createElement("div"); gh.className="group-h";
+    let getHtml="";
+    if(g.pkg) getHtml=`<a class="getbtn" href="${PLAY_URL(g.pkg)}" target="_blank" rel="noopener">${I18N[LANG].get} ↗</a>`;
+    else if(g.link) getHtml=`<a class="getbtn" href="${g.link}">${LANG==="ko"?"열기":"Open"} →</a>`;
+    gh.innerHTML=`<span class="dot" style="background:${g.accent}"></span>
+      <h2>${app}</h2><span class="sub">${tag}</span>${getHtml}`;
+    sec.appendChild(gh);
+    const grid=document.createElement("div"); grid.className="grid";
+    g.videos.forEach(v=>{
+      const card=document.createElement("div"); card.className="card";
+      if(v.placeholder){
+        card.innerHTML=`<div class="placeholder">🎬<br>${I18N[LANG].ph}</div>`;
+        grid.appendChild(card); return;
+      }
+      const file = (LANG==="en" && v.file_en)?v.file_en:v.file_ko;
+      const t = LANG==="ko"?v.t_ko:v.t_en;
+      const d = LANG==="ko"?v.d_ko:v.d_en;
+      card.innerHTML=`
+        <div class="vwrap" onclick="playVid(this)">
+          <video preload="none" playsinline poster="videos/${file}.jpg" src="videos/${file}.mp4"></video>
+          <div class="play"><svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="31" fill="rgba(10,14,26,.55)" stroke="rgba(255,255,255,.5)"/><path d="M26 21l18 11-18 11z" fill="#fff"/></svg></div>
+        </div>
+        <div class="meta"><div class="t">${t}</div><div class="d">${d}</div></div>`;
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid); box.appendChild(sec);
+  });
+  // 정적 텍스트
+  document.querySelectorAll("[data-i]").forEach(el=>{ const k=el.getAttribute("data-i"); if(I18N[LANG][k]!=null) el.textContent=I18N[LANG][k]; });
+  document.documentElement.lang=LANG;
+}
+
+let CURRENT=null;
+function playVid(w){
+  const v=w.querySelector("video");
+  if(CURRENT && CURRENT!==v){ CURRENT.pause(); CURRENT.parentElement.classList.remove("playing"); }
+  if(v.paused){ v.play(); w.classList.add("playing"); CURRENT=v;
+    v.onended=()=>w.classList.remove("playing");
+  } else { v.pause(); w.classList.remove("playing"); }
+}
+function setLang(l){ LANG=l; try{localStorage.setItem("appshin_lang",l);}catch(e){}
+  document.getElementById("lang-ko").classList.toggle("active",l==="ko");
+  document.getElementById("lang-en").classList.toggle("active",l==="en");
+  if(CURRENT){CURRENT.pause();CURRENT=null;} render();
+}
+document.getElementById("lang-"+LANG).classList.add("active");
+document.getElementById("lang-"+(LANG==="ko"?"en":"ko")).classList.remove("active");
+render();
+</script>
+</body>
+</html>
