@@ -235,12 +235,14 @@
     var res=await fetch("https://androidshin.goatcounter.com/counter/TOTAL.json");
     if(!res.ok)return;
     var data=await res.json();
-    var num=data.count_unique||data.count;
-    if(num){
-      var el=document.getElementById("visits");
-      el.textContent=Number(num).toLocaleString()+" visitors";
-      el.style.display="inline-block";
-    }
+    // GoatCounter returns a pre-formatted string (e.g. "1,234" or "1.2k"); use it as-is.
+    var raw=(data.count_unique!=null?data.count_unique:data.count);
+    if(raw==null)return;
+    var text=(""+raw).trim();
+    if(!text||text==="0")return;
+    var el=document.getElementById("visits");
+    el.textContent=text+" visitors";
+    el.style.display="inline-block";
   }catch(e){}
 })();
 </script>
