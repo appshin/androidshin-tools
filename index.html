@@ -212,6 +212,9 @@
 </main>
 
 <footer>
+  <div class="wrap" style="text-align:center">
+    <span id="visits" style="display:none;margin:0 auto 16px;padding:6px 14px;border:1px solid #2A3444;border-radius:999px;background:#151A24;color:#8B94A7;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.78rem"></span>
+  </div>
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
     <div>
@@ -224,5 +227,23 @@
 </footer>
 
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<!-- Combined visitor count (same GoatCounter account as the app hub → totals add up) -->
+<script>
+(async function(){
+  try{
+    var res=await fetch("https://androidshin.goatcounter.com/counter/TOTAL.json");
+    if(!res.ok)return;
+    var data=await res.json();
+    var num=data.count_unique||data.count;
+    if(num){
+      var el=document.getElementById("visits");
+      el.textContent=Number(num).toLocaleString()+" visitors";
+      el.style.display="inline-block";
+    }
+  }catch(e){}
+})();
+</script>
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
