@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android strings.xml Escaper — fix apostrophes, quotes &amp; more | Mr.AndroidShin</title>
+<meta name="description" content="Paste plain text and get a properly escaped Android string resource. Handles apostrophes, quotes, ampersands, angle brackets, newlines and format percent signs, and wraps it in a ready-to-paste <string> element. Runs entirely in your browser.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/android-strings-xml-escaper.html">
+<meta property="og:title" content="Android strings.xml Escaper">
+<meta property="og:description" content="Paste plain text, get a properly escaped Android string resource — apostrophes, quotes, ampersands and more. Runs locally in your browser.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:62ch;margin:0 0 24px}
+  .stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+  .panel{padding:20px}.panel + .panel{border-top:1px solid var(--line)}
+  label.fieldlabel{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  textarea{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:var(--mono);font-size:.95rem;padding:12px 14px;line-height:1.5;outline:none}
+  textarea:focus{border-color:var(--accent)}
+  .opts{display:flex;flex-wrap:wrap;gap:16px;margin:16px 0 4px}
+  .opt{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+  .opt input{width:16px;height:16px;accent-color:var(--accent)}
+  .out{background:var(--surface2)}
+  .outbox{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--accent-2);font-family:var(--mono);font-size:.95rem;padding:12px 14px;line-height:1.5;white-space:pre-wrap;word-break:break-word;min-height:52px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{background:var(--surface);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:.85rem;padding:11px 16px;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{border-color:var(--accent);color:var(--accent);background:linear-gradient(180deg,rgba(255,180,84,.09),transparent)}
+  .btn.done{color:#7BE0A3;border-color:#7BE0A3}
+  .nm{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+  .nm input{background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.82rem;padding:6px 10px;outline:none}
+  .nm input:focus{border-color:var(--accent)}
+  .adslot{display:none}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+  th{color:var(--muted);font-family:var(--mono);font-size:.78rem;font-weight:600}
+  td code{color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  .related{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;color:var(--muted);font-size:.92rem}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="tool">
+    <p class="eyebrow">Android · Resources</p>
+    <h1>strings.xml Escaper</h1>
+    <p class="sub">Paste plain text and get a properly escaped Android string resource. It handles the characters that quietly break a build or mangle your text — <b>apostrophes</b>, quotes, ampersands, angle brackets — and wraps the result in a ready-to-paste <code>&lt;string&gt;</code> element. Everything runs in your browser.</p>
+
+    <div class="stage">
+      <div class="panel">
+        <label class="fieldlabel" for="input">Plain text</label>
+        <textarea id="input" spellcheck="false" placeholder="e.g.  You're 100% done — tap &quot;Save&quot; &amp; go">You're 100% done — tap "Save" & go</textarea>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="optPercent"> Escape <code>%</code> as <code>%%</code> (format strings)</label>
+          <label class="opt"><input type="checkbox" id="optNewline" checked> Convert line breaks to <code>\n</code></label>
+        </div>
+      </div>
+
+      <div class="panel out">
+        <label class="fieldlabel">Escaped value</label>
+        <div class="outbox" id="outValue" aria-live="polite"></div>
+
+        <label class="fieldlabel" style="margin-top:18px">Ready to paste</label>
+        <div style="margin:0 0 8px" class="nm">name= <input id="nameField" value="my_string" spellcheck="false" size="16"></div>
+        <div class="outbox" id="outFull"></div>
+
+        <div class="row">
+          <button class="btn primary" id="copyFull">Copy &lt;string&gt;</button>
+          <button class="btn" id="copyValue">Copy value only</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+
+  <section class="content" id="learn">
+    <h2>What actually needs escaping</h2>
+    <p>Android string resources are XML with a couple of extra rules, so two kinds of character cause trouble: <b>XML characters</b> and <b>Android-specific ones</b>. The classic build-breaker is a bare apostrophe — <code>You're</code> throws <i>"unescaped apostrophe in string"</i> until you fix it.</p>
+    <table>
+      <tr><th>Character</th><th>Becomes</th><th>Why</th></tr>
+      <tr><td><code>'</code></td><td><code>\'</code></td><td>Bare apostrophe is an Android error</td></tr>
+      <tr><td><code>"</code></td><td><code>\"</code></td><td>Bare double quote is an Android error</td></tr>
+      <tr><td><code>&amp;</code></td><td><code>&amp;amp;</code></td><td>Reserved XML character</td></tr>
+      <tr><td><code>&lt;</code> <code>&gt;</code></td><td><code>&amp;lt;</code> <code>&amp;gt;</code></td><td>Reserved XML characters</td></tr>
+      <tr><td>line break</td><td><code>\n</code></td><td>Real newlines are collapsed by Android</td></tr>
+      <tr><td><code>%</code></td><td><code>%%</code></td><td>Only when the string is a format string</td></tr>
+    </table>
+    <p>Leading and trailing spaces are also collapsed unless the whole value is wrapped in double quotes, and a value that starts with <code>@</code> or <code>?</code> needs a leading backslash so Android doesn't read it as a resource reference. This tool takes care of those cases too.</p>
+
+    <h2>About the % option</h2>
+    <p>Percent signs only need doubling when the string is used with <code>getString()</code> and format arguments (like <code>%1$s</code>). If your text just happens to contain a percent sign and you never format it, leave the option off so <code>100%</code> stays <code>100%</code>. Turn it on for something like <code>You're %1$s%% done</code>.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is my text sent anywhere?</summary>
+      <p>No. Escaping happens entirely in your browser with local JavaScript. Nothing is uploaded and there's no sign-up.</p>
+    </details>
+    <details>
+      <summary>Why did my apostrophe break the build?</summary>
+      <p>Android treats <code>'</code> and <code>"</code> as special inside string resources. A bare apostrophe raises a build error; escaping it as <code>\'</code> (or wrapping the whole value in double quotes) resolves it.</p>
+    </details>
+    <details>
+      <summary>Does this handle plurals or string arrays?</summary>
+      <p>It escapes the value text, which you can drop into a <code>&lt;string&gt;</code>, an <code>&lt;item&gt;</code> inside <code>&lt;plurals&gt;</code>, or a <code>&lt;string-array&gt;</code> entry. The escaping rules are the same for all of them.</p>
+    </details>
+
+    <div class="related">
+      Related: <a href="/android-app-bundle-missing-translations.html">Fix missing translations in an AAB</a> · <a href="/compose-color-converter.html">Compose color converter</a>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var input=document.getElementById('input'),
+      optPercent=document.getElementById('optPercent'),
+      optNewline=document.getElementById('optNewline'),
+      nameField=document.getElementById('nameField'),
+      outValue=document.getElementById('outValue'),
+      outFull=document.getElementById('outFull'),
+      copyFull=document.getElementById('copyFull'),
+      copyValue=document.getElementById('copyValue');
+
+  function escapeValue(s){
+    if(s==null) s='';
+    // XML-reserved first
+    s=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Android-specific quotes
+    s=s.replace(/'/g,"\\'").replace(/"/g,'\\"');
+    // optional format percent
+    if(optPercent.checked){ s=s.replace(/%/g,'%%'); }
+    // newlines
+    if(optNewline.checked){ s=s.replace(/\r\n|\r|\n/g,'\\n'); }
+    // leading @ or ? must be escaped
+    if(/^[@?]/.test(s)){ s='\\'+s; }
+    // preserve leading/trailing spaces by wrapping in quotes
+    if(/^\s|\s$/.test(s)){ s='"'+s+'"'; }
+    return s;
+  }
+  function safeName(){
+    var n=(nameField.value||'my_string').trim().replace(/[^a-zA-Z0-9_]/g,'_');
+    if(!n) n='my_string';
+    return n;
+  }
+  function render(){
+    var v=escapeValue(input.value);
+    outValue.textContent=v;
+    outFull.textContent='<string name="'+safeName()+'">'+v+'</string>';
+  }
+  function flash(btn,label){
+    var old=btn.textContent; btn.textContent=label; btn.classList.add('done');
+    setTimeout(function(){btn.textContent=old;btn.classList.remove('done');},1200);
+  }
+  function copy(text,btn){
+    if(navigator.clipboard){ navigator.clipboard.writeText(text).then(function(){flash(btn,'Copied');},function(){flash(btn,'Blocked');}); }
+    else { flash(btn,'Unsupported'); }
+  }
+  copyFull.addEventListener('click',function(){ copy(outFull.textContent,copyFull); });
+  copyValue.addEventListener('click',function(){ copy(outValue.textContent,copyValue); });
+  ['input','change'].forEach(function(ev){
+    input.addEventListener(ev,render);
+    optPercent.addEventListener(ev,render);
+    optNewline.addEventListener(ev,render);
+    nameField.addEventListener(ev,render);
+  });
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  render();
+})();
+</script>
+</body>
+</html>
