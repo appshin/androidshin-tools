@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play App Signing explained: upload key vs app signing key | Mr.AndroidShin</title>
+<meta name="description" content="A plain-English guide to Google Play App Signing: the difference between your upload key and the app signing key Google holds, why it matters, what happens if you lose your upload key, and how to keep your keystore safe.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/google-play-app-signing-explained.html">
+<meta property="og:title" content="Play App Signing explained: upload key vs app signing key">
+<meta property="og:description" content="Upload key vs app signing key, what happens if you lose your upload key, and how to keep your keystore safe.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{color:var(--muted);font-family:var(--mono);font-size:.78rem;font-weight:600}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · Play Console</p>
+  <h1>Play App Signing, explained: upload key vs app signing key</h1>
+
+  <p>The first time you publish an app, Play Console throws two similar-sounding terms at you — <b>upload key</b> and <b>app signing key</b> — and it's genuinely confusing which one you own, which one Google holds, and what happens if you lose one. Getting this wrong used to mean you could never update your app again. Here's the mental model that makes it click.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> with Play App Signing, <b>you</b> sign each upload with your <b>upload key</b>, and <b>Google</b> re-signs the app that reaches users with the <b>app signing key</b> it keeps. If you lose your upload key, you can reset it. The app signing key is the one that must never change — and Google guards it for you.</p>
+  </div>
+
+  <h2>Two keys, two jobs</h2>
+  <table>
+    <tr><th>Key</th><th>Who holds it</th><th>What it does</th></tr>
+    <tr><td><b>Upload key</b></td><td>You</td><td>Signs the AAB you upload to Play Console, so Google knows the upload came from you.</td></tr>
+    <tr><td><b>App signing key</b></td><td>Google (with Play App Signing)</td><td>The key Google uses to sign the APKs actually delivered to users' devices. This is the identity of your app.</td></tr>
+  </table>
+  <p>When you enroll in Play App Signing, Google takes over the critical job — holding the app signing key in secure infrastructure — while you keep a less dangerous upload key. Your build signs with the upload key; Google verifies it, strips it, and re-signs with the app signing key before distribution.</p>
+
+  <h2>Why this split exists</h2>
+  <p>Android requires that every update to an app be signed with the <b>same</b> key as the original install; otherwise the device rejects it. Before Play App Signing, that meant one precious keystore file that, if lost or leaked, ended your ability to update the app — forever. By holding the app signing key itself, Google removes that single point of failure. Your upload key becomes replaceable, because it's only used to prove uploads come from you, not to define the app's identity on devices.</p>
+
+  <h2>What happens if you lose your upload key</h2>
+  <p>This is the reassuring part: a lost or compromised <b>upload</b> key is recoverable.</p>
+  <ol>
+    <li>Generate a new upload key (a fresh keystore).</li>
+    <li>In Play Console, request an upload key reset and provide the new key's certificate.</li>
+    <li>Google swaps the registered upload key; your next upload is signed with the new one.</li>
+  </ol>
+  <p>Your users notice nothing, because the <b>app signing key</b> — the one that defines the app on their devices — never changed. That's the whole point of the split.</p>
+
+  <div class="callout">
+    <p>The one key you can't casually reset is the <b>app signing key</b>. With Play App Signing, Google holds it, so a crash on your laptop doesn't end your app. If you ever opted to manage it yourself, back it up like it's irreplaceable — because it is.</p>
+  </div>
+
+  <h2>Keystore hygiene</h2>
+  <ul>
+    <li><b>Back up your upload keystore</b> and its passwords somewhere safe (a password manager, an offline copy). Resetting is possible but avoidable friction.</li>
+    <li><b>Never commit keystores or passwords</b> to your repo. Keep the <code>.jks</code> file and its credentials out of source control and inject them at build time.</li>
+    <li><b>Record the key alias and passwords</b> the day you create the key — future you will not remember them.</li>
+    <li><b>Enroll in Play App Signing</b> for new apps; it's the default and it's the safety net that makes a lost upload key a minor inconvenience instead of a disaster.</li>
+  </ul>
+
+  <h2>Quick mental model</h2>
+  <p>Think of the upload key as your <i>ID badge to get into the building</i> — if you lose it, security issues you a new one. The app signing key is the <i>deed to the house</i>; Play App Signing means Google keeps the deed in a vault so it can't be lost. You show your badge; Google handles the deed.</p>
+
+  <p class="note">Play Console's exact menu labels change over time; the concepts here — one key you sign with, one key Google distributes with — stay the same.</p>
+
+  <div class="related">
+    <p>Related: <a href="/google-play-closed-testing-12-testers.html">Closed testing: 12 testers for 14 days</a> · <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

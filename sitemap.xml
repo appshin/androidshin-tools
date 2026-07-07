@@ -21,4 +21,7 @@
   <url><loc>https://androidshin.dev/about.html</loc><lastmod>2026-07-04</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://androidshin.dev/privacy.html</loc><lastmod>2026-07-04</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://androidshin.dev/contact.html</loc><lastmod>2026-07-04</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://androidshin.dev/debug-inconsistent-jvm-target-compatibility.html</loc><lastmod>2026-07-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-release-crash-proguard-r8-keep-rules.html</loc><lastmod>2026-07-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/google-play-app-signing-explained.html</loc><lastmod>2026-07-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

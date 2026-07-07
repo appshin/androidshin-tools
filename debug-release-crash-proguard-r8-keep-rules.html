@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: debug works, release crashes — the R8 keep-rule trap | Mr.AndroidShin</title>
+<meta name="description" content="The app ran perfectly in debug and crashed on launch in the release build. The cause was R8 stripping and renaming classes I only touch through reflection (Gson, serialization). What broke, how to read the crash, and the keep rules that fixed it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-release-crash-proguard-r8-keep-rules.html">
+<meta property="og:title" content="Debugging log: debug works, release crashes — the R8 keep-rule trap">
+<meta property="og:description" content="Release-only crashes usually mean R8 removed or renamed something you use via reflection. Here's the fix.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Release build</p>
+  <h1>It works in debug and crashes in release — the R8 keep-rule trap</h1>
+
+  <p>The app ran flawlessly all through development. Then I built the release version, installed it, and it crashed on the first screen that loaded data. Same code, same device — only the build type changed. This is one of the most common "but it worked yesterday" traps in Android, and it almost always comes down to one thing: <b>R8</b>.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> release builds run R8 (code shrinking + obfuscation). It removes code it thinks is unused and renames what's left. Anything you reach by <b>reflection</b> — Gson/Moshi models, serialization, class names loaded by string — gets stripped or renamed, and crashes. The fix is to add <b>keep rules</b> for exactly those pieces.</p>
+  </div>
+
+  <h2>Why only the release build?</h2>
+  <p>Debug builds don't shrink or obfuscate, so every class and method is present with its original name. Release builds enable R8 via <code>minifyEnabled true</code>, which does two things: it <b>removes</b> code that appears unused, and it <b>renames</b> classes, methods and fields to short names to shrink the app. R8 decides "unused" by tracing calls it can see in the code. What it <i>can't</i> see is reflection — when you look something up by name at runtime — so it happily deletes or renames the very classes your reflection depends on.</p>
+
+  <h2>Reading the crash</h2>
+  <p>The stack trace usually points straight at the culprit, even though the names look scrambled:</p>
+<pre>java.lang.ClassNotFoundException: Didn't find class "a.b.c"
+// or
+com.google.gson.JsonSyntaxException / NullPointerException
+// on a model whose fields all came back null after minify</pre>
+  <p>Two tell-tale signs: a <code>ClassNotFoundException</code>/<code>NoSuchMethodException</code> for something you know exists, or a data model that parses to an object with <b>all fields null</b>. The second one is sneaky — it doesn't crash immediately; R8 renamed the fields, so Gson can't match the JSON keys, and everything comes back empty.</p>
+
+  <h2>The fix: keep rules</h2>
+  <p>Tell R8 to leave the reflected pieces alone in your <code>proguard-rules.pro</code>. A few of the ones that saved me:</p>
+
+  <h3>Keep your data models</h3>
+<pre># Models parsed by Gson/Moshi — keep names and fields intact
+-keep class com.yourapp.model.** { *; }
+-keepclassmembers class com.yourapp.model.** { *; }</pre>
+
+  <h3>Keep annotations and generic signatures</h3>
+<pre>-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod</pre>
+  <p>Serialization libraries read annotations and generic types at runtime; strip these and parsing silently misbehaves.</p>
+
+  <h3>Follow the library's own rules</h3>
+  <p>Most libraries that use reflection ship their own keep rules — you just have to not fight them. Check the docs for Gson, Moshi, Retrofit, Room and your DI framework; add the consumer rules they recommend rather than inventing your own.</p>
+
+  <div class="callout">
+    <p>Don't reach for <code>minifyEnabled false</code>. Turning R8 off "fixes" the crash but ships a bigger, un-optimized app and hides the real problem. Keep shrinking on and add targeted keep rules.</p>
+  </div>
+
+  <h2>How to debug it properly</h2>
+  <ul>
+    <li>Reproduce with a <b>release</b> build (or a debug build with <code>minifyEnabled true</code>), not a normal debug build — otherwise you can't see it.</li>
+    <li>Keep the <b>mapping file</b> R8 produces (<code>mapping.txt</code>). It translates the obfuscated names in a crash back to your real ones — essential for reading production stack traces.</li>
+    <li>Add keep rules narrowly: keep the specific packages that use reflection, not your whole app, so you still get the size benefit.</li>
+  </ul>
+
+  <p class="note">Package names above are placeholders — swap in your own model and serialization packages.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-inconsistent-jvm-target-compatibility.html">Inconsistent JVM-target compatibility</a> · <a href="/google-play-app-signing-explained.html">Play App Signing explained</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

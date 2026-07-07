@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Inconsistent JVM-target compatibility" in Gradle | Mr.AndroidShin</title>
+<meta name="description" content="Gradle refused to build with 'Inconsistent JVM-target compatibility detected for tasks compileJava and compileKotlin'. What the two numbers mean, why Java and Kotlin drifted apart, and the cleanest way to lock them to one JVM target.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-inconsistent-jvm-target-compatibility.html">
+<meta property="og:title" content="Debugging log: 'Inconsistent JVM-target compatibility' in Gradle">
+<meta property="og:description" content="Why Java and Kotlin JVM targets drift apart, and the cleanest way to pin them together.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"Inconsistent JVM-target compatibility" — when Java and Kotlin disagree</h1>
+
+  <p>After updating my toolchain, a project that had built fine for months suddenly refused to compile with a message about <b>JVM-target compatibility</b> between <code>compileJava</code> and <code>compileKotlin</code>. Nothing in my code had changed. If you just bumped Android Gradle Plugin, the JDK, or Kotlin and got hit with this, here's what's going on and how to make it stop for good.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the Java compiler and the Kotlin compiler are targeting <b>different JVM bytecode versions</b>. Pin them both to the same target — ideally with a single Java toolchain — and the error disappears.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Inconsistent JVM-target compatibility detected for tasks
+'compileDebugJavaWithJavac' (17) and 'compileDebugKotlin' (11).</pre>
+  <p>The two numbers are JVM bytecode targets. Here Java is compiling to 17 and Kotlin to 11. Gradle now treats that mismatch as an error rather than a warning, because linking bytecode built for two different JVM versions is a recipe for subtle runtime breakage. So instead of guessing, it stops.</p>
+
+  <h2>Why they drifted apart</h2>
+  <p>They usually start aligned and then one side moves. Common triggers:</p>
+  <ul>
+    <li>You bumped <code>sourceCompatibility</code>/<code>targetCompatibility</code> (the Java side) but left the Kotlin <code>jvmTarget</code> where it was — or vice versa.</li>
+    <li>A newer Android Gradle Plugin changed the default Java target, while your explicit Kotlin target stayed put.</li>
+    <li>You switched the JDK that Gradle runs on, which shifted one compiler's default but not the other's.</li>
+  </ul>
+  <p>The fix is simply to make both compilers agree on one number.</p>
+
+  <h2>Fix A — the explicit way (both blocks)</h2>
+  <p>Set the Java compatibility and the Kotlin target to the same value in your module's <code>build.gradle</code>:</p>
+<pre>android {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {           // older Kotlin plugin
+        jvmTarget = "17"
+    }
+}</pre>
+  <p>On newer Kotlin plugins <code>kotlinOptions</code> is replaced by a <code>compilerOptions</code> block:</p>
+<pre>kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}</pre>
+  <p>The exact DSL depends on your Kotlin version, but the principle is unchanged: the Java number and the Kotlin number must match.</p>
+
+  <h2>Fix B — the clean way (one toolchain)</h2>
+  <p>Better than keeping two numbers in sync is to declare a single <b>Java toolchain</b> and let both compilers inherit it. Then there's only one place to change, and they can't drift again:</p>
+<pre>kotlin {
+    jvmToolchain(17)
+}</pre>
+  <p>This tells Gradle to compile both Java and Kotlin against JDK 17, downloading it if needed, regardless of which JDK you happen to be running Gradle with. I switched to this and stopped seeing the error entirely — there's simply no second number left to fall out of step.</p>
+
+  <div class="callout">
+    <p>Rule of thumb: <b>one JVM target, declared once.</b> A toolchain is the single source of truth; two hand-maintained numbers will eventually disagree.</p>
+  </div>
+
+  <h2>How to confirm it's fixed</h2>
+  <ul>
+    <li>Run a clean build, not just a sync — the error surfaces at compile time.</li>
+    <li>If you use a toolchain, remove any leftover <code>jvmTarget</code>/<code>targetCompatibility</code> overrides so nothing quietly contradicts it.</li>
+    <li>Change one thing at a time. Bumping the JDK, AGP, and Kotlin together makes it impossible to see which knob moved the target.</li>
+  </ul>
+
+  <p class="note">Version numbers here are illustrative; use whatever target your project actually needs, and keep both compilers on it.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-kotlin-metadata-version-firebase-bom.html">Firebase broke my build with a Kotlin error</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
