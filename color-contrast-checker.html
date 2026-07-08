@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Contrast Checker — WCAG AA / AAA ratio | Mr.AndroidShin</title>
+<meta name="description" content="Check the contrast ratio between a text color and its background against WCAG AA and AAA thresholds. Pick two colors, see the ratio and pass/fail for normal and large text, with a live preview. Runs entirely in your browser.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/color-contrast-checker.html">
+<meta property="og:title" content="Color Contrast Checker — WCAG AA / AAA">
+<meta property="og:description" content="Pick a text and background color, get the WCAG contrast ratio and AA/AAA pass-fail with a live preview. Runs locally.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;--ok:#7BE0A3;--bad:#FF7A7A;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:64ch;margin:0 0 24px}
+  .stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  @media(max-width:620px){.row2{grid-template-columns:1fr}}
+  .field{padding:18px 20px}
+  .field + .field{border-left:1px solid var(--line)}
+  @media(max-width:620px){.field + .field{border-left:none;border-top:1px solid var(--line)}}
+  label.fl{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .pick{display:flex;align-items:center;gap:10px}
+  input[type=color]{width:46px;height:46px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;padding:2px}
+  input[type=text]{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.95rem;padding:12px 12px;outline:none;text-transform:uppercase}
+  input[type=text]:focus{border-color:var(--accent)}
+  .result{border-top:1px solid var(--line);padding:22px 20px;background:var(--surface2)}
+  .ratio{font-family:var(--disp);font-weight:700;font-size:2.4rem;letter-spacing:-.02em}
+  .ratio small{font-size:1rem;color:var(--muted);font-weight:500}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .badge{font-family:var(--mono);font-size:.78rem;padding:7px 12px;border-radius:9px;border:1px solid var(--line);display:flex;gap:8px;align-items:center}
+  .badge b{font-weight:700}
+  .badge.pass{color:var(--ok);border-color:rgba(123,224,163,.4)}
+  .badge.fail{color:var(--bad);border-color:rgba(255,122,122,.35)}
+  .preview{padding:26px 20px;text-align:center}
+  .preview .pv{border-radius:12px;padding:26px 18px;border:1px solid var(--line)}
+  .preview .lg{font-size:1.5rem;font-weight:700;margin-bottom:8px}
+  .preview .sm{font-size:1rem}
+  .adslot{display:none}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+  th{color:var(--muted);font-family:var(--mono);font-size:.78rem;font-weight:600}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  .related{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;color:var(--muted);font-size:.92rem}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="tool">
+    <p class="eyebrow">Design · Accessibility</p>
+    <h1>Color Contrast Checker</h1>
+    <p class="sub">Pick a text color and a background color and see the <b>WCAG contrast ratio</b> between them, with pass/fail for AA and AAA at normal and large text sizes. Handy for checking that labels stay legible on your app's surfaces. Everything runs in your browser.</p>
+
+    <div class="stage">
+      <div class="row2">
+        <div class="field">
+          <label class="fl">Text color</label>
+          <div class="pick">
+            <input type="color" id="fgColor" value="#E7EAF0" aria-label="Text color picker">
+            <input type="text" id="fgHex" value="#E7EAF0" spellcheck="false" maxlength="7">
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl">Background color</label>
+          <div class="pick">
+            <input type="color" id="bgColor" value="#0B0E14" aria-label="Background color picker">
+            <input type="text" id="bgHex" value="#0B0E14" spellcheck="false" maxlength="7">
+          </div>
+        </div>
+      </div>
+
+      <div class="result">
+        <div class="ratio"><span id="ratioVal">–</span> <small>: 1 contrast ratio</small></div>
+        <div class="badges" id="badges"></div>
+      </div>
+
+      <div class="preview">
+        <div class="pv" id="pv">
+          <div class="lg">Large text sample</div>
+          <div class="sm">Normal body text — the quick brown fox jumps over the lazy dog.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+
+  <section class="content" id="learn">
+    <h2>What the ratio means</h2>
+    <p>Contrast ratio compares the relative luminance of two colors. It runs from <code>1:1</code> (identical, invisible) to <code>21:1</code> (pure black on pure white). The higher the number, the easier text is to read — especially for people with low vision or on a phone in bright sunlight.</p>
+
+    <h2>WCAG thresholds</h2>
+    <table>
+      <tr><th>Level</th><th>Normal text</th><th>Large text</th></tr>
+      <tr><td>AA (minimum)</td><td>4.5 : 1</td><td>3 : 1</td></tr>
+      <tr><td>AAA (enhanced)</td><td>7 : 1</td><td>4.5 : 1</td></tr>
+    </table>
+    <p>"Large text" means roughly 18pt and up, or 14pt and up if bold. AA is the common target for shipping UI; AAA is stricter and worth aiming for on body text where you can.</p>
+
+    <h2>Why it matters in an app</h2>
+    <p>Low-contrast labels look elegant in a mockup and become unreadable on a real device outdoors. Checking the ratio between your text and its surface — buttons, cards, disabled states — catches that before users do. If a color fails, nudge the text lighter/darker or deepen the background until it clears the bar you're targeting.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is anything sent to a server?</summary>
+      <p>No. The ratio is computed locally in your browser with the standard WCAG luminance formula. No colors leave the page and there's no sign-up.</p>
+    </details>
+    <details>
+      <summary>Does this account for opacity or gradients?</summary>
+      <p>It compares two solid colors. If your text sits on a translucent layer or a gradient, test against the actual effective background color at the least favorable spot.</p>
+    </details>
+    <details>
+      <summary>What about disabled or placeholder text?</summary>
+      <p>WCAG exempts truly disabled controls, but users still try to read them. Aiming for at least AA large on placeholder and secondary text keeps your UI usable.</p>
+    </details>
+
+    <div class="related">
+      Related: <a href="/compose-color-converter.html">Compose color converter</a> · <a href="/dp-sp-px-converter.html">dp / sp / px converter</a>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var fgColor=document.getElementById('fgColor'),fgHex=document.getElementById('fgHex'),
+      bgColor=document.getElementById('bgColor'),bgHex=document.getElementById('bgHex'),
+      ratioVal=document.getElementById('ratioVal'),badges=document.getElementById('badges'),pv=document.getElementById('pv');
+
+  function normHex(v){
+    v=(v||'').trim();
+    if(v[0]!=='#') v='#'+v;
+    if(/^#[0-9a-fA-F]{3}$/.test(v)){ v='#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3]; }
+    return /^#[0-9a-fA-F]{6}$/.test(v)?v.toUpperCase():null;
+  }
+  function toRGB(hex){ return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]; }
+  function lum(rgb){
+    var a=rgb.map(function(v){ v/=255; return v<=0.03928? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+    return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
+  }
+  function ratio(fg,bg){
+    var l1=lum(toRGB(fg)),l2=lum(toRGB(bg));
+    var hi=Math.max(l1,l2),lo=Math.min(l1,l2);
+    return (hi+0.05)/(lo+0.05);
+  }
+  function badge(label,pass){
+    return '<span class="badge '+(pass?'pass':'fail')+'"><b>'+label+'</b> '+(pass?'Pass':'Fail')+'</span>';
+  }
+  function update(){
+    var fg=normHex(fgHex.value),bg=normHex(bgHex.value);
+    if(!fg||!bg){ ratioVal.textContent='–'; badges.innerHTML='<span class="badge fail">Enter valid hex colors</span>'; return; }
+    fgColor.value=fg; bgColor.value=bg;
+    var r=ratio(fg,bg);
+    ratioVal.textContent=r.toFixed(2);
+    badges.innerHTML=
+      badge('AA normal',r>=4.5)+badge('AA large',r>=3)+
+      badge('AAA normal',r>=7)+badge('AAA large',r>=4.5);
+    pv.style.background=bg; pv.style.color=fg;
+  }
+  fgColor.addEventListener('input',function(){ fgHex.value=fgColor.value.toUpperCase(); update(); });
+  bgColor.addEventListener('input',function(){ bgHex.value=bgColor.value.toUpperCase(); update(); });
+  fgHex.addEventListener('input',update);
+  bgHex.addEventListener('input',update);
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  update();
+})();
+</script>
+</body>
+</html>

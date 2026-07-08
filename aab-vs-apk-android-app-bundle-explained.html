@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AAB vs APK: what to upload to Google Play, and why | Mr.AndroidShin</title>
+<meta name="description" content="A plain-English guide to the Android App Bundle (AAB) versus the APK: what each one is, why Google Play now wants an AAB, how users still get an APK, and when you'd still build an APK yourself.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/aab-vs-apk-android-app-bundle-explained.html">
+<meta property="og:title" content="AAB vs APK: what to upload to Google Play, and why">
+<meta property="og:description" content="What the App Bundle is, why Play wants it, how users still get an APK, and when to build an APK yourself.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{color:var(--muted);font-family:var(--mono);font-size:.78rem;font-weight:600}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · Play Console</p>
+  <h1>AAB vs APK: what to upload to Google Play, and why</h1>
+
+  <p>When you go to publish, Play Console asks for an <b>.aab</b>, but everything you've read about installing Android apps talks about <b>.apk</b>. Are they the same thing? Which do you build? Here's the clean mental model, and where each one actually fits.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the <b>APK</b> is the finished app a device installs. The <b>AAB</b> (Android App Bundle) is a publishing format you upload to Google Play — Google uses it to generate a small, optimized APK for each user's device. You upload an AAB; users still receive an APK.</p>
+  </div>
+
+  <h2>What each one is</h2>
+  <table>
+    <tr><th></th><th>APK</th><th>AAB</th></tr>
+    <tr><td><b>What it is</b></td><td>The installable app package</td><td>A publishing bundle of everything needed to build APKs</td></tr>
+    <tr><td><b>Who installs it</b></td><td>Devices install it directly</td><td>Devices never install it — Google Play processes it</td></tr>
+    <tr><td><b>Where it goes</b></td><td>Sideloading, other stores, testing</td><td>Uploaded to Google Play</td></tr>
+    <tr><td><b>Size on device</b></td><td>Contains all densities/languages/ABIs</td><td>Google strips it down per device</td></tr>
+  </table>
+
+  <h2>Why Play switched to the AAB</h2>
+  <p>A single "universal" APK has to contain resources for <i>every</i> device: all screen densities, all CPU architectures, all languages. Most of that is dead weight for any one user — their phone only needs one density, one ABI, one language. The App Bundle hands Google all of it, and Google generates a tailored APK per device that includes only what that device uses. The result is a smaller download for users without you maintaining a dozen separate APKs. This is why new apps and updates on Play must be AABs.</p>
+
+  <h2>How users still get an APK</h2>
+  <p>The AAB itself is never installed. When someone downloads your app, Google Play's servers build the right APKs on the fly from your bundle — the base plus the specific density/language/ABI splits that device needs — and deliver those. So the chain is: <b>you build an AAB → Play generates per-device APKs → the device installs an APK.</b> The APK never disappeared; it just gets produced by Google instead of by you.</p>
+
+  <h2>Building each one</h2>
+  <p>In Android Studio, <i>Build &gt; Generate Signed Bundle / APK</i> lets you pick either. From the command line:</p>
+<pre># App Bundle for Play upload
+./gradlew bundleRelease      # → app-release.aab
+
+# APK for direct install / testing
+./gradlew assembleRelease    # → app-release.apk</pre>
+
+  <h2>When you'd still build an APK yourself</h2>
+  <ul>
+    <li><b>Quick testing</b> — installing directly on a device over USB or sharing a build with a tester.</li>
+    <li><b>Distribution outside Google Play</b> — other app stores or direct download, where there's no Play to process a bundle.</li>
+    <li><b>Debugging what actually ships</b> — you can use the bundletool to generate the exact APKs Google would, to reproduce a device-specific issue.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Because Google builds the delivered APKs from your AAB, it also signs them — which is where Play App Signing comes in. If that split of keys is fuzzy, it's worth understanding before your first release.</p>
+  </div>
+
+  <h2>Quick mental model</h2>
+  <p>Think of the AAB as the <i>raw ingredients and recipe</i> you hand to Google's kitchen; the APK is the <i>finished dish</i> served to each diner, cooked to their table's needs. You ship ingredients; Google plates the meal.</p>
+
+  <p class="note">Gradle task names and Studio menu labels shift slightly between versions; the AAB-for-Play, APK-for-device split is the part that stays constant.</p>
+
+  <div class="related">
+    <p>Related: <a href="/google-play-app-signing-explained.html">Play App Signing explained</a> · <a href="/debug-aab-english-only-language-split.html">My AAB shipped in English only</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
