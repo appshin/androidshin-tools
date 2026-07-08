@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exposure Calculator — shutter &amp; ISO equivalents for phone Pro mode | Mr.AndroidShin</title>
+<meta name="description" content="Set a baseline exposure and see every shutter-speed and ISO pair that keeps the same brightness. Built for phone Pro/manual mode where aperture is fixed: trade shutter for ISO without changing exposure. Runs entirely in your browser.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/exposure-calculator.html">
+<meta property="og:title" content="Exposure Calculator — shutter & ISO equivalents">
+<meta property="og:description" content="See every shutter/ISO pair that keeps the same brightness. Built for phone Pro mode. Runs locally.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;--ok:#7BE0A3;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:64ch;margin:0 0 24px}
+  .stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+  .controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+  @media(max-width:620px){.controls{grid-template-columns:1fr}}
+  .ctl{padding:16px 18px}
+  .ctl + .ctl{border-left:1px solid var(--line)}
+  @media(max-width:620px){.ctl + .ctl{border-left:none;border-top:1px solid var(--line)}}
+  label.fl{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:.95rem;padding:11px 12px;outline:none}
+  select:focus{border-color:var(--accent)}
+  .ev{border-top:1px solid var(--line);padding:16px 18px;background:var(--surface2);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+  .ev .big{font-family:var(--disp);font-weight:700;font-size:1.5rem}
+  .ev .lbl{color:var(--muted);font-size:.9rem}
+  .tbl{border-top:1px solid var(--line);overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:.92rem;min-width:420px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+  td.val{font-family:var(--mono);color:var(--text)}
+  tr.base td{background:rgba(255,180,84,.08)}
+  tr.base td.val{color:var(--accent);font-weight:700}
+  .tag{font-size:.78rem;color:var(--muted)}
+  .adslot{display:none}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  .related{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;color:var(--muted);font-size:.92rem}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="tool">
+    <p class="eyebrow">Photography · Exposure</p>
+    <h1>Exposure Calculator</h1>
+    <p class="sub">Set a baseline shot, and see every <b>shutter speed + ISO</b> pair that gives the <b>same brightness</b>. Built for phone Pro/manual mode, where the aperture is usually fixed — so you trade shutter for ISO. Freeze motion by going faster, or drop noise by going lower, without changing the exposure. All local, in your browser.</p>
+
+    <div class="stage">
+      <div class="controls">
+        <div class="ctl">
+          <label class="fl">Aperture (f-number)</label>
+          <select id="ap"></select>
+        </div>
+        <div class="ctl">
+          <label class="fl">Shutter speed</label>
+          <select id="sh"></select>
+        </div>
+        <div class="ctl">
+          <label class="fl">ISO</label>
+          <select id="iso"></select>
+        </div>
+      </div>
+      <div class="ev">
+        <span><span class="big" id="evVal">–</span> <span class="lbl">EV (at ISO 100)</span></span>
+        <span class="lbl" id="evWord"></span>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Shutter</th><th>ISO</th><th>Same brightness — good for</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:14px;font-size:.9rem">Aperture stays fixed across the table (as on most phones); it only shifts the EV number. Change it if your camera or phone lets you.</p>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+
+  <section class="content" id="learn">
+    <h2>How the trade works</h2>
+    <p>Exposure is set by three things: <b>aperture</b> (how wide the lens opens), <b>shutter speed</b> (how long light hits the sensor), and <b>ISO</b> (how much the signal is amplified). On a phone the aperture is usually fixed, so you're left balancing two: shutter and ISO. Make the shutter one stop faster and you halve the light — so you raise ISO one stop to put it back. That's what every row of the table above is: the same total exposure, split differently.</p>
+
+    <h2>Which pair should you pick?</h2>
+    <ul>
+      <li><b>Faster shutter + higher ISO</b> — freezes motion (kids, pets, street) but adds noise. Go just fast enough to stop the blur.</li>
+      <li><b>Slower shutter + lower ISO</b> — cleanest image, but any movement (yours or the subject's) smears. Brace the phone or use a tripod.</li>
+      <li><b>Middle ground</b> — for a still subject in decent light, keep ISO low and the shutter fast enough to hand-hold (a rough rule: 1/60s or faster).</li>
+    </ul>
+
+    <h2>What EV tells you</h2>
+    <p>EV (exposure value) is a single number for "how much light" a setting lets in, referenced to ISO 100. Lower EV means a darker scene needs more light; higher EV means a bright scene. It's mostly a sanity check here — the useful part is the equivalence table, which shows your real, on-device options.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Does this control my camera?</summary>
+      <p>No — it's a reference calculator. You read the pair you want and dial it into your phone's Pro/manual mode yourself. Nothing is sent anywhere.</p>
+    </details>
+    <details>
+      <summary>My phone has no aperture setting.</summary>
+      <p>That's normal — most phones have a fixed aperture. Leave it at your phone's value (often around f/1.8) and just use the shutter/ISO table.</p>
+    </details>
+    <details>
+      <summary>Why do all rows say "same brightness"?</summary>
+      <p>Because they are equivalent exposures. The point is that many settings give the same brightness — you choose the one whose side effects (motion freeze vs noise) suit the shot.</p>
+    </details>
+
+    <div class="related">
+      New here? Read the companion guide: <a href="/phone-manual-mode-exposure-guide.html">How to set exposure in your phone's Pro mode</a>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // full-stop reference arrays (slow shutter -> fast)
+  var AP=[1.4,1.8,2.0,2.8,4.0,5.6,8.0,11,16];
+  var SH=[  // label + seconds, ordered slow -> fast
+    ["30\"",30],["15\"",15],["8\"",8],["4\"",4],["2\"",2],["1\"",1],
+    ["1/2",0.5],["1/4",0.25],["1/8",0.125],["1/15",1/15],["1/30",1/30],
+    ["1/60",1/60],["1/125",1/125],["1/250",1/250],["1/500",1/500],
+    ["1/1000",1/1000],["1/2000",1/2000],["1/4000",1/4000],["1/8000",1/8000]
+  ];
+  var ISO=[50,100,200,400,800,1600,3200,6400,12800];
+
+  var apSel=document.getElementById('ap'),shSel=document.getElementById('sh'),
+      isoSel=document.getElementById('iso'),rows=document.getElementById('rows'),
+      evVal=document.getElementById('evVal'),evWord=document.getElementById('evWord');
+
+  AP.forEach(function(v,i){ apSel.add(new Option("f/"+v, i)); });
+  SH.forEach(function(v,i){ shSel.add(new Option(v[0], i)); });
+  ISO.forEach(function(v,i){ isoSel.add(new Option(v, i)); });
+  // sensible defaults: f/1.8, 1/125, ISO 100
+  apSel.value=1; shSel.value=12; isoSel.value=1;
+
+  function evAtISO100(N,t){ return Math.log2((N*N)/t); }
+  function evWordFor(ev){
+    if(ev>=14) return "bright daylight";
+    if(ev>=11) return "outdoors, overcast";
+    if(ev>=8)  return "bright indoors / shade";
+    if(ev>=5)  return "dim indoors";
+    return "low light / night";
+  }
+  function tagFor(d){
+    if(d>=2) return "freeze fast motion (more noise)";
+    if(d===1) return "freeze motion";
+    if(d===0) return "your baseline";
+    if(d===-1) return "cleaner, watch for blur";
+    return "lowest noise (tripod)";
+  }
+
+  function render(){
+    var ai=+apSel.value, si=+shSel.value, ii=+isoSel.value;
+    var N=AP[ai], t=SH[si][1];
+    var ev=evAtISO100(N,t);
+    evVal.textContent=ev.toFixed(1);
+    evWord.textContent="≈ "+evWordFor(ev);
+
+    rows.innerHTML="";
+    // d>0 => faster shutter (index+d) + higher ISO (index+d), same exposure
+    for(var d=-4; d<=4; d++){
+      var sIdx=si+d, isoIdx=ii+d;
+      if(sIdx<0||sIdx>=SH.length||isoIdx<0||isoIdx>=ISO.length) continue;
+      var tr=document.createElement('tr');
+      if(d===0) tr.className='base';
+      tr.innerHTML='<td class="val">'+SH[sIdx][0]+'</td>'+
+                   '<td class="val">'+ISO[isoIdx]+'</td>'+
+                   '<td class="tag">'+tagFor(d)+'</td>';
+      rows.appendChild(tr);
+    }
+  }
+  [apSel,shSel,isoSel].forEach(function(el){ el.addEventListener('change',render); });
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  render();
+})();
+</script>
+</body>
+</html>

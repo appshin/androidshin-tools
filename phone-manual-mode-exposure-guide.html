@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to set exposure in your phone's Pro (manual) mode | Mr.AndroidShin</title>
+<meta name="description" content="A practical guide to nailing exposure in a phone's Pro/manual mode: what ISO, shutter speed and exposure compensation actually do, how to read the meter, and starting settings for common scenes — bright day, indoors, motion and night.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/phone-manual-mode-exposure-guide.html">
+<meta property="og:title" content="How to set exposure in your phone's Pro (manual) mode">
+<meta property="og:description" content="What ISO, shutter and exposure compensation do, how to read the meter, and starting settings for common scenes.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.95rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{color:var(--muted);font-family:var(--mono);font-size:.78rem;font-weight:600}
+  td code{color:var(--accent)}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Guide · Photography</p>
+  <h1>Setting exposure in your phone's Pro (manual) mode</h1>
+
+  <p>Auto mode guesses, and it usually guesses fine — until the scene is tricky: a backlit face, a neon sign at night, someone moving. Pro or manual mode hands you the controls so you decide how bright the shot is and how it looks. Here's what each control does, how to read the meter, and where to start for common scenes.</p>
+
+  <div class="callout">
+    <p><b>The one idea to hold onto:</b> exposure is a balance of <b>shutter speed</b> and <b>ISO</b> (aperture is fixed on most phones). More of one lets you use less of the other for the same brightness — so you pick the split whose side effects suit the shot.</p>
+  </div>
+
+  <h2>The three controls</h2>
+  <table>
+    <tr><th>Control</th><th>What it changes</th><th>Side effect</th></tr>
+    <tr><td><b>ISO</b></td><td>Signal amplification — higher = brighter image</td><td>High ISO adds noise/grain</td></tr>
+    <tr><td><b>Shutter</b></td><td>How long the sensor collects light</td><td>Slow = motion blur; fast = freezes action</td></tr>
+    <tr><td><b>Exp. comp (EV)</b></td><td>Nudges the whole exposure brighter/darker</td><td>Overrides the meter's guess</td></tr>
+  </table>
+  <p>On a phone the aperture (the f-number) is usually fixed, so you mostly juggle ISO and shutter. Exposure compensation is a quick "make it brighter/darker" dial that's useful when the meter is fooled.</p>
+
+  <h2>How to read the meter</h2>
+  <p>Most Pro modes show a little scale from <code>-2</code> to <code>+2</code> with a marker. At <code>0</code>, the phone thinks the shot is correctly exposed. Positive means it'll look brighter, negative darker. But "correct" is an average — a bright sky or a dark room can pull the meter the wrong way, which is exactly when you take over.</p>
+
+  <h2>A simple workflow</h2>
+  <ol>
+    <li><b>Set ISO as low as the scene allows</b> (often 100 in daylight) for the cleanest image.</li>
+    <li><b>Pick a shutter speed for the subject:</b> fast enough to freeze motion, or slow for a still scene. Hand-held, keep it around <code>1/60</code>s or faster to avoid shake blur.</li>
+    <li><b>Check the meter.</b> Too dark? Raise ISO or slow the shutter. Too bright? Lower ISO or speed the shutter.</li>
+    <li><b>Fine-tune with exposure compensation</b> if the whole frame should be brighter or darker than the meter wants.</li>
+  </ol>
+  <p>Because raising one and lowering the other keeps brightness constant, you can freeze more motion by going a stop faster on the shutter and a stop higher on ISO — same exposure, different trade. The <a href="/exposure-calculator.html">exposure calculator</a> lays out those equivalent pairs so you can see your options at a glance.</p>
+
+  <h2>Starting points for common scenes</h2>
+  <table>
+    <tr><th>Scene</th><th>ISO</th><th>Shutter</th><th>Notes</th></tr>
+    <tr><td>Bright daylight</td><td><code>100</code></td><td><code>1/500</code>+</td><td>Low ISO, fast shutter; watch for blown highlights</td></tr>
+    <tr><td>Overcast / shade</td><td><code>100–400</code></td><td><code>1/125</code></td><td>Raise ISO a little as it darkens</td></tr>
+    <tr><td>Indoors</td><td><code>400–1600</code></td><td><code>1/60</code></td><td>Brace the phone; keep shutter hand-holdable</td></tr>
+    <tr><td>Freezing motion</td><td>as needed</td><td><code>1/500–1/1000</code></td><td>Fast shutter first, raise ISO to compensate</td></tr>
+    <tr><td>Night / tripod</td><td><code>100</code></td><td>seconds</td><td>Low ISO for clean image; needs a steady rest</td></tr>
+  </table>
+  <p class="note">These are starting points, not rules — read the meter and your preview, then adjust to taste.</p>
+
+  <h2>A few habits that help</h2>
+  <ul>
+    <li><b>Expose for the important part.</b> For a backlit face, let the background blow out a bit so the face is right.</li>
+    <li><b>Chase the lowest ISO you can get away with.</b> Noise is the thing you can't fix later; add ISO only when you must.</li>
+    <li><b>Steady the phone.</b> A slower shutter at low ISO beats a fast shutter at high ISO — if you can hold still or prop it up.</li>
+    <li><b>Shoot RAW if your app offers it.</b> It gives you more room to rescue exposure afterward.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Want to see the shutter/ISO trade laid out numerically? The <a href="/exposure-calculator.html">Exposure Calculator</a> takes a baseline shot and lists every equivalent pair — same brightness, different balance of motion and noise.</p>
+  </div>
+
+  <div class="related">
+    <p>Related: <a href="/exposure-calculator.html">Exposure Calculator</a> · <a href="/color-contrast-checker.html">Color Contrast Checker</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
