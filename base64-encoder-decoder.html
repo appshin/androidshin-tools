@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Base64 Encoder / Decoder — UTF-8 safe, URL-safe, data URI | Mr.AndroidShin</title>
+<meta name="description" content="Encode text to Base64 or decode it back, with proper UTF-8 handling for non-ASCII characters. Toggle URL-safe output and wrap the result as a data URI. Runs entirely in your browser — nothing is uploaded.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/base64-encoder-decoder.html">
+<meta property="og:title" content="Base64 Encoder / Decoder">
+<meta property="og:description" content="Encode and decode Base64 with correct UTF-8 handling, URL-safe mode and data URIs. Runs locally.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;--ok:#7BE0A3;--bad:#FF7A7A;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:64ch;margin:0 0 24px}
+  .stage{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+  .modes{display:flex;border-bottom:1px solid var(--line)}
+  .mode{flex:1;text-align:center;padding:13px 10px;cursor:pointer;font-family:var(--mono);font-size:.85rem;color:var(--muted);background:transparent;border:none;border-right:1px solid var(--line)}
+  .mode:last-child{border-right:none}
+  .mode.active{color:var(--accent);background:linear-gradient(180deg,rgba(255,180,84,.09),transparent)}
+  .panel{padding:18px 20px}
+  .panel + .panel{border-top:1px solid var(--line)}
+  label.fl{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  textarea{width:100%;min-height:118px;resize:vertical;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:var(--mono);font-size:.92rem;padding:12px 14px;line-height:1.5;outline:none;word-break:break-all}
+  textarea:focus{border-color:var(--accent)}
+  .opts{display:flex;flex-wrap:wrap;gap:16px;margin:14px 0 2px}
+  .opt{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+  .opt input{width:16px;height:16px;accent-color:var(--accent)}
+  .out{background:var(--surface2)}
+  .outbox{width:100%;min-height:118px;background:var(--bg);border:1px solid var(--line);border-radius:12px;color:var(--accent-2);font-family:var(--mono);font-size:.92rem;padding:12px 14px;line-height:1.5;white-space:pre-wrap;word-break:break-all;overflow:auto}
+  .outbox.err{color:var(--bad)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .btn{background:var(--surface);border:1px solid var(--line);color:var(--text);font-family:var(--mono);font-size:.85rem;padding:11px 16px;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{border-color:var(--accent);color:var(--accent);background:linear-gradient(180deg,rgba(255,180,84,.09),transparent)}
+  .btn.done{color:var(--ok);border-color:var(--ok)}
+  .meta{margin-left:auto;font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+  .adslot{display:none}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  .related{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;color:var(--muted);font-size:.92rem}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="tool">
+    <p class="eyebrow">Utility · Encoding</p>
+    <h1>Base64 Encoder / Decoder</h1>
+    <p class="sub">Convert text to Base64 and back, with correct <b>UTF-8</b> handling so emoji and non-Latin characters survive the round trip. Optional <b>URL-safe</b> alphabet and a one-click <b>data URI</b> wrapper. Everything runs in your browser — nothing is uploaded.</p>
+
+    <div class="stage">
+      <div class="modes">
+        <button class="mode active" id="mEnc" type="button">Encode → Base64</button>
+        <button class="mode" id="mDec" type="button">Decode → Text</button>
+      </div>
+
+      <div class="panel">
+        <label class="fl" id="inLabel" for="input">Plain text</label>
+        <textarea id="input" spellcheck="false" placeholder="Type or paste here…">Hello, 안녕하세요 👋</textarea>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="urlSafe"> URL-safe alphabet (<code>-_</code>, no padding)</label>
+          <label class="opt"><input type="checkbox" id="dataUri"> Wrap as data URI</label>
+        </div>
+      </div>
+
+      <div class="panel out">
+        <label class="fl" id="outLabel">Base64</label>
+        <div class="outbox" id="output" aria-live="polite"></div>
+        <div class="row">
+          <button class="btn primary" id="copyBtn">Copy result</button>
+          <button class="btn" id="swapBtn">Use result as input</button>
+          <button class="btn" id="clearBtn">Clear</button>
+          <span class="meta" id="meta"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+
+  <section class="content" id="learn">
+    <h2>What Base64 actually is</h2>
+    <p>Base64 rewrites arbitrary bytes using only 64 safe characters (<code>A–Z</code>, <code>a–z</code>, <code>0–9</code>, <code>+</code>, <code>/</code>, with <code>=</code> as padding). It exists so binary data can travel through channels that only handle text — HTTP headers, JSON payloads, email, config files. It is <b>not</b> encryption: anyone can decode it instantly.</p>
+
+    <h2>The UTF-8 trap</h2>
+    <p>Base64 encodes <i>bytes</i>, not characters. Naive browser code hands non-ASCII text straight to <code>btoa()</code> and throws an error, or worse, quietly mangles it. This tool converts your text to UTF-8 bytes first, so <code>안녕</code> and 👋 come back exactly as they went in. If you've ever decoded a string into mojibake, this is why.</p>
+
+    <h2>URL-safe mode</h2>
+    <p>Standard Base64 contains <code>+</code> and <code>/</code>, which mean something else inside a URL or filename, and <code>=</code> padding, which gets escaped. URL-safe Base64 swaps them for <code>-</code> and <code>_</code> and drops the padding. You'll see it in JWTs, OAuth tokens and query parameters — decode those with URL-safe mode on.</p>
+
+    <h2>Data URIs</h2>
+    <p>A data URI embeds content directly in a link or stylesheet instead of pointing at a file: <code>data:text/plain;base64,SGVsbG8=</code>. Handy for tiny assets and quick tests, wasteful for anything large — Base64 makes data about 33% bigger.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Is my text sent to a server?</summary>
+      <p>No. Encoding and decoding happen locally in your browser with JavaScript. Nothing leaves the page, and there's no sign-up.</p>
+    </details>
+    <details>
+      <summary>Is Base64 secure?</summary>
+      <p>Not at all. It's an encoding, not encryption — reversing it takes one click. Never use it to hide secrets; use it to move bytes safely through text-only channels.</p>
+    </details>
+    <details>
+      <summary>Why does decoding fail on my string?</summary>
+      <p>Usually one of three things: it's URL-safe Base64 (turn the option on), it lost its padding when copied, or it wasn't valid Base64 to begin with. This tool tolerates missing padding and whitespace.</p>
+    </details>
+
+    <div class="related">
+      Related: <a href="/jwt-decoder.html">JWT decoder</a> · <a href="/json-formatter.html">JSON formatter</a> · <a href="/android-strings-xml-escaper.html">strings.xml escaper</a>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var input=document.getElementById('input'),output=document.getElementById('output'),
+      urlSafe=document.getElementById('urlSafe'),dataUri=document.getElementById('dataUri'),
+      mEnc=document.getElementById('mEnc'),mDec=document.getElementById('mDec'),
+      inLabel=document.getElementById('inLabel'),outLabel=document.getElementById('outLabel'),
+      copyBtn=document.getElementById('copyBtn'),swapBtn=document.getElementById('swapBtn'),
+      clearBtn=document.getElementById('clearBtn'),meta=document.getElementById('meta');
+  var mode='encode';
+
+  function utf8ToB64(str){
+    var bytes=new TextEncoder().encode(str);
+    var bin='';
+    for(var i=0;i<bytes.length;i++){ bin+=String.fromCharCode(bytes[i]); }
+    return btoa(bin);
+  }
+  function b64ToUtf8(b64){
+    var s=b64.replace(/\s+/g,'');
+    // accept url-safe input regardless of the toggle
+    s=s.replace(/-/g,'+').replace(/_/g,'/');
+    while(s.length%4!==0){ s+='='; }
+    var bin=atob(s);
+    var bytes=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++){ bytes[i]=bin.charCodeAt(i); }
+    return new TextDecoder('utf-8',{fatal:false}).decode(bytes);
+  }
+  function toUrlSafe(b64){ return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+
+  function setMode(m){
+    mode=m;
+    mEnc.classList.toggle('active',m==='encode');
+    mDec.classList.toggle('active',m==='decode');
+    inLabel.textContent = m==='encode' ? 'Plain text' : 'Base64';
+    outLabel.textContent = m==='encode' ? 'Base64' : 'Plain text';
+    dataUri.parentElement.style.opacity = m==='encode' ? '1' : '.4';
+    dataUri.disabled = m!=='encode';
+    run();
+  }
+
+  function run(){
+    var v=input.value;
+    output.classList.remove('err');
+    if(!v){ output.textContent=''; meta.textContent=''; return; }
+    try{
+      if(mode==='encode'){
+        var b=utf8ToB64(v);
+        if(urlSafe.checked) b=toUrlSafe(b);
+        if(dataUri.checked && !urlSafe.checked) b='data:text/plain;base64,'+b;
+        else if(dataUri.checked && urlSafe.checked) b='data:text/plain;base64,'+b;
+        output.textContent=b;
+        meta.textContent=v.length+' chars → '+b.length+' chars';
+      } else {
+        var raw=v.replace(/^data:[^;]*;base64,/,'');
+        var t=b64ToUtf8(raw);
+        output.textContent=t;
+        meta.textContent=raw.replace(/\s+/g,'').length+' chars → '+t.length+' chars';
+      }
+    }catch(e){
+      output.classList.add('err');
+      output.textContent='Could not decode — not valid Base64.';
+      meta.textContent='';
+    }
+  }
+  function flash(btn,label){
+    var old=btn.textContent; btn.textContent=label; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent=old; btn.classList.remove('done'); },1200);
+  }
+  copyBtn.addEventListener('click',function(){
+    var t=output.textContent; if(!t) return;
+    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(function(){flash(copyBtn,'Copied');},function(){flash(copyBtn,'Blocked');}); }
+    else flash(copyBtn,'Unsupported');
+  });
+  swapBtn.addEventListener('click',function(){
+    var t=output.textContent; if(!t||output.classList.contains('err')) return;
+    input.value=t; setMode(mode==='encode'?'decode':'encode');
+  });
+  clearBtn.addEventListener('click',function(){ input.value=''; run(); input.focus(); });
+  mEnc.addEventListener('click',function(){setMode('encode');});
+  mDec.addEventListener('click',function(){setMode('decode');});
+  ['input','change'].forEach(function(ev){
+    input.addEventListener(ev,run); urlSafe.addEventListener(ev,run); dataUri.addEventListener(ev,run);
+  });
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  setMode('encode');
+})();
+</script>
+</body>
+</html>

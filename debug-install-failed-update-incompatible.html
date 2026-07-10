@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: INSTALL_FAILED_UPDATE_INCOMPATIBLE | Mr.AndroidShin</title>
+<meta name="description" content="The install failed with INSTALL_FAILED_UPDATE_INCOMPATIBLE — the APK was signed with a different key than the copy already on the device. Why Android refuses it, what usually causes it, and the safe fixes.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-install-failed-update-incompatible.html">
+<meta property="og:title" content="Debugging log: INSTALL_FAILED_UPDATE_INCOMPATIBLE">
+<meta property="og:description" content="Android refused the install because the signing key changed. Why, and how to fix it safely.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Install</p>
+  <h1>INSTALL_FAILED_UPDATE_INCOMPATIBLE — the key changed</h1>
+
+  <p>I tried to install a build on a test device and Android flatly refused it. The app was already there, the package name matched, the version was newer — and it still wouldn't go on. The error told me everything if I'd known how to read it: the copy on the device and the APK in my hand were <b>signed with different keys</b>.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Android only lets an app be replaced by a build signed with the <b>same</b> key. If the signature differs — even by accident — the install is blocked. Either sign with the original key, or uninstall the old copy first (which wipes its data).</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>adb: failed to install app-release.apk:
+Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE:
+Existing package com.example.app signatures do not match
+newer version; ignoring!]</pre>
+  <p>Sometimes it shows up as <code>INSTALL_FAILED_VERSION_DOWNGRADE</code> instead if you also went backwards in version code, but the signature line is the one that matters here.</p>
+
+  <h2>Why Android is so strict about this</h2>
+  <p>The signing key <i>is</i> the app's identity. It's what proves a new APK came from the same developer as the one already installed — and therefore that it's safe to hand over that app's stored data, permissions and identity. If any APK with a matching package name could overwrite yours, a malicious app could impersonate your banking app and inherit its data. So the rule is absolute: same package name <b>and</b> same signature, or no update.</p>
+
+  <h2>How it usually happens</h2>
+  <ul>
+    <li><b>Debug build over a release build</b> (or vice versa). Debug APKs are signed with the auto-generated debug key; release ones with your keystore. Different keys.</li>
+    <li><b>A Play-installed app, then a local build.</b> With Play App Signing, Google signs the APK users get; your local build is signed with the upload/debug key. They won't match.</li>
+    <li><b>Building on a different machine.</b> Android Studio generates a debug keystore per machine, so your laptop's debug key differs from your desktop's.</li>
+    <li><b>A new keystore.</b> You regenerated one, or a teammate signed with theirs.</li>
+  </ul>
+
+  <h2>Fixes</h2>
+
+  <h3>1. Uninstall first (the usual answer for testing)</h3>
+  <p>If it's a test device and you don't care about the app's data:</p>
+<pre>adb uninstall com.example.app
+adb install app-release.apk</pre>
+  <p>Note that this <b>deletes the app's data</b>. If the point of your test was to check an upgrade path, this defeats it — see the next option.</p>
+
+  <h3>2. Sign with the original key</h3>
+  <p>To genuinely test an update over an existing install, the new APK must carry the same signature. Build with the same keystore that signed what's on the device. If the device has the Play version, install a build signed with the <b>app signing key</b> — Play Console can give you a testable artifact for that, rather than you shipping your upload key around.</p>
+
+  <h3>3. Keep debug and release apart</h3>
+  <p>Give your debug builds a different package name so both can live on the device at once and never collide:</p>
+<pre>android {
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
+    }
+}</pre>
+  <p>Now the debug app is <code>com.example.app.debug</code> — a different package entirely, so it installs alongside the real one and this error stops happening during development.</p>
+
+  <div class="callout">
+    <p>Don't "fix" this by changing your release keystore. The signature is what lets you update your published app; swapping it means existing users can't update at all. If you've genuinely lost the key, the recovery path runs through Play Console, not through re-signing.</p>
+  </div>
+
+  <h2>How to check the signature yourself</h2>
+  <p>If you're not sure which key an APK carries, inspect it:</p>
+<pre>apksigner verify --print-certs app-release.apk</pre>
+  <p>Compare the certificate fingerprint with the one on the device build (or with the app signing certificate shown in Play Console). If the fingerprints differ, you've found your answer.</p>
+
+  <p class="note">Package names and file names above are placeholders — use your own.</p>
+
+  <div class="related">
+    <p>Related: <a href="/google-play-app-signing-explained.html">Play App Signing explained</a> · <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
