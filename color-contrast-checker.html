@@ -152,6 +152,12 @@
       <p>WCAG exempts truly disabled controls, but users still try to read them. Aiming for at least AA large on placeholder and secondary text keeps your UI usable.</p>
     </details>
 
+    <h2>Contrast beyond text</h2>
+    <p>WCAG's text thresholds get the attention, but the same idea applies to anything a user must distinguish: an icon against its button, the border of an input field, the active state of a tab. Non-text UI elements have their own guideline (a 3:1 minimum) precisely because a control nobody can see is as broken as a label nobody can read. When you check a color pair here, you can apply the same ratio thinking to those cases &mdash; a focus ring or a disabled/enabled distinction that falls under 3:1 is a real usability problem, not just a text one.</p>
+
+    <h2>Why dark themes need re-checking</h2>
+    <p>A palette that passes in light mode often fails when inverted, because contrast isn't symmetric &mdash; light-gray text that reads well on white can vanish on near-black. If your app or site offers a dark theme, every text/background pair needs its own check in that theme, not a copy of the light-mode result. This is one of the most common accessibility regressions shipped alongside an otherwise polished dark mode.</p>
+
     <div class="related">
       Related: <a href="/compose-color-converter.html">Compose color converter</a> · <a href="/dp-sp-px-converter.html">dp / sp / px converter</a>
     </div>

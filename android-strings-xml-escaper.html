@@ -144,6 +144,12 @@
       <p>It escapes the value text, which you can drop into a <code>&lt;string&gt;</code>, an <code>&lt;item&gt;</code> inside <code>&lt;plurals&gt;</code>, or a <code>&lt;string-array&gt;</code> entry. The escaping rules are the same for all of them.</p>
     </details>
 
+    <h2>Why this bites during translation</h2>
+    <p>The escaping problem scales the moment you localize. A single English string with a stray apostrophe is easy to spot; a folder of thirty translated <code>strings.xml</code> files, where French and Italian are full of apostrophes, is where unescaped-apostrophe build failures really pile up. Running translated text through an escaper before it lands in your resources turns a class of last-minute build breakages into a non-issue, which matters when a translator hands back content you can't easily proofread character by character.</p>
+
+    <h2>Escaping vs formatting arguments</h2>
+    <p>Two different concerns often get tangled here. Escaping makes a character <i>safe to store</i> in XML; format specifiers like <code>%1$s</code> control how runtime values get <i>inserted</i>. They interact through the percent sign: a literal <code>%</code> in a formatted string must be doubled to <code>%%</code> so it isn't read as the start of a specifier. If you use <code>getString()</code> with arguments, turn on the percent option; if the string is purely static, leave it off so a genuine percent sign stays single.</p>
+
     <div class="related">
       Related: <a href="/android-app-bundle-missing-translations.html">Fix missing translations in an AAB</a> · <a href="/compose-color-converter.html">Compose color converter</a>
     </div>

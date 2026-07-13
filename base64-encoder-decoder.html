@@ -142,6 +142,12 @@
       <p>Usually one of three things: it's URL-safe Base64 (turn the option on), it lost its padding when copied, or it wasn't valid Base64 to begin with. This tool tolerates missing padding and whitespace.</p>
     </details>
 
+    <h2>Where you'll actually meet Base64</h2>
+    <p>Once you recognize it, Base64 is everywhere: the <code>Authorization: Basic</code> header packs a username and password as Base64, a data URI embeds an image or font as Base64 inside CSS, an email attachment is Base64 in transit, and the header and payload of a JWT are Base64URL. Knowing how to decode it on the spot turns a lot of opaque strings into readable data &mdash; which is exactly why a quick decoder is worth keeping a click away when you're inspecting a request or a config file.</p>
+
+    <h2>Base64 is not compression &mdash; it costs size</h2>
+    <p>A common misconception is that encoding "packs" data. It's the opposite: Base64 represents 3 bytes with 4 characters, so the output is about 33% larger than the input. That's a fine trade when you need binary to survive a text-only channel, but it's the reason you don't Base64 large files into a page &mdash; a big inlined image bloats the HTML and can't be cached separately. Use it for small assets and for moving bytes safely, not as a way to shrink anything.</p>
+
     <div class="related">
       Related: <a href="/jwt-decoder.html">JWT decoder</a> · <a href="/json-formatter.html">JSON formatter</a> · <a href="/android-strings-xml-escaper.html">strings.xml escaper</a>
     </div>

@@ -193,6 +193,15 @@
     <details><summary>Should I use dp or sp?</summary><p>Use dp for layout dimensions (margins, sizes) and sp for text. sp additionally scales with the user's font-size setting, which dp does not.</p></details>
     <details><summary>How do I find my device's density?</summary><p>It maps to a bucket by dpi range. In code, <code>resources.displayMetrics.densityDpi</code> gives the exact value; pick the closest bucket in the table above.</p></details>
     <details><summary>Does this store my input?</summary><p>No. Everything is computed in your browser and nothing is uploaded.</p></details>
+
+    <h2>Why Android uses dp instead of pixels</h2>
+    <p>If you sized everything in raw pixels, a 48-pixel button would look finger-friendly on an old low-density screen and shrink to a tiny target on a modern high-density one — same pixel count, wildly different physical size. dp fixes this by describing size in density-independent units, so 48 dp is roughly the same physical size on every screen. The system multiplies dp by the screen's density to arrive at the real pixel count for you. Designing in dp is what lets one layout look consistent across a cheap phone, a flagship, and a tablet.</p>
+
+    <h2>The 48 dp touch-target rule</h2>
+    <p>A practical reason this conversion matters: Android's accessibility guidance recommends interactive elements be at least 48 dp on a side, which works out to about a 9mm physical target — roughly the pad of a finger. Because that's in dp, it holds across densities. When you check a design against that minimum, you're checking dp, not pixels; this converter shows you what that 48 dp becomes in physical pixels on each bucket, which is handy when you're slicing assets or debugging why a control feels too small on one device.</p>
+
+    <h2>Where sp changes the picture</h2>
+    <p>The reason text uses sp and everything else uses dp is accessibility. A user who sets a larger system font expects your text to grow with it — sp makes that happen automatically, dp does not. The trade-off is that sp text can overflow a fixed-size dp container at large font scales, which is a common source of clipped labels. Previewing your text at a higher font scale (this tool lets you apply one) catches that before a user with large fonts does.</p>
   </section>
 
   <!-- ADSENSE SLOT 2 -->

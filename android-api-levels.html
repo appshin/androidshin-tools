@@ -97,6 +97,15 @@
     <details><summary>What API level is Android 14?</summary><p>API level 34, codename Upside Down Cake, constant <code>UPSIDE_DOWN_CAKE</code>.</p></details>
     <details><summary>What is the latest Android API level?</summary><p>API 37 — Android 17, internal codename Cinnamon Bun — which reached stable in June 2026. API 36 is Android 16 (Baklava).</p></details>
     <details><summary>What minSdk should I choose?</summary><p>It's a trade-off between reach and maintenance. Many teams sit around API 24–26 today; check current device distribution and see the <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk guide</a>.</p></details>
+
+    <h2>Why the number matters more than the name</h2>
+    <p>Dessert names are fun trivia, but the API level integer is what your build and your code actually care about. Gradle compares integers to decide which APIs are available, and <code>Build.VERSION.SDK_INT</code> is an integer you branch on at runtime. When a library says it "requires API 26+", it means the integer, not the marketing version — so the mapping in the table above is the thing you reach for when a dependency, a permission, or a platform behavior is gated behind a particular release. Knowing that Android 8.0 is API 26 turns a vague requirement into a concrete <code>minSdk</code> decision.</p>
+
+    <h2>How new API levels reach devices</h2>
+    <p>A new API level ships the moment a platform version reaches stable, but the devices in people's hands lag behind for years. That gap is the whole reason <code>minSdk</code> and runtime version checks exist: you compile against the newest level to use its APIs, while still supporting older ones by guarding new calls behind <code>SDK_INT</code> checks. This is why the "latest" API level and the API level you should actually target for reach are rarely the same number — the newest gives you capabilities, the distribution data tells you how many users you'd exclude.</p>
+
+    <details><summary>Is the API level the same as the Android version?</summary><p>No — they're parallel numbering. The Android version (like 14) is the marketing name; the API level (34) is what your build and code use. This table maps between them.</p></details>
+    <details><summary>Why do some releases share a "version" but differ in API level?</summary><p>Feature-drop and point releases can add a new API level without a headline version bump, which is exactly why relying on the integer avoids confusion.</p></details>
   </section>
 
   <!-- ADSENSE SLOT 2 -->
