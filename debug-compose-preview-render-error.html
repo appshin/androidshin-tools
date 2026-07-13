@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: Compose @Preview fails but the app runs fine | Mr.AndroidShin</title>
+<meta name="description" content="The Compose @Preview pane showed a render error while the app itself built and ran perfectly. Why previews break where the real app doesn't — usually a ViewModel, context or real data reached at preview time — and how to make previews render again.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-compose-preview-render-error.html">
+<meta property="og:title" content="Debugging log: Compose @Preview fails but the app runs fine">
+<meta property="og:description" content="Why the preview breaks where the real app doesn't, and how to make it render again.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Compose</p>
+  <h1>Compose @Preview fails, but the app runs fine</h1>
+
+  <p>My screen built, launched and worked perfectly on a device. But the Android Studio <b>preview pane</b> just showed a red render error. It's a strange feeling — the code is clearly fine, yet the tool that's supposed to show it a design-time snapshot refuses. The reason is that a preview is not your app, and it can reach things a running app quietly provides.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> a <code>@Preview</code> renders your composable in isolation, with no real Activity, no ViewModel graph and no live data. If the composable needs any of those to draw, the preview crashes while the real app is fine. The fix is to make previews use fake data and avoid the app's runtime plumbing.</p>
+  </div>
+
+  <h2>Why the preview is different</h2>
+  <p>When your app runs, a whole environment exists: an Activity, a navigation graph, dependency injection, a ViewModel holding state, maybe a repository fetching data. The preview renderer has none of that. It calls your composable directly in a stripped-down sandbox. So anything the composable pulls from that environment — a <code>viewModel()</code>, a <code>LocalContext</code> cast to your Activity, a resource that isn't there at design time — has nothing to resolve to, and rendering fails.</p>
+
+  <h2>The usual culprits</h2>
+  <ul>
+    <li><b>A ViewModel inside the previewed composable.</b> <code>viewModel()</code> or an injected VM can't be built at preview time.</li>
+    <li><b>Casting <code>LocalContext.current</code> to an Activity.</b> In a preview the context isn't your Activity, so the cast throws.</li>
+    <li><b>Real data or I/O at composition.</b> Reading a database, network or DataStore while composing has nothing to read from.</li>
+    <li><b>Non-preview-safe resources</b> — fonts, drawables or themes that only resolve inside the full app setup.</li>
+  </ul>
+
+  <h2>The fix: split the stateful and stateless parts</h2>
+  <p>The clean pattern is to separate the composable that <i>holds state</i> from the one that just <i>draws</i>. Preview the stateless one with plain sample values.</p>
+<pre>// Stateful: reaches the ViewModel. Don't preview this one.
+@Composable
+fun ProfileScreen(vm: ProfileViewModel = viewModel()) {
+    val state by vm.state.collectAsStateWithLifecycle()
+    ProfileContent(state)
+}
+
+// Stateless: just draws from its inputs. Preview THIS.
+@Composable
+fun ProfileContent(state: ProfileState) { /* UI only */ }
+
+@Preview
+@Composable
+fun ProfileContentPreview() {
+    ProfileContent(
+        state = ProfileState(name = "Sample User", followers = 42)
+    )
+}</pre>
+  <p>Now the preview draws real UI from fake data, touching none of the runtime graph. This split is good architecture anyway — it makes the drawing layer easy to test and reuse.</p>
+
+  <h2>When you must preview something context-bound</h2>
+  <p>Guard the runtime-only bits with <code>LocalInspectionMode</code>, which is <code>true</code> only inside a preview:</p>
+<pre>@Composable
+fun Banner() {
+    if (LocalInspectionMode.current) {
+        // draw a placeholder for the preview
+    } else {
+        // do the real, context-dependent work
+    }
+}</pre>
+  <p>Use this sparingly — the split above is cleaner — but it's handy when a composable genuinely needs to behave differently at design time.</p>
+
+  <div class="callout">
+    <p>Before assuming your code is wrong, open the preview's error detail and read the exception. A preview failure is a render-time crash with a real stack trace — it usually names the exact ViewModel, cast or resource that isn't available.</p>
+  </div>
+
+  <h2>Quick checklist</h2>
+  <ul>
+    <li>Preview a <b>stateless</b> composable with sample inputs, not the screen that wires up the ViewModel.</li>
+    <li>Don't build ViewModels, read data, or cast the context inside anything you preview.</li>
+    <li>Provide fake but realistic parameters so the layout reflects real content.</li>
+    <li>Reach for <code>LocalInspectionMode</code> only when a composable must differ at design time.</li>
+  </ul>
+
+  <p class="note">Class and property names above are illustrative — the pattern matters more than the names.</p>
+
+  <div class="related">
+    <p>Related: <a href="/compose-color-converter.html">Compose color converter</a> · <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

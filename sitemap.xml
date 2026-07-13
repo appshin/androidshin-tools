@@ -31,4 +31,7 @@
   <url><loc>https://androidshin.dev/phone-manual-mode-exposure-guide.html</loc><lastmod>2026-07-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/base64-encoder-decoder.html</loc><lastmod>2026-07-08</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://androidshin.dev/debug-install-failed-update-incompatible.html</loc><lastmod>2026-07-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-compose-preview-render-error.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-default-firebaseapp-not-initialized.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-manifest-merger-failed.html</loc><lastmod>2026-07-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

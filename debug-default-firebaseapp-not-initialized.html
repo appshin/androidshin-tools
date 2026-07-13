@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Default FirebaseApp is not initialized" | Mr.AndroidShin</title>
+<meta name="description" content="The app crashed with 'Default FirebaseApp is not initialized in this process'. What Firebase needs before you call it, why the google-services plugin or config file is usually the missing piece, and how to get initialization working.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-default-firebaseapp-not-initialized.html">
+<meta property="og:title" content="Debugging log: 'Default FirebaseApp is not initialized'">
+<meta property="og:description" content="What Firebase needs before you call it, and why the plugin or config file is usually missing.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Firebase</p>
+  <h1>"Default FirebaseApp is not initialized in this process"</h1>
+
+  <p>I wired up a Firebase feature, ran the app, and it crashed on the first Firebase call with a message telling me to <code>call FirebaseApp.initializeApp(Context) first</code>. The confusing part: I never call that anywhere, and Firebase samples don't either. That's because it's normally supposed to happen <b>automatically</b> — and when it doesn't, one specific piece is missing.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Firebase auto-initializes from your <code>google-services.json</code> via the <code>google-services</code> Gradle plugin. If the plugin isn't applied, or the JSON is missing or in the wrong place, that automatic setup never runs — so the "default app" doesn't exist when you call it.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>java.lang.IllegalStateException: Default FirebaseApp is not
+initialized in this process com.example.app. Make sure to call
+FirebaseApp.initializeApp(Context) first.</pre>
+
+  <h2>How initialization is supposed to work</h2>
+  <p>You don't normally call <code>initializeApp</code> yourself. At build time the <code>google-services</code> plugin reads <code>google-services.json</code> and generates the config values; at startup a content provider Firebase ships reads those values and creates the default <code>FirebaseApp</code> before your code runs. When the error appears, that chain broke somewhere — the plugin didn't run, or it had no JSON to read.</p>
+
+  <h2>Check these, in order</h2>
+
+  <h3>1. Is the google-services plugin applied?</h3>
+  <p>You need it declared at the project level and applied in the app module. In the app module's <code>build.gradle</code>:</p>
+<pre>plugins {
+    id("com.android.application")
+    id("com.google.gms.google-services")   // this line
+}</pre>
+  <p>Missing this is the single most common cause. Without it, the JSON is never processed and nothing initializes.</p>
+
+  <h3>2. Is google-services.json in the right place?</h3>
+  <p>It belongs in the <b>app module</b> directory (the <code>app/</code> folder), not the project root. For build variants with different package names, it must contain a matching entry — or the plugin can't find config for the applicationId you're running.</p>
+
+  <h3>3. Does the package name match?</h3>
+  <p>The <code>package_name</code> inside <code>google-services.json</code> has to match your app's <code>applicationId</code> (including any suffix like <code>.debug</code>). A mismatch means the plugin generates no config for the variant you launched, and initialization silently no-ops.</p>
+
+  <h3>4. Clean and rebuild</h3>
+  <p>The plugin runs at build time. After adding it or replacing the JSON, do a clean build so the config is regenerated — a stale build can keep failing even after you've fixed the setup.</p>
+
+  <h2>If you really do need to initialize manually</h2>
+  <p>Automatic init covers almost everyone. If you have an unusual setup (no JSON, multiple Firebase projects, values from somewhere else), you can initialize explicitly early in <code>Application.onCreate()</code>:</p>
+<pre>class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        FirebaseApp.initializeApp(this)   // or with explicit FirebaseOptions
+    }
+}</pre>
+  <p>But if you're hitting this error on a normal project, prefer fixing the plugin/JSON — that's almost always the real gap, and manual init just papers over it.</p>
+
+  <div class="callout">
+    <p>A subtle variant: the error only appears in a <b>secondary process</b> (a widget, a background service in its own process). Firebase initializes per process, so make sure whatever runs there also triggers initialization.</p>
+  </div>
+
+  <p class="note">Package names and IDs above are placeholders — use your own project's values.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-kotlin-metadata-version-firebase-bom.html">Firebase broke my build with a Kotlin error</a> · <a href="/debug-manifest-merger-failed.html">Manifest merger failed</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
