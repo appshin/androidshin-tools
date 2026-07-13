@@ -98,6 +98,18 @@
     <details><summary>Is my JSON uploaded anywhere?</summary><p>No. Formatting, validation and minifying all run locally in your browser.</p></details>
     <details><summary>Why does it say invalid when it looks fine?</summary><p>The most common causes are a trailing comma, single quotes, or an unquoted key. The status line points to the position of the first error.</p></details>
     <details><summary>Does it handle large files?</summary><p>It handles typical API payloads easily. Extremely large documents may be slow because everything runs on the page.</p></details>
+
+    <h2>Pretty-print vs minify: when to use which</h2>
+    <p>These are two directions of the same operation. <b>Pretty-printing</b> adds newlines and indentation so a human can scan the structure, match brackets, and diff two versions in a code review — use it while you're reading, debugging an API response, or committing a config file that people will edit. <b>Minifying</b> removes every optional space and newline so the bytes are as small as possible — use it when the JSON travels over the network or gets embedded in a URL or attribute, where each character costs bandwidth. The data is identical either way; only the whitespace changes, so you can freely round-trip between the two.</p>
+
+    <h2>Why an invalid line breaks the whole document</h2>
+    <p>JSON is parsed as a single structured value, not line by line, so one stray character invalidates everything after it. That's why a missing comma three levels deep reports an error near the end of the file rather than at the real cause. When the validator points at a position, look <i>just before</i> it: the offending comma, quote or bracket is usually the token right before where the parser gave up. Formatting the document first often makes the mistake jump out, because misaligned indentation reveals a bracket that never closed.</p>
+
+    <h2>JSON vs JavaScript objects</h2>
+    <p>The two look almost identical, which is exactly why JSON trips people up. JavaScript object literals allow single quotes, unquoted keys, trailing commas, comments and functions; JSON allows none of those. Anything you copy out of source code usually needs cleaning before it's valid JSON: double-quote every key and string, drop the trailing commas, and strip comments. This tool's validator flags each of those so you can tell at a glance whether you're holding real JSON or just JavaScript that resembles it.</p>
+
+    <details><summary>Does formatting change my data?</summary><p>No. Only whitespace is added or removed. Keys, values, ordering and types are preserved exactly, so a minified and a pretty-printed version parse to the identical object.</p></details>
+    <details><summary>Are numbers or key order altered?</summary><p>Key order is preserved as written, and numbers are kept as-is rather than re-formatted, so you won't see values silently rounded or reordered.</p></details>
   </section>
 
   <!-- ADSENSE SLOT 2 -->

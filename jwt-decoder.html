@@ -101,6 +101,18 @@
     <details><summary>Is my token sent anywhere?</summary><p>No. The token is decoded locally in your browser and never leaves the page.</p></details>
     <details><summary>Why isn't the signature verified?</summary><p>Verification requires the secret or public key that signed the token, which only your backend should hold. This tool intentionally stays a decoder.</p></details>
     <details><summary>Can I read an encrypted JWT (JWE)?</summary><p>No. Standard JWTs are signed, not encrypted, so their payload is readable. A JWE is encrypted and cannot be read without the key.</p></details>
+
+    <h2>Decoding is not verifying</h2>
+    <p>This is the single most important thing to understand about JWTs. Because the payload is only Base64URL-encoded, <b>anyone</b> can read it and, just as easily, forge a new one with whatever claims they like. What stops a forged token from being accepted is the <b>signature</b>: your backend recomputes it with the signing key and rejects the token if it doesn't match. So decoding a token &mdash; what this tool does &mdash; tells you what it <i>claims</i>, never whether those claims are <i>trustworthy</i>. Never make an authorization decision based on a decoded payload alone; always verify the signature on the server first.</p>
+
+    <h2>Why the payload isn't a secret</h2>
+    <p>Since anyone holding a JWT can read its payload, never put anything sensitive in it &mdash; no passwords, no private personal data, no API secrets. Treat the payload as public information that merely happens to be tamper-evident. If you need to hide the contents rather than just prove they weren't altered, you want encryption (a JWE), not a normal signed JWT.</p>
+
+    <h2>Reading expiry with confidence</h2>
+    <p>The <code>exp</code> and <code>iat</code> claims are Unix timestamps in seconds, which is why "is this token expired?" is one of the most common reasons to decode one. A token whose <code>exp</code> is in the past will be rejected by a correct server no matter what else it contains. If a request is failing with an auth error, decoding the token and checking <code>exp</code> against the current time is the fastest first diagnostic &mdash; often the token is simply stale and needs refreshing.</p>
+
+    <details><summary>Why does my token have only two parts?</summary><p>An <code>alg: none</code> token has an empty signature, so it can look like it's missing a part. These are unsigned and should never be trusted; a normal signed JWT has all three sections.</p></details>
+    <details><summary>Does decoding change or consume the token?</summary><p>No. Decoding is read-only and offline &mdash; the token is unchanged and can still be used exactly as before.</p></details>
   </section>
 
   <!-- ADSENSE SLOT 2 -->

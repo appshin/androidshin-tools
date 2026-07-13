@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — Mr.AndroidShin Dev Tools</title>
-<meta name="description" content="Get in touch with Mr.AndroidShin Dev Tools — suggestions, corrections, and tool requests for Android and Jetpack Compose developers.">
+<meta name="description" content="Get in touch with Mr.AndroidShin Dev Tools — report a bug, suggest a tool, or ask a question. Email and GitHub, with a note on what to expect and how requests become new tools.">
 <meta name="theme-color" content="#0B0E14">
 <link rel="canonical" href="https://androidshin.dev/contact.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,10 @@
   main{padding:44px 0 20px}
   .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
   h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:32px 0 8px;letter-spacing:-.01em}
   p{color:#C7CDDA;margin:0 0 18px}
+  ul{padding-left:20px}li{color:#C7CDDA;margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
   .cards{display:grid;grid-template-columns:1fr;gap:14px;margin:24px 0}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
   .card .k{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
@@ -53,7 +56,7 @@
 <main class="wrap">
   <p class="eyebrow">Contact</p>
   <h1>Get in touch</h1>
-  <p>Found a bug, spotted something wrong in a tool, or want a tool that doesn't exist yet? I'd like to hear it. The fastest way to reach me is email.</p>
+  <p>Mr.AndroidShin Dev Tools is run by one person &mdash; a solo Android developer. If you've found a bug, spotted something wrong or misleading in a tool, or want a utility that doesn't exist here yet, I genuinely want to hear about it. Reader feedback is where most of the roadmap comes from. The fastest way to reach me is email.</p>
 
   <div class="cards">
     <div class="card">
@@ -62,17 +65,30 @@
     </div>
     <div class="card">
       <div class="k">GitHub</div>
-      <div class="v"><a href="https://github.com/appshin" rel="noopener" target="_blank">github.com/appshin</a></div>
+      <div class="v"><a href="https://github.com/appshin" target="_blank" rel="noopener">github.com/appshin</a></div>
     </div>
   </div>
 
-  <p>I read every message but can't always reply immediately — thanks for your patience. Feature requests that would help other Android developers are especially welcome and often become the next tool on the site.</p>
+  <h2>What's useful to include</h2>
+  <p>To help me act on a message quickly, a little context goes a long way:</p>
+  <ul>
+    <li><b>For a bug:</b> which tool, what you entered, what you expected, and what happened instead. A copy of the input that broke it is ideal.</li>
+    <li><b>For a wrong result:</b> the tool, the value you used, and the answer you believe is correct &mdash; with a source if you have one. Accuracy matters to me and I'll fix confirmed errors quickly.</li>
+    <li><b>For a new tool or guide:</b> the problem you're trying to solve. The best requests describe a chore you keep hitting in your own Android work &mdash; those often become the next page on the site.</li>
+    <li><b>For rendering issues:</b> your browser and OS, since a few tools depend on modern browser features.</li>
+  </ul>
+
+  <h2>What to expect</h2>
+  <p>I read every message, but this is a one-person site run alongside building apps, so I can't always reply immediately &mdash; thank you for your patience. Confirmed bugs and factual corrections get priority. Feature requests that would help other Android developers, not just a single use case, are especially welcome and are the most likely to ship.</p>
+
+  <h2>A note on privacy</h2>
+  <p>The tools on this site run entirely in your browser and don't collect your inputs, so there's nothing for me to look up on your behalf &mdash; if you're reporting a problem, please include the details above rather than assuming I can see your session. For how the site itself handles data and advertising cookies, see the <a href="/privacy.html">privacy policy</a>. To learn more about who runs the site and why, see the <a href="/about.html">about page</a>.</p>
 </main>
 
 <footer>
   <div class="wrap foot">
-    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
-    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+    <div>&copy; <span id="yr"></span> Mr.AndroidShin &middot; Dev Tools</div>
+    <div><a href="/about.html">About</a> &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="/contact.html">Contact</a></div>
   </div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>

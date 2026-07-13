@@ -104,6 +104,18 @@
     <details><summary>Why is my date off by hours?</summary><p>Timestamps are UTC-based. This tool shows both your local time and UTC so you can tell them apart. An offset usually means you were comparing local vs UTC.</p></details>
     <details><summary>Is anything sent to a server?</summary><p>No. All conversion happens in your browser.</p></details>
     <details><summary>What's the year-2038 problem?</summary><p>Systems storing Unix time in a signed 32-bit integer overflow on 19 January 2038. Modern platforms use 64-bit, which pushes the limit far into the future.</p></details>
+
+    <h2>Why store time as a number at all</h2>
+    <p>A human-readable string like <code>"March 3, 2026 9:00 PM"</code> is ambiguous the moment it leaves your screen: in which time zone, in which locale's format, with or without daylight saving? A Unix timestamp sidesteps all of that. It names one exact instant on the planet as a single integer, with no time zone, no formatting, and no language baked in. Whoever reads it later converts to whatever local time they need. That's why databases sort by it, APIs return it, and logs from servers around the world can be lined up on one timeline without any of them agreeing on a display format first.</p>
+
+    <h2>The seconds/milliseconds mistake</h2>
+    <p>The most common bug with epoch time is mixing the two scales. If you feed a milliseconds value into code expecting seconds, you land roughly 50,000 years in the future; do the reverse and you land in 1970. The quick sanity check is digit count: a current-era timestamp in seconds is 10 digits, in milliseconds 13. When a date comes out absurdly far from now, a seconds/milliseconds mismatch is almost always why — multiply or divide by 1000 and it snaps back into place.</p>
+
+    <h2>Working with timestamps on Android</h2>
+    <p>On Android this comes up constantly: <code>System.currentTimeMillis()</code> and Firebase timestamps are in milliseconds, while many backend APIs and Unix tools speak seconds. When you store an event time, decide on one unit and keep it consistent across your database, your API and your UI &mdash; then convert only at the edges, for display. Pasting a raw value in here is a fast way to confirm whether a stored number is the instant you actually meant.</p>
+
+    <details><summary>Does this handle negative timestamps?</summary><p>Yes &mdash; values before 1970 are negative. They're valid Unix time and convert the same way, they just represent dates in the past.</p></details>
+    <details><summary>Which time zone does the result use?</summary><p>The tool shows both UTC and your device's local time, so you can read whichever you need and see the offset between them at a glance.</p></details>
   </section>
 
   <!-- ADSENSE SLOT 2 -->
