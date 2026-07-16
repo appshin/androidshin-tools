@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "SDK location not found" after cloning a project | Mr.AndroidShin</title>
+<meta name="description" content="Gradle failed with 'SDK location not found. Define a valid SDK location with an ANDROID_HOME environment variable or by setting the sdk.dir path in local.properties'. Why the file is missing on a fresh clone, and the right way to fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-sdk-location-not-found.html">
+<meta property="og:title" content="Debugging log: 'SDK location not found' after cloning a project">
+<meta property="og:description" content="Why local.properties is missing on a fresh clone, and the right way to fix the SDK location error.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"SDK location not found" on a fresh clone</h1>
+
+  <p>I cloned one of my own projects onto a second machine, opened it, hit build — and Gradle stopped immediately complaining it couldn't find the Android SDK. Nothing was wrong with the code; it built fine on the machine I'd just come from. The missing piece was a small file that, by design, never travels with the repository.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Gradle finds your SDK through <code>local.properties</code> (or the <code>ANDROID_HOME</code> environment variable). That file is machine-specific and is deliberately excluded from Git, so a fresh clone has no idea where your SDK lives. Point it at the SDK on <i>this</i> machine and the build proceeds.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>SDK location not found. Define a valid SDK location with an
+ANDROID_HOME environment variable or by setting the sdk.dir
+path in your project's local.properties file.</pre>
+  <p>The message actually tells you both fixes. It's just not obvious <i>why</i> the setting vanished, which is what makes this confusing the first time.</p>
+
+  <h2>Why local.properties isn't in the repo</h2>
+  <p>The SDK path is different on every machine — a different drive on Windows, a different home directory on macOS, a different user on a CI runner. Committing one person's absolute path would break the build for everyone else, so the standard Android <code>.gitignore</code> excludes <code>local.properties</code> on purpose. That's correct behavior, not an oversight: the file is <b>local</b> configuration, which is exactly what its name says. Every fresh clone is expected to generate or supply its own.</p>
+
+  <h2>Fix 1 — let Android Studio do it</h2>
+  <p>The easiest path: open the project in Android Studio and let it sync. When Studio knows where your SDK is, it writes <code>local.properties</code> for you and the error disappears. If Studio itself doesn't know, set the path in <b>File → Project Structure → SDK Location</b>, and it'll write the file from that.</p>
+
+  <h3>Or write it yourself</h3>
+  <p>Create <code>local.properties</code> in the project root (next to <code>settings.gradle</code>) with one line:</p>
+<pre># macOS / Linux
+sdk.dir=/Users/you/Library/Android/sdk
+
+# Windows — note the escaped backslashes
+sdk.dir=C\:\\Users\\you\\AppData\\Local\\Android\\Sdk</pre>
+  <p>The Windows escaping trips people up: this is a Java properties file, so backslashes and the drive colon need escaping. A single unescaped path is a very common reason the file exists but "doesn't work".</p>
+
+  <h2>Fix 2 — set ANDROID_HOME instead</h2>
+  <p>For CI, Docker, or command-line builds where nobody's opening Studio, an environment variable is the cleaner answer:</p>
+<pre>export ANDROID_HOME=/path/to/android/sdk   # macOS / Linux
+setx ANDROID_HOME "C:\Users\you\AppData\Local\Android\Sdk"  # Windows</pre>
+  <p>Gradle checks this when <code>local.properties</code> has no <code>sdk.dir</code>. It's the right mechanism for build servers, because it keeps the path in the environment rather than in a file someone might accidentally commit.</p>
+
+  <div class="callout">
+    <p>Don't "fix" this by committing your <code>local.properties</code>. It works on your machine and breaks on everyone else's — including your CI. Keep it ignored and let each environment supply its own path.</p>
+  </div>
+
+  <h2>If it still fails after setting the path</h2>
+  <ul>
+    <li><b>Check the path actually exists</b> and points at the SDK root — the folder containing <code>platforms/</code> and <code>build-tools/</code>, not one of them.</li>
+    <li><b>Check for typos and escaping</b> on Windows, where an unescaped backslash silently produces a path Gradle can't resolve.</li>
+    <li><b>Restart the terminal or Studio</b> after setting an environment variable, since existing processes won't see it.</li>
+    <li><b>Confirm the SDK is installed at all</b> — on a brand-new machine you may need to install it via Studio's SDK Manager first.</li>
+  </ul>
+
+  <p class="note">Paths above are examples — substitute the SDK location on your own machine.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-inconsistent-jvm-target-compatibility.html">Inconsistent JVM-target compatibility</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
