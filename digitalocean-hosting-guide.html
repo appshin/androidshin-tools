@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When to Move Off Free Hosting — and Why DigitalOcean | Mr.AndroidShin</title>
+<meta name="description" content="A solo developer's take on when free hosting (Firebase, Cloudflare Pages, GitHub Pages) stops being enough, when a VPS makes sense, and why DigitalOcean is an easy first cloud — with honest pricing, the powered-off billing trap, and alternatives.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/digitalocean-hosting-guide.html">
+<meta property="og:title" content="When to Move Off Free Hosting — and Why DigitalOcean">
+<meta property="og:description" content="When free tiers stop being enough, when you actually need a VPS, and why DigitalOcean is a clean first cloud. Honest pricing and alternatives included.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;--ok:#7BE0A3;--bad:#FF7A7A;
+    --radius:16px;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.6;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  .hero{padding:34px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.1;margin:0 0 12px}
+  .sub{color:var(--muted);max-width:64ch;margin:0 0 20px}
+  .disclosure{border:1px solid var(--accent);border-radius:12px;background:linear-gradient(180deg,rgba(255,180,84,.08),transparent);padding:14px 16px;margin:0 0 8px;font-size:.9rem;color:#C7CDDA}
+  .disclosure b{color:var(--accent);font-family:var(--disp);letter-spacing:-.01em}
+  .adslot{display:none}
+  .content{padding:12px 0 40px}
+  .content h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;font-size:1.35rem;margin:30px 0 10px}
+  .content p,.content li{color:#C7CDDA}
+  .content ul{padding-left:1.15em;margin:10px 0}
+  .content li{margin:6px 0}
+  .content code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  .cta{display:block;text-align:center;margin:26px 0 6px;padding:16px 20px;border:1px solid var(--accent);border-radius:12px;background:linear-gradient(180deg,rgba(255,180,84,.12),transparent);font-family:var(--disp);font-weight:600;color:var(--accent);font-size:1.05rem}
+  .cta:hover{text-decoration:none;background:linear-gradient(180deg,rgba(255,180,84,.2),transparent)}
+  .cta-note{text-align:center;font-family:var(--mono);font-size:.76rem;color:var(--muted);margin:0 0 6px}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin:10px 0;background:var(--surface)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--disp)}
+  details p{margin:0 0 14px}
+  .related{border-top:1px solid var(--line);margin-top:26px;padding-top:16px;color:var(--muted);font-size:.92rem}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="#guide">Guide</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" id="guide">
+    <p class="eyebrow">Guide · Cloud Hosting</p>
+    <h1>When to move off free hosting — and why DigitalOcean</h1>
+    <p class="sub">A solo dev's honest take on when free tiers stop being enough, when a VPS actually makes sense, and why DigitalOcean is a clean first cloud. Real pricing, the billing trap nobody warns you about, and alternatives included.</p>
+
+    <!-- ADVERTISING DISCLOSURE — keep at top of page, above the affiliate link. Do not remove. -->
+    <div class="disclosure">
+      <b>Disclosure:</b> When you use the services featured on this page, we earn a referral fee at no additional cost to you.
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+
+  <section class="content">
+    <p>Ship enough apps and side projects and you eventually hit the same question: how long can you ride free hosting, and when do you need a real server? I start most projects on Cloudflare Pages for static sites, Firebase for the backend, and GitHub Pages for quick demos. That stack is close to free and more than enough early on. The trouble is that the moment a service grows even a little, you start bumping into the walls of those free tiers.</p>
+
+    <h2>When free hosting is genuinely enough</h2>
+    <p>If your project fits the shape below, you don't need to pay for a server at all. Static sites and JAMstack setups that only hand the visitor HTML, CSS and JS, plus a handful of low-traffic serverless functions, run essentially forever on the free tiers of Cloudflare Pages, Firebase Hosting or GitHub Pages. My own tools site has run this way for a long time. Don't over-engineer before you have to.</p>
+
+    <h2>The moment you actually need a VPS or cloud</h2>
+    <p>The signal to move is when any of these start biting:</p>
+    <ul>
+      <li>You need a <b>long-running backend process</b> — something stateful or long-lived that serverless handles awkwardly.</li>
+      <li>You want a <b>database you control</b> — your own PostgreSQL or Redis, tuned your way.</li>
+      <li>You have <b>cron or batch jobs</b> that must run on a schedule.</li>
+      <li>You need <b>persistent WebSocket connections</b>, where serverless cold starts are a dealbreaker for real-time features.</li>
+      <li>You're doing <b>heavy file or media processing</b> that blows past function time and memory limits.</li>
+      <li>Free-tier <b>request caps or cold-start latency</b> start hurting the user experience.</li>
+    </ul>
+    <p>Past this point, one Linux box you control is often simpler and cheaper than fighting the limits of a free tier.</p>
+
+    <h2>Why DigitalOcean</h2>
+    <p>I've used several clouds, and for a solo developer or a small team DigitalOcean's strengths are specific and real.</p>
+    <p><b>Predictable pricing.</b> This is the big one. Billing switched to per-second in 2026, but there's still a <b>monthly cap</b>, so a Droplet you leave running never bills past its monthly rate. None of the AWS-style dread of a bill quietly ballooning mid-month.</p>
+    <p><b>Droplets from $4/month.</b> A basic Droplet (a Linux VPS) starts at $4/month. A single side project runs comfortably under $10/month, and the most commonly deployed size — 4 GiB RAM / 2 vCPU — is $24/month with 4 TB of outbound transfer included.</p>
+    <p><b>Generous bandwidth.</b> Each Droplet includes outbound transfer, and overage is just $0.01 per GiB — roughly 9× cheaper than AWS. Traffic spikes won't detonate your bill.</p>
+    <p><b>App Platform if you hate managing servers.</b> Connect a GitHub or GitLab repo and it handles builds, deploys and SSL for you. Dynamic apps start at $5/month, and static sites get a free tier for up to three apps — a natural next step up from Firebase Hosting.</p>
+    <p><b>Managed databases and docs.</b> Managed PostgreSQL starts at $15/month for a single node, and the documentation and community tutorials are good enough that you can usually unstick yourself fast.</p>
+
+    <h2>What it actually costs</h2>
+    <p>Rough guide: a single side project is under $10/month. A production app with a managed database and backups realistically lands between $80 and $150/month once you add the pieces. Start with the smallest Droplet and size up only when you need to.</p>
+
+    <h2>The honest downsides (know these first)</h2>
+    <p>I recommend it, but go in clear-eyed. <b>A powered-off Droplet still bills you</b> — the resources stay reserved even when it's off, so to truly stop charges you snapshot and destroy it. This surprises a lot of people who shut a Droplet down expecting to pay nothing. If you're a massive enterprise needing hundreds of niche services, AWS or GCP still win, and DigitalOcean's managed-service catalog isn't as broad. If rock-bottom price and bandwidth are your only priorities, it's worth comparing Linode or Vultr too.</p>
+
+    <h2>How to start</h2>
+    <p>New accounts get a <b>signup credit</b> you can spend over a limited window. The exact amount and validity period change over time, so check the current offer on the signup page rather than trusting a number you read in a blog post. Signing up needs a card or PayPal on file, but you won't be charged as long as your usage stays within the credit.</p>
+
+    <!-- AFFILIATE LINK — replace the href below with your real DigitalOcean referral URL (Dashboard → Referrals). -->
+    <a class="cta" href="https://m.do.co/c/896999449941" target="_blank" rel="sponsored nofollow noopener">Get started on DigitalOcean →</a>
+    <p class="cta-note">The signup credit is applied automatically — no coupon code needed.</p>
+
+    <p>If you've hit the wall on free hosting, spinning up one small Droplet is a low-stakes way to find out whether the cloud step is worth it for you.</p>
+
+    <h2>FAQ</h2>
+    <details>
+      <summary>Do I get charged the moment I sign up?</summary>
+      <p>No. You add a payment method to verify, but usage draws down your signup credit first. You're only billed once you exceed the credit or after it expires — so destroy resources you're done with before then.</p>
+    </details>
+    <details>
+      <summary>Is DigitalOcean cheaper than AWS?</summary>
+      <p>For small-to-mid workloads, usually yes — mostly because bandwidth is included and overage is far cheaper, and the monthly cap makes the bill predictable. At large enterprise scale with many managed services, AWS/GCP can pull ahead. It depends on your workload.</p>
+    </details>
+    <details>
+      <summary>Droplet or App Platform — which should I pick?</summary>
+      <p>Pick a Droplet if you want full control of a Linux box (and don't mind managing it). Pick App Platform if you'd rather push to Git and let the platform handle builds, deploys and SSL. Many people start on App Platform and move to Droplets when they need more control.</p>
+    </details>
+
+    <div class="related">
+      Related: <a href="/debug-cleartext-http-traffic-not-permitted.html">Cleartext HTTP not permitted</a> · <a href="/google-play-app-signing-explained.html">Play app signing explained</a> · <a href="/base64-encoder-decoder.html">Base64 encoder / decoder</a>
+    </div>
+  </section>
+
+  <!-- ADSENSE SLOT (hidden until approval) -->
+  <div class="adslot">Ad slot</div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div>
+      <a href="/about.html">About</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
