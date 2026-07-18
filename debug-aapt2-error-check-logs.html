@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "AAPT2 error: check logs for details" | Mr.AndroidShin</title>
+<meta name="description" content="The build failed with 'AAPT2 error: check logs for details'. This message hides the real cause — a bad XML file, an invalid resource name, or a broken image. How to find the actual error line and fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-aapt2-error-check-logs.html">
+<meta property="og:title" content="Debugging log: 'AAPT2 error: check logs for details'">
+<meta property="og:description" content="The AAPT2 error hides the real cause. How to surface the actual line and fix the common culprits — bad XML, invalid resource names, broken images.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Resources</p>
+  <h1>"AAPT2 error: check logs for details"</h1>
+
+  <p>This one used to send me straight to a search engine, because the message is almost aggressively unhelpful. "Check logs for details" — which logs? The truth is the real error is right there in the build output; AAPT2 just buries the useful line under a generic headline. Once you know where to look, these are usually a two-minute fix.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> AAPT2 compiles your resources (XML, images, <code>strings.xml</code>, drawables). The "check logs" line is a summary — the actual cause is a more specific <code>error:</code> line a bit above or below it, naming a file and often a line number. Find that line and the fix is usually obvious: malformed XML, an invalid resource name, or a broken image.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>ERROR: /path/to/app/src/main/res/values/strings.xml:14:
+  AAPT: error: ...
+com.android.builder.internal.aapt.v2.Aapt2Exception:
+  Android resource compilation failed
+Execution failed for task ':app:processDebugResources'.
+&gt; AAPT2 error: check logs for details</pre>
+  <p>The bottom line is the headline; the useful part is the <code>error:</code> line at the top with a file path and <code>line:column</code>. Always read upward from "check logs for details".</p>
+
+  <h2>Step 1 — surface the real message</h2>
+  <p>If the Build window only shows the generic line, expand it. In Android Studio, open the <b>Build</b> tab and click into the failing task to see the full AAPT2 output. From the command line, run with more detail:</p>
+<pre>./gradlew assembleDebug --stacktrace --info</pre>
+  <p>Look for the first line containing <code>error:</code> and a file path. Everything you need to fix is in that line — the generic summary is just noise.</p>
+
+  <h2>Common cause 1 — malformed XML</h2>
+  <p>The most frequent culprit. An unclosed tag, a stray character, or an unescaped ampersand in a string will do it:</p>
+<pre>&lt;!-- ❌ raw &amp; is illegal in XML text --&gt;
+&lt;string name="terms"&gt;Terms &amp; Conditions&lt;/string&gt;
+
+&lt;!-- ✅ escape it --&gt;
+&lt;string name="terms"&gt;Terms &amp;amp; Conditions&lt;/string&gt;</pre>
+  <p>Apostrophes in strings need escaping too (<code>\'</code>), as do a few other characters. If you're hand-editing <code>strings.xml</code>, an escaper saves a lot of these round-trips.</p>
+
+  <h2>Common cause 2 — an invalid resource file name</h2>
+  <p>Resource file names must be lowercase <code>a–z</code>, <code>0–9</code> and underscore, and can't start with a digit. A file like <code>Icon-Home.png</code> or <code>2x_banner.webp</code> will fail AAPT2. Rename to <code>icon_home.png</code> / <code>banner_2x.webp</code> and update references. The same rule applies to resource IDs inside XML.</p>
+
+  <h2>Common cause 3 — a broken or unsupported image</h2>
+  <p>A corrupted PNG, a truncated download, or an image in a format AAPT2 doesn't accept in that folder can trigger it. Open the offending file (the path is in the real error line) and confirm it's a valid image; re-export it if in doubt. Malformed vector drawables — a bad <code>pathData</code> string, an unsupported attribute — land here too.</p>
+
+  <h2>Common cause 4 — a duplicate resource</h2>
+  <p>Defining the same resource name twice (often after a merge, or across <code>values</code> files) produces a "duplicate value" error under the AAPT2 headline. The message names both locations; delete or rename one.</p>
+
+  <div class="callout">
+    <p>After fixing the underlying file, do a clean build (<code>./gradlew clean</code>) before concluding it's not solved. AAPT2 caches compiled resources, and a stale cache can keep reporting an error you've already fixed. If it truly persists, <b>File → Invalidate Caches / Restart</b>.</p>
+  </div>
+
+  <h2>If the path points at a library, not your code</h2>
+  <p>Occasionally the failing resource lives in a dependency — usually because a newer library expects a higher <code>compileSdk</code> than your project targets. If the error line points into a cached AAR rather than your <code>res/</code>, bumping <code>compileSdk</code> to match the library's requirement is the usual fix.</p>
+
+  <p class="note">Paths and line numbers above are examples — your real error line names the exact file to open.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-manifest-merger-failed.html">Manifest merger failed</a> · <a href="/android-strings-xml-escaper.html">strings.xml escaper</a> · <a href="/android-app-bundle-missing-translations.html">App Bundle missing translations</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

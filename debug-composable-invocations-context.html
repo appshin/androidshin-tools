@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "@Composable invocations can only happen from the context of a @Composable function" | Mr.AndroidShin</title>
+<meta name="description" content="Jetpack Compose failed with '@Composable invocations can only happen from the context of a @Composable function'. Why it happens inside onClick, coroutines and plain functions — and the state-driven fix.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-composable-invocations-context.html">
+<meta property="og:title" content="Debugging log: '@Composable invocations can only happen from the context of a @Composable function'">
+<meta property="og:description" content="Why Compose rejects composable calls inside onClick, coroutines and helper functions — and how to restructure around state.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Compose</p>
+  <h1>"@Composable invocations can only happen from the context of a @Composable function"</h1>
+
+  <p>Early on with Jetpack Compose I tried to show a dialog straight from a button's <code>onClick</code> and the compiler stopped me cold. The message is long and, the first time, a little cryptic — but it's pointing at the single most important mental shift Compose asks of you: you don't <i>call</i> UI in response to events, you change state and let the UI recompose.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> a <code>@Composable</code> function can only be called from another <code>@Composable</code> function (or a composable lambda). You're calling one from a place that isn't composable — an <code>onClick</code> handler, a coroutine, a <code>ViewModel</code>, or a plain helper function. The fix is almost never to force the call through; it's to drive the UI with state instead.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>@Composable invocations can only happen from the context of
+a @Composable function</pre>
+  <p>It's a compile-time error, which is good news — the Compose compiler is catching a structural mistake before it can ship. The trick is recognizing which of a few common shapes you've hit.</p>
+
+  <h2>Why Compose enforces this</h2>
+  <p>A <code>@Composable</code> function isn't a normal function. The Compose compiler rewrites it to receive a hidden <code>Composer</code> parameter that tracks where you are in the UI tree, so it can remember state and recompose only what changed. That machinery only exists inside a composable calling context. Call one from ordinary code and there's no <code>Composer</code> to thread through — hence the error. In short, <code>@Composable</code> is a <i>calling convention</i>, not just a label.</p>
+
+  <h2>Cause 1 — calling a composable from onClick</h2>
+  <p>This is the classic. You can't invoke <code>AlertDialog(...)</code> from inside <code>onClick</code>, because the click lambda runs outside composition:</p>
+<pre>// ❌ Wrong
+Button(onClick = {
+    AlertDialog(...)   // not a composable context
+}) { Text("Delete") }</pre>
+  <p>Instead, flip a state flag in <code>onClick</code> and render the dialog in the composition based on that state:</p>
+<pre>// ✅ Right
+var showDialog by remember { mutableStateOf(false) }
+
+Button(onClick = { showDialog = true }) { Text("Delete") }
+
+if (showDialog) {
+    AlertDialog(
+        onDismissRequest = { showDialog = false },
+        /* ... */
+    )
+}</pre>
+  <p>The event handler mutates state; the composition reacts. That inversion is the whole model.</p>
+
+  <h2>Cause 2 — calling a composable from a coroutine or effect body</h2>
+  <p>Launching a coroutine and calling composables inside it hits the same wall — the coroutine body isn't composable. Do the async work, store the result in state, and read that state in the composition:</p>
+<pre>// ❌ scope.launch { SomeComposable() }
+
+// ✅
+var data by remember { mutableStateOf<Data?>(null) }
+LaunchedEffect(Unit) { data = repository.load() }
+data?.let { ItemView(it) }   // composable read happens in composition</pre>
+
+  <h2>Cause 3 — a helper function that forgot its annotation</h2>
+  <p>If you factored some UI into a helper but didn't annotate it, any composable call inside it fails. The fix is one word:</p>
+<pre>// ❌ fun Header() { Text("Title") }
+@Composable
+fun Header() { Text("Title") }</pre>
+
+  <h2>Cause 4 — trying to build UI in a ViewModel or plain class</h2>
+  <p>Sometimes the error is telling you the code is in the wrong layer entirely. Composables belong in the UI/composition layer; a <code>ViewModel</code> should expose <b>state</b> (via <code>StateFlow</code> or Compose state), and the composable observes it. If you find yourself wanting to call a composable from a ViewModel, that's the signal to move the rendering into the composable and let it read the ViewModel's state.</p>
+
+  <div class="callout">
+    <p>A quick rule of thumb: if you're inside a lambda that reacts to something (<code>onClick</code>, <code>onValueChange</code>, a coroutine), you're outside composition — set state there. If you're in the body of an <code>@Composable</code>, you're inside composition — read state and call composables freely.</p>
+  </div>
+
+  <p class="note">Snippets are minimal for clarity — adapt the state hoisting to where the data actually lives in your app.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-compose-preview-render-error.html">Compose preview render error</a> · <a href="/compose-color-converter.html">Compose color converter</a> · <a href="/debug-cannot-fit-classes-single-dex.html">Cannot fit classes in a single dex file</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Cannot fit requested classes in a single dex file" | Mr.AndroidShin</title>
+<meta name="description" content="The build failed with 'Cannot fit requested classes in a single dex file (# methods: 65536 > 65536)'. What the 64K method-reference limit really is, when multidex fixes it, and why shrinking is often the better answer.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-cannot-fit-classes-single-dex.html">
+<meta property="og:title" content="Debugging log: 'Cannot fit requested classes in a single dex file'">
+<meta property="og:description" content="The 64K method-reference limit explained — when multidex is the fix, and when shrinking your method count is the better one.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Build</p>
+  <h1>"Cannot fit requested classes in a single dex file"</h1>
+
+  <p>One afternoon I added a couple of libraries to an app that had been building fine for months, hit run, and the build died at the dex step with a number I recognized instantly: 65536. That figure is the fingerprint of one of Android's oldest gotchas — the 64K method-reference limit — and the fix depends entirely on <i>why</i> you crossed it.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> a single <code>.dex</code> file can reference at most 65,536 methods. Your app plus all its transitive dependencies pushed past that. If your <code>minSdk</code> is 21 or higher, enabling multidex is trivial (often automatic); either way, the cleaner long-term fix is usually to <i>shrink</i> the method count with R8 rather than just splitting into more dex files.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Cannot fit requested classes in a single dex file (# methods: 68123 > 65536)
+Execution failed for task ':app:mergeDexDebug'.
+&gt; com.android.tools.r8.internal... The number of method references
+  in a .dex file cannot exceed 64K.</pre>
+  <p>The exact task name varies (<code>mergeDexDebug</code>, <code>mergeExtDexDebug</code>, etc.) but the "cannot exceed 64K" line is the constant. Note it counts method <i>references</i>, not just your own methods — every framework and library call you touch is counted too, which is why a small app can trip it.</p>
+
+  <h2>Why the limit exists</h2>
+  <p>The Dalvik/DEX bytecode format uses a 16-bit index to reference methods, and 2<sup>16</sup> is 65,536. It's a structural limit of the file format, not a quota you can raise. Modern apps blow past it easily because a single innocent-looking dependency can drag in a large transitive tree — Google Play Services, Guava, or a kitchen-sink SDK can each add thousands of method references on their own.</p>
+
+  <h2>Fix 1 — enable multidex</h2>
+  <p>Multidex lets your app span multiple dex files instead of one. How you enable it depends on your <code>minSdk</code>.</p>
+
+  <h3>minSdk 21 or higher (almost everyone today)</h3>
+  <p>On Android 5.0+ the runtime (ART) handles multiple dex files natively, so you often just need to turn it on:</p>
+<pre>android {
+    defaultConfig {
+        multiDexEnabled = true
+    }
+}</pre>
+  <p>In many modern setups this is already effectively handled, and simply crossing the limit with a 21+ <code>minSdk</code> triggers multidex automatically. If it doesn't, the one line above is all you need — no extra dependency, no Application subclass.</p>
+
+  <h3>minSdk below 21</h3>
+  <p>Older devices need a support library to load the extra dex files at startup:</p>
+<pre>dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
+}</pre>
+  <p>Then either extend <code>MultiDexApplication</code>, or call <code>MultiDex.install(this)</code> in your Application's <code>attachBaseContext()</code>. Without that install step the app builds but crashes on launch on pre-21 devices.</p>
+
+  <h2>Fix 2 — shrink instead of split (often better)</h2>
+  <p>Multidex makes the error go away, but if you're only slightly over the limit, the real problem is that you're shipping methods you don't use. Turning on R8 shrinking removes them and can drop you back under 64K with a smaller, faster app as a bonus:</p>
+<pre>android {
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+    }
+}</pre>
+  <p>Beyond that, audit what pulled you over. Prefer <code>implementation</code> over <code>api</code> so dependencies don't leak transitively, import only the specific Play Services modules you need rather than the umbrella artifact, and drop libraries you added for a single helper. A method-count problem is often a dependency-hygiene problem wearing a disguise.</p>
+
+  <div class="callout">
+    <p>If the debug build hits the limit but you don't want to shrink in debug, multidex is the pragmatic switch. For release, prefer minification — it addresses the cause rather than the symptom, and it's the same pass that keeps your APK small.</p>
+  </div>
+
+  <h2>If it still fails after enabling multidex</h2>
+  <ul>
+    <li><b>Do a clean build</b> — stale dex outputs can linger. <code>./gradlew clean</code> then rebuild.</li>
+    <li><b>Check you edited the right module</b> — <code>multiDexEnabled</code> goes in the app module, not a library module.</li>
+    <li><b>Pre-21 crash on launch?</b> You enabled multidex but skipped the <code>MultiDex.install</code> / <code>MultiDexApplication</code> step.</li>
+    <li><b>Still ballooning?</b> Run a dependency report and look for one artifact contributing most of the references before reaching for more dex files.</li>
+  </ul>
+
+  <p class="note">Version numbers above are examples — check for the current multidex release when you add it.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes (R8 keep rules)</a> · <a href="/debug-duplicate-class-dependency-conflict.html">"Duplicate class" found in modules</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
