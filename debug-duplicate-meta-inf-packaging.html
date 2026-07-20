@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "More than one file found with OS independent path 'META-INF/…'" | Mr.AndroidShin</title>
+<meta name="description" content="Packaging failed with '2 files found with path META-INF/...' or 'More than one file was found with OS independent path'. Why two dependencies ship the same metadata file, and the packaging { resources { } } fix.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-duplicate-meta-inf-packaging.html">
+<meta property="og:title" content="Debugging log: 'More than one file found with OS independent path META-INF/…'">
+<meta property="og:description" content="Why two dependencies ship the same META-INF file, and how to resolve the packaging conflict with pickFirst or exclude.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Build</p>
+  <h1>"More than one file found with OS independent path 'META-INF/…'"</h1>
+
+  <p>I added a networking library to a project that already had a couple of others, and the build got all the way to packaging before failing over a file I'd never heard of, buried in <code>META-INF</code>. The code was fine; two dependencies just happened to ship the same bookkeeping file, and the packager didn't know which one to keep.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> two of your dependencies each include a file at the same path inside <code>META-INF/</code> (a license, a Kotlin module file, a service descriptor). The APK can only contain one copy, so packaging fails. Tell AGP how to resolve it in the <code>packaging { resources { } }</code> block — usually <code>pickFirst</code> or <code>excludes</code>.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>2 files found with path 'META-INF/DEPENDENCIES' from inputs:
+ - .../okhttp-x.y.z.jar
+ - .../some-other-lib.jar
+More than one file was found with OS independent path
+'META-INF/DEPENDENCIES'.
+Execution failed for task ':app:mergeDebugJavaResource'.</pre>
+  <p>The path varies — common ones are <code>META-INF/DEPENDENCIES</code>, <code>META-INF/LICENSE</code>, <code>META-INF/NOTICE</code>, <code>*.kotlin_module</code>, and <code>META-INF/*.version</code> — but the shape is always the same: two inputs, one destination.</p>
+
+  <h2>Why this happens</h2>
+  <p>Libraries bundle metadata under <code>META-INF/</code>: license texts, notices, Kotlin module descriptors, service-loader files. When two dependencies each carry a file at the identical path, the resource-merge step has a genuine collision. It won't silently pick one for you, because in some cases (like service-loader registrations) picking the wrong one would break behavior. So it stops and asks you to decide.</p>
+
+  <h2>Fix 1 — exclude the duplicate</h2>
+  <p>If the file is inert metadata (a license or notice you don't ship), just drop it from the APK:</p>
+<pre>android {
+    packaging {
+        resources {
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE*"
+            excludes += "/META-INF/NOTICE*"
+        }
+    }
+}</pre>
+  <p>This is the right choice for pure documentation files — they have no runtime purpose in your app.</p>
+
+  <h2>Fix 2 — pickFirst when the file matters</h2>
+  <p>For files that need to exist but where any one copy is fine (some native libs, certain descriptors), keep the first and ignore the rest:</p>
+<pre>android {
+    packaging {
+        resources {
+            pickFirsts += "/META-INF/*.kotlin_module"
+        }
+        // for native duplicates:
+        jniLibs {
+            pickFirsts += "**/libc++_shared.so"
+        }
+    }
+}</pre>
+
+  <div class="callout">
+    <p>Be careful with <code>META-INF/services/</code> files — these register implementations (ServiceLoader). Blindly <code>pickFirst</code>-ing them can drop a registration and cause a subtle runtime failure. If a duplicate is under <code>services/</code>, check whether both need merging rather than discarding one.</p>
+  </div>
+
+  <h2>Older AGP syntax</h2>
+  <p>On older Android Gradle Plugin versions the block was named differently. If <code>packaging { }</code> isn't recognized, you're on an older AGP and the equivalent is:</p>
+<pre>android {
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        pickFirst 'META-INF/*.kotlin_module'
+    }
+}</pre>
+  <p>Same idea, older names. Upgrading AGP eventually moves you to the <code>packaging { resources { } }</code> form.</p>
+
+  <h2>Before you exclude — is the duplicate a symptom?</h2>
+  <p>Sometimes the collision is really two versions of the <i>same</i> library pulled in transitively. If the two inputs are different versions of one artifact, the cleaner fix is to align the versions (or exclude the transitive duplicate) rather than paper over it in packaging. A single duplicated <code>META-INF</code> file can be the visible tip of a dependency-graph problem.</p>
+
+  <p class="note">Paths above are the common ones — match the exact path your own error prints.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-duplicate-class-dependency-conflict.html">"Duplicate class" found in modules</a> · <a href="/debug-cannot-fit-classes-single-dex.html">Cannot fit classes in a single dex file</a> · <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

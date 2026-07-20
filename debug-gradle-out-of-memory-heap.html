@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: Gradle "Out of memory" / "Expiring Daemon because JVM heap space is exhausted" | Mr.AndroidShin</title>
+<meta name="description" content="The Gradle build died with 'Java heap space' or 'Expiring Daemon because JVM heap space is exhausted'. Why the daemon runs out of memory, and how to size the heap correctly in gradle.properties.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-gradle-out-of-memory-heap.html">
+<meta property="og:title" content="Debugging log: Gradle 'Out of memory' / 'JVM heap space is exhausted'">
+<meta property="og:description" content="Why the Gradle daemon runs out of heap, and how to size org.gradle.jvmargs correctly instead of just cranking it to the max.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>Gradle "Out of memory" / "JVM heap space is exhausted"</h1>
+
+  <p>One of my larger projects started failing builds intermittently — fine one run, dead the next with a heap error, then a slow "expiring daemon" message. Intermittent memory failures are the worst kind because they feel random, but the cause is boringly consistent: the Gradle daemon's JVM simply doesn't have enough heap for what the build is asking of it.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the Gradle daemon runs in a JVM with a fixed maximum heap. A big project (lots of modules, R8, annotation processing) can exceed it. Give the daemon more heap via <code>org.gradle.jvmargs</code> in <code>gradle.properties</code> — but size it sensibly, don't just set it to your whole machine's RAM.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Expiring Daemon because JVM heap space is exhausted
+
+FAILURE: Build failed with an exception.
+&gt; java.lang.OutOfMemoryError: Java heap space
+  (or: GC overhead limit exceeded)</pre>
+  <p>You may see any of three faces of the same problem: <code>Java heap space</code>, <code>GC overhead limit exceeded</code>, or the daemon "expiring" and restarting. All three mean the same thing — the JVM ran out of usable heap.</p>
+
+  <h2>The main fix — raise the daemon heap</h2>
+  <p>In <code>gradle.properties</code> (project root, or the global one in your Gradle user home), set the max heap:</p>
+<pre># gradle.properties
+org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g \
+  -Dfile.encoding=UTF-8</pre>
+  <p><code>-Xmx4g</code> caps the heap at 4&nbsp;GB. If 4&nbsp;GB isn't enough for a very large project, 6&nbsp;GB is a reasonable next step. Restart the daemon after changing this (<code>./gradlew --stop</code>) so the new setting takes effect — editing the file without stopping the old daemon is a common reason "nothing changed".</p>
+
+  <h2>Don't over-allocate</h2>
+  <p>It's tempting to set <code>-Xmx</code> to almost all your RAM, but that backfires. The daemon isn't the only thing running — the OS, Android Studio, the Kotlin daemon, and emulators all need memory too. Over-allocate and you push the whole machine into swapping, which makes builds slower and can cause new, stranger failures. A good rule of thumb is to leave several gigabytes for everything else; on a 16&nbsp;GB machine, 4–6&nbsp;GB for Gradle is usually the sweet spot.</p>
+
+  <h2>Metaspace, not heap</h2>
+  <p>If the error specifically says <code>OutOfMemoryError: Metaspace</code>, that's a different pool — class metadata, not objects. Raise <code>-XX:MaxMetaspaceSize</code> instead of (or alongside) <code>-Xmx</code>. Heavy annotation processing and lots of generated classes are the usual cause.</p>
+
+  <h2>Reduce the pressure, not just the ceiling</h2>
+  <p>More heap treats the symptom. A few settings reduce how much memory a build needs in the first place:</p>
+  <ul>
+    <li><b>Enable the build cache and configuration cache</b> so unchanged work isn't redone: <code>org.gradle.caching=true</code>.</li>
+    <li><b>Be careful with parallelism on low-RAM machines</b> — <code>org.gradle.parallel=true</code> is faster but runs modules concurrently, multiplying peak memory. On a memory-starved machine, turning it off can paradoxically make builds succeed.</li>
+    <li><b>Watch annotation processors</b> — KAPT in particular is memory-hungry; migrating to KSP where a library supports it cuts both time and memory.</li>
+    <li><b>Split monster modules</b> — a single giant module forces one huge compilation unit into one heap.</li>
+  </ul>
+
+  <div class="callout">
+    <p>If builds fail only on CI but pass locally, the CI runner almost certainly has less RAM than your laptop. Set a CI-appropriate <code>-Xmx</code> for that environment rather than assuming your local value fits — a value that's comfortable on 32&nbsp;GB can OOM on a 7&nbsp;GB runner.</p>
+  </div>
+
+  <p class="note">Heap sizes above are starting points — tune to your project size and the RAM actually available on the machine.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-cannot-fit-classes-single-dex.html">Cannot fit classes in a single dex file</a> · <a href="/debug-inconsistent-jvm-target-compatibility.html">Inconsistent JVM-target compatibility</a> · <a href="/debug-sdk-location-not-found.html">SDK location not found</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

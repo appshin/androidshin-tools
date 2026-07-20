@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Dependency requires libraries to compile against version X or later" | Mr.AndroidShin</title>
+<meta name="description" content="The build failed at checkDebugAarMetadata: 'Dependency ... requires libraries and applications that depend on it to compile against version 34 or later of the Android APIs'. Why a library bump forces a compileSdk bump, and the safe way to fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-dependency-requires-compilesdk.html">
+<meta property="og:title" content="Debugging log: 'requires ... to compile against version X or later of the Android APIs'">
+<meta property="og:description" content="Why a dependency bump forces a compileSdk bump, what checkDebugAarMetadata is checking, and how to fix it safely.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"…requires libraries to compile against version X or later"</h1>
+
+  <p>I bumped one AndroidX library to its latest version, synced, and the build stopped before it even compiled anything — complaining that the dependency needed a newer compile SDK than my project used. Nothing in my code had changed. This is one of those errors that looks alarming but is really just Gradle enforcing a version contract, and the fix is a single number.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> a library you depend on was built against a newer Android API level than your <code>compileSdk</code>. The <code>checkDebugAarMetadata</code> task enforces that your app compiles against at least that level. Raise <code>compileSdk</code> to the version the message asks for. This is a compile-time setting only — it does <i>not</i> change which devices your app runs on.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Execution failed for task ':app:checkDebugAarMetadata'.
+&gt; Dependency 'androidx.core:core:1.15.0' requires libraries and
+  applications that depend on it to compile against version 35
+  or later of the Android APIs.
+  :app is currently compiled against android-34.</pre>
+  <p>The message is unusually clear for a Gradle error: it names the exact dependency and the exact API level it wants. The only confusing part is <i>why</i> raising this is safe, which is where people hesitate.</p>
+
+  <h2>Why this happens</h2>
+  <p>When a library is compiled against, say, API 35, it may reference APIs that only exist from 35 onward. If your app compiled against API 34, those references could be unresolved at build time. AGP's AAR-metadata check catches this early and refuses to build, rather than letting you hit confusing errors later. It's a guardrail, not a bug — the library is simply newer than your compile target.</p>
+
+  <h2>The fix — raise compileSdk</h2>
+  <p>Set <code>compileSdk</code> to at least the version named in the error:</p>
+<pre>android {
+    compileSdk = 35   // was 34
+}</pre>
+  <p>Sync and rebuild. That's usually the entire fix. If the AGP version is too old to know about that SDK, you may also see a note to update the Android Gradle Plugin — bump AGP to a version that supports the new <code>compileSdk</code>, then set the level.</p>
+
+  <h2>Why raising compileSdk is safe</h2>
+  <p>This is the part worth internalizing, because it's the crux of the confusion. The three SDK settings do different jobs:</p>
+  <ul>
+    <li><b><code>compileSdk</code></b> — the API level your code is <i>compiled and checked</i> against. It affects the build, not runtime behavior.</li>
+    <li><b><code>minSdk</code></b> — the <i>oldest</i> Android version your app installs on. This is what determines device reach.</li>
+    <li><b><code>targetSdk</code></b> — the version your app is <i>tested and behaves</i> as, controlling opt-in behavior changes.</li>
+  </ul>
+  <p>Raising <code>compileSdk</code> alone does not drop any devices — that's <code>minSdk</code>'s job, and you're not touching it. You're only letting the compiler see the newer APIs the library needs.</p>
+
+  <div class="callout">
+    <p>Don't "fix" this by downgrading the library back to an older version unless you truly must. It works, but you lose the fixes and features you upgraded for. Raising <code>compileSdk</code> addresses the actual requirement.</p>
+  </div>
+
+  <h2>If it still fails after raising compileSdk</h2>
+  <ul>
+    <li><b>Update AGP</b> if the new <code>compileSdk</code> isn't recognized — the plugin must be new enough to support that API level.</li>
+    <li><b>Install the SDK platform</b> for that level via the SDK Manager if the build can't find <code>android-35</code>.</li>
+    <li><b>Check every module</b> — a library module can carry its own <code>compileSdk</code>, and the failing one might not be <code>:app</code>.</li>
+    <li><b>Do a clean sync</b> after the change so cached metadata doesn't keep reporting the old level.</li>
+  </ul>
+
+  <p class="note">Version numbers above are examples — use the exact API level and library version your own error names.</p>
+
+  <div class="related">
+    <p>Related: <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a> · <a href="/android-api-levels.html">Android API levels</a> · <a href="/debug-kotlin-metadata-version-firebase-bom.html">Firebase BoM broke my build</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

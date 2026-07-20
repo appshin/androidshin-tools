@@ -219,6 +219,21 @@
 
   <div class="section-label" id="log">Debugging log</div>
   <div class="grid">
+    <a class="card" href="/debug-dependency-requires-compilesdk.html">
+      <div class="k"><span class="pill">War story</span> Gradle</div>
+      <h3>Requires compiling against a newer API</h3>
+      <p>A library bump forced a compileSdk bump. What checkDebugAarMetadata enforces, and why raising compileSdk is safe.</p>
+    </a>
+    <a class="card" href="/debug-duplicate-meta-inf-packaging.html">
+      <div class="k"><span class="pill">War story</span> Build</div>
+      <h3>More than one file found with path META-INF/…</h3>
+      <p>Two dependencies shipped the same metadata file. The packaging { resources { } } fix — and when not to pickFirst.</p>
+    </a>
+    <a class="card" href="/debug-gradle-out-of-memory-heap.html">
+      <div class="k"><span class="pill">War story</span> Gradle</div>
+      <h3>Gradle ran out of heap</h3>
+      <p>"JVM heap space is exhausted." How to size org.gradle.jvmargs correctly instead of just cranking it to the max.</p>
+    </a>
     <a class="card" href="/debug-cannot-fit-classes-single-dex.html">
       <div class="k"><span class="pill">War story</span> Build</div>
       <h3>Cannot fit classes in a single dex file</h3>

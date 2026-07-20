@@ -41,4 +41,7 @@
   <url><loc>https://androidshin.dev/debug-cannot-fit-classes-single-dex.html</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-composable-invocations-context.html</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-aapt2-error-check-logs.html</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-dependency-requires-compilesdk.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-duplicate-meta-inf-packaging.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-gradle-out-of-memory-heap.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
