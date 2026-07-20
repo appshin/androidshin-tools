@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Mr.AndroidShin mark">
+  <defs>
+    <linearGradient id="amber" x1="120" y1="32" x2="392" y2="488" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFC46F"/>
+      <stop offset="1" stop-color="#F59E2E"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="496" height="496" rx="118" fill="url(#amber)"/>
+  <path fill="#0B0E14" fill-rule="evenodd" d="
+    M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z
+    M256 172 L212 300 L300 300 Z"/>
+</svg>

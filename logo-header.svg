@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 64" width="340" height="64" role="img" aria-label="Mr.AndroidShin / Dev Tools">
+  <defs>
+    <linearGradient id="amberH" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFC46F"/><stop offset="1" stop-color="#F59E2E"/>
+    </linearGradient>
+  </defs>
+  <!-- mark -->
+  <g transform="translate(8,8)">
+    <rect x="0" y="0" width="48" height="48" rx="12" fill="url(#amberH)"/>
+    <path fill="#0B0E14" fill-rule="evenodd" transform="translate(4,4) scale(0.078125)"
+      d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/>
+  </g>
+  <!-- wordmark -->
+  <text x="72" y="40" font-family="'Space Grotesk',system-ui,sans-serif" font-size="26" font-weight="700" letter-spacing="-0.5">
+    <tspan fill="#E7EAF0">Mr</tspan><tspan fill="#FFB454">.</tspan><tspan fill="#E7EAF0">AndroidShin</tspan>
+  </text>
+  <text x="72" y="56" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="10" letter-spacing="2" fill="#8B94A7">DEV TOOLS</text>
+</svg>
