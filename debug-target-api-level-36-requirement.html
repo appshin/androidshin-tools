@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Debugging log: "Your app must target Android 16 (API 36)" — the Aug 31, 2026 Play deadline | Mr.AndroidShin</title>
+<meta name="description" content="Google Play now requires app updates to target API level 36 (Android 16) from August 31, 2026. What the requirement actually blocks, why bumping targetSdk drags in AGP 8.9 and Gradle, and the exact steps I used across ten apps.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-target-api-level-36-requirement.html">
+<meta property="og:title" content="Debugging log: the target API level 36 (Android 16) Play deadline">
+<meta property="og:description" content="What the Aug 31, 2026 targetSdk 36 requirement blocks, and the exact build-system chain reaction it sets off.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Play Console</p>
+  <h1>"Your app must target Android 16 (API 36)" — the Aug 31 deadline</h1>
+
+  <p>I got the same Play Console notice on ten apps at once: an update can't be submitted unless it targets a recent enough Android version. The wording is bureaucratic, but the effect is concrete and dated — and once I started fixing it, a single one-line change quietly turned into a build-system upgrade. Here's what the requirement actually means and the chain reaction it sets off.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> from <b>August 31, 2026</b>, new apps and app <i>updates</i> must target <b>API level 36 (Android 16)</b> to be submitted to Google Play. It does <i>not</i> pull your live app from the store — it only blocks new uploads. Bumping <code>targetSdk</code> to 36 also requires <code>compileSdk</code> 36, which requires AGP 8.9+, which requires a newer Gradle. Plan for the whole chain, not just one number.</p>
+  </div>
+
+  <h2>What the requirement blocks (and what it doesn't)</h2>
+  <p>This is the part worth being precise about, because the panic is usually worse than the reality. After the deadline, an app that still targets API 35 or lower <b>can't publish new updates</b> — you'll be stopped at upload. But the currently published version <b>stays live</b> and installable for existing and new users. So missing the date doesn't delete your app; it freezes your ability to ship changes until you comply. There's typically a deadline-extension request available in Play Console if you need a few more weeks.</p>
+  <p>Separately, to keep showing up for users on the newest devices, an app generally needs to target at least API 35. So 35 keeps you visible; 36 is what unlocks new uploads after the deadline.</p>
+
+  <h2>The one-line change</h2>
+  <p>In your module's build file:</p>
+<pre>android {
+    compileSdk = 36        // was 35
+    defaultConfig {
+        targetSdk = 36     // was 35
+    }
+}</pre>
+  <p>If only it stopped there. The moment you set <code>compileSdk = 36</code>, the build wants tooling new enough to know about Android 16.</p>
+
+  <h2>The chain reaction</h2>
+  <p>Across every project I touched, the same dependencies had to move together:</p>
+  <ul>
+    <li><b>compileSdk 36</b> needs <b>Android Gradle Plugin 8.9.0+</b>. Older AGP simply doesn't recognize the API level. If you're on 8.6 or 8.7, you're bumping.</li>
+    <li><b>AGP 8.9</b> needs a newer <b>Gradle</b> (8.11.1+). Update <code>gradle-wrapper.properties</code> or the build fails with a version-compatibility message.</li>
+    <li><b>Install the SDK</b> — Android 16 platform (API 36) and Build-Tools 36 via the SDK Manager, or the build can't find <code>android-36</code>.</li>
+    <li><b>JDK 17</b> — AGP 8.x runs on JDK 17. Confirm your Gradle JDK is set to 17.</li>
+    <li><b>Old Kotlin</b> — if you're on Kotlin 1.9.x, AGP 8.9 will complain; moving to 2.0.21+ clears it. Kotlin 2.0+ already tested against recent AGP.</li>
+  </ul>
+  <p>None of these is hard individually. The trap is expecting a one-line edit and getting a version-matrix puzzle. Do them in the order above and each error message points at the next step.</p>
+
+  <h2>Behavior changes to actually test</h2>
+  <p>Targeting 36 opts your app into Android 16 behavior changes. The two that bit me most:</p>
+  <ul>
+    <li><b>Edge-to-edge is enforced</b> — content draws behind the status and navigation bars unless you handle insets. If buttons end up under the system bars, that's this.</li>
+    <li><b>Large-screen orientation override</b> — on screens ≥600dp, the system now ignores orientation and resizability restrictions for apps targeting 36. Good for tablets; worth checking your layouts don't assume portrait.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Bump the <code>versionCode</code> with every rebuild before you upload — it's the easiest step to forget when you're batching ten apps, and Play rejects a duplicate version code immediately.</p>
+  </div>
+
+  <p class="note">This touches Play policy and dates that can change; check the current requirement in the Play Console before your final upload.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-edge-to-edge-enforced-target-36.html">Content hidden behind system bars on API 36</a> · <a href="/debug-dependency-requires-compilesdk.html">Requires compiling against a newer API</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

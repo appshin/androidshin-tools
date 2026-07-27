@@ -44,4 +44,7 @@
   <url><loc>https://androidshin.dev/debug-dependency-requires-compilesdk.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-duplicate-meta-inf-packaging.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-gradle-out-of-memory-heap.html</loc><lastmod>2026-07-20</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-target-api-level-36-requirement.html</loc><lastmod>2026-07-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://androidshin.dev/debug-play-billing-library-8-migration.html</loc><lastmod>2026-07-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://androidshin.dev/debug-edge-to-edge-enforced-target-36.html</loc><lastmod>2026-07-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

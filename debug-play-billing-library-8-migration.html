@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Debugging log: Play Billing Library 8 migration — the queryProductDetailsAsync callback change | Mr.AndroidShin</title>
+<meta name="description" content="Google Play requires Billing Library 8+ for updates after Aug 31, 2026. The one breaking change that touched every app I migrated: queryProductDetailsAsync now returns a QueryProductDetailsResult, not a List.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-play-billing-library-8-migration.html">
+<meta property="og:title" content="Debugging log: Play Billing Library 8 migration">
+<meta property="og:description" content="The queryProductDetailsAsync callback signature changed in PBL 8 — here's the exact before/after that fixed every app.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Billing</p>
+  <h1>Play Billing Library 8: the one change that touched every app</h1>
+
+  <p>Alongside the Android 16 deadline, Google Play also requires apps to use <b>Play Billing Library 8 or higher</b> for updates. I braced for a painful rewrite across seven apps with in-app purchases. It turned out to be far smaller than expected — in most projects a single callback and a version number. Here's the exact change so you can do it in minutes, not hours.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the breaking change that matters is <code>queryProductDetailsAsync</code>. Its callback used to hand you a <code>List&lt;ProductDetails&gt;</code>; in v8 it hands you a <code>QueryProductDetailsResult</code>, and you pull the list off it with <code>getProductDetailsList()</code>. Bump the dependency, fix that one call, and most integrations are done.</p>
+  </div>
+
+  <h2>Bump the dependency</h2>
+<pre>// was 7.x.x
+implementation("com.android.billingclient:billing:8.0.0")
+// or the KTX artifact
+implementation("com.android.billingclient:billing-ktx:8.0.0")</pre>
+  <p>After the deadline you can't publish updates built against v7, so this is not optional if you plan to ship again.</p>
+
+  <h2>The callback change (Java)</h2>
+  <p>Before — the second parameter was the list itself:</p>
+<pre>billingClient.queryProductDetailsAsync(params, (billingResult, list) -&gt; {
+    if (billingResult.getResponseCode() == BillingResponseCode.OK &amp;&amp; list != null) {
+        for (ProductDetails pd : list) { /* ... */ }
+    }
+});</pre>
+  <p>After — the second parameter is a result object; get the list from it:</p>
+<pre>billingClient.queryProductDetailsAsync(params, (billingResult, result) -&gt; {
+    List&lt;ProductDetails&gt; list =
+        (result == null) ? null : result.getProductDetailsList();
+    if (billingResult.getResponseCode() == BillingResponseCode.OK &amp;&amp; list != null) {
+        for (ProductDetails pd : list) { /* ... */ }
+    }
+});</pre>
+
+  <h2>The callback change (Kotlin)</h2>
+<pre>// before
+client.queryProductDetailsAsync(params) { _, list -&gt;
+    list.forEach { /* ... */ }
+}
+// after
+client.queryProductDetailsAsync(params) { _, result -&gt;
+    result.productDetailsList.forEach { /* ... */ }
+}</pre>
+  <p>That's the whole change in the common case. The <code>QueryProductDetailsResult</code> object also exposes an unfetched-products list if you want to detect product IDs that came back empty, but you don't need it to compile.</p>
+
+  <h2>What you probably do NOT need to change</h2>
+  <p>This is where the time savings came from. If your integration is already modern (v6/v7 style), these were untouched in every app I migrated:</p>
+  <ul>
+    <li><code>enablePendingPurchases(PendingPurchasesParams…)</code> — the parameterized form is still correct. Only the old no-argument <code>enablePendingPurchases()</code> was removed.</li>
+    <li><code>queryPurchasesAsync(QueryPurchasesParams, …)</code> — the params-object form is unchanged.</li>
+    <li><code>launchBillingFlow</code>, <code>acknowledgePurchase</code>, <code>consumeAsync</code> — unchanged.</li>
+    <li>Subscription update via <code>setSubscriptionReplacementMode</code> / <code>setOldPurchaseToken</code> — unchanged (these are the v7 replacements for the truly old removed APIs).</li>
+  </ul>
+
+  <h2>The removed APIs (only if you still use them)</h2>
+  <p>If your code is older, watch for these — they're gone in v8 and need replacing first: <code>querySkuDetailsAsync</code> (use <code>queryProductDetailsAsync</code>), <code>queryPurchaseHistoryAsync</code>, and the no-arg <code>enablePendingPurchases()</code>. If you're already on <code>ProductDetails</code>, you almost certainly don't touch any of these.</p>
+
+  <div class="callout">
+    <p>Billing is real money, so build a release and actually run a purchase and a restore on a device before you ship — a subscription upgrade, a consumable, and a restore-after-reinstall. A compile-clean migration is not the same as a tested one.</p>
+  </div>
+
+  <p class="note">Library versions and Play requirements shift; confirm the current minimum billing version in the Play Console before uploading.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-target-api-level-36-requirement.html">The target API 36 Play deadline</a> · <a href="/debug-real-admob-ids-in-testing.html">Real AdMob IDs in testing</a> · <a href="/admob-ecpm-calculator.html">AdMob eCPM calculator</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
