@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: the 12-tester, 14-day closed-testing gate — what actually resets the clock | Mr.AndroidShin</title>
+<meta name="description" content="A personal account's real experience clearing Google Play's closed-testing requirement: 12 opted-in testers for 14 continuous days. The opt-in counting nobody explains, the re-apply trap that resets your clock, and how I stopped fighting it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-closed-testing-12-testers-14-days.html">
+<meta property="og:title" content="Field log: the 12-tester, 14-day closed-testing gate">
+<meta property="og:description" content="What 'opted in' really counts, the re-apply trap that resets the 14-day clock, and the mistakes that quietly restart it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Play Console</p>
+  <h1>The 12-tester, 14-day gate: what actually resets the clock</h1>
+  <p class="lede">I built the app. I fixed the bugs. And then I spent longer clearing Google Play's closed-testing requirement than I did writing the thing — not because it's hard, but because almost everything I assumed about how it counts was wrong. Here's the honest version.</p>
+
+  <p>If you made a personal Google Play developer account after November 13, 2023, there's a wall between you and your first production release that has nothing to do with your code: you must run a closed test with at least 12 testers who stay opted in for 14 continuous days before you can even <i>apply</i> for production access. It used to be 20 testers; Google dropped it to 12 at the end of 2024. Twelve sounds trivial. It is not, and this log is about why.</p>
+
+  <h2>"Opted in" is stricter than it sounds</h2>
+  <p>My first mistake was thinking recruiting was the task. I sent the opt-in link to more than a dozen people, watched them say "sure, done," and assumed the counter would show twelve. It showed far fewer. The reason is the definition of <b>opted in</b>: a tester has to open the opt-in web link, accept, and actually install the app under the same Google account they accepted with. Invited-but-not-installed does not count. "I clicked the link" does not count if they never finished. Half of my yeses evaporated at exactly this step, and the dashboard only counts the ones who crossed the finish line.</p>
+
+  <div class="callout">
+    <p><b>The number that matters</b> is not how many people you invited — it's how many are <i>currently opted in</i> on the closed-testing page. Watch that count, not your invite list. They are almost never the same in the first few days.</p>
+  </div>
+
+  <h2>The clock doesn't start when you think</h2>
+  <p>The second surprise: the 14 days don't start when you upload your build. The countdown begins only after two things are both true — your release has been <b>approved</b> by Google's review, and you have <b>at least 12 testers opted in</b>. So a brand-new account often loses the first few days to review latency and to slowly accumulating opt-ins. On the day I finally hit twelve, my clock read something like "day 1 of 14," even though the build had been live for a week. That gap between "I uploaded" and "the clock is running" is where a lot of the frustration lives.</p>
+
+  <h2>The trap that resets everything: re-applying too early</h2>
+  <p>This is the one that nearly put me in a loop, and it's the most important thing in this log. When you apply for production access before the 14 days are complete, Google reviews the application and effectively sets a fresh reference point — the message I got read like "continue testing for 14 more days from the review date," and my counter showed something like "day 5 of 14 · 12 testers currently opted in." I read that as "you failed, start over" and my instinct was to fix something and re-apply immediately.</p>
+  <p>That instinct is exactly wrong. Re-applying while the count is mid-run can move the review date forward and restart the window. The people who complain that Google "keeps telling them to test more" are often re-triggering the clock themselves. The correct move is boring: <b>do nothing, keep your 12 opted in, and wait until the counter genuinely reaches 14 of 14 before you apply.</b> I stopped touching the Apply button and the number climbed on its own.</p>
+
+  <h2>What quietly drops you below 12</h2>
+  <p>Staying at twelve is its own small project. A few things that can pull the count down or read as "no real testing," which is what actually gets applications rejected:</p>
+  <ul>
+    <li><b>Formal opt-outs.</b> A tester can opt out via the testing web link (not by uninstalling). If one does and you fall under 12, your streak is at risk. This is the main argument for recruiting a buffer — aim for fifteen-plus, not exactly twelve.</li>
+    <li><b>Install-once-and-vanish testers.</b> Uninstalling doesn't remove their opt-in, so the raw count can look fine — but at production review, testers who installed once and never came back read as inactive, and "insufficient real testing" is a rejection reason on its own.</li>
+    <li><b>A frozen build.</b> If your release sits completely untouched for all 14 days, that reads as no testing having happened. Ship at least one small update during the window based on whatever feedback you get.</li>
+    <li><b>"No issues found."</b> When you finally apply, the questionnaire wants specific, concrete answers about bugs found and changes made. A cheerful "everything's great" is a near-automatic rejection.</li>
+  </ul>
+
+  <h2>How I'd approach it from day zero</h2>
+  <p>Knowing what I know now, the sequence that avoids the pain is: build a signed release early (it doesn't need to be finished — the clock can't start until something is live), recruit noticeably more than twelve because half won't complete the opt-in, verify your <b>target countries include wherever your testers actually live</b> (a wrong country list is why testers see "app not available"), push a small update mid-window, and then — the hard part — sit on your hands until the counter reaches the full 14 days before applying. The mechanics are simple once you stop fighting them; the discipline is not re-applying early.</p>
+
+  <p>None of this is about your app's quality. It's a process gate for new accounts, and treating it as a two-week logistics exercise rather than a code problem is the whole mindset shift. Recruit a buffer, protect the count, keep the build alive, wait for 14 of 14, then write a specific application. That's the path.</p>
+
+  <p class="note">Google's testing policy and numbers have changed before (20 to 12) and can change again; confirm the current requirement on the Play Console Help page before you plan around specific figures.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-target-api-36-ten-apps.html">Migrating 10 apps to target API 36</a> · <a href="/google-play-closed-testing-12-testers.html">Closed testing: 12 testers explained</a> · <a href="/google-play-app-signing-explained.html">Play app signing explained</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

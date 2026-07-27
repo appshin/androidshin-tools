@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: migrating 10 Android apps to target API 36 in one weekend | Mr.AndroidShin</title>
+<meta name="description" content="A complete, honest field log of moving ten published apps to target API level 36 (Android 16) before the Aug 31, 2026 Play deadline — the exact version chain, every error I hit (lint, file locks, billing, edge-to-edge, a transitive fragment), and what I'd do differently.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-target-api-36-ten-apps.html">
+<meta property="og:title" content="Field log: migrating 10 Android apps to target API 36 in one weekend">
+<meta property="og:description" content="Every version bump, every error, every per-project quirk from moving ten real apps to Android 16 targeting — with the fixes that actually worked.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+  th{background:var(--surface);font-family:var(--disp);color:var(--text)}
+  td{color:#C7CDDA}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Migration</p>
+  <h1>Migrating 10 apps to target API 36 in one weekend</h1>
+  <p class="lede">A complete, unedited account of moving ten of my published apps to Android 16 targeting before the August 31, 2026 Play deadline — the exact version chain, every error I actually hit, and the two that cost me the most time even though neither was a code bug.</p>
+
+  <p>When the Play Console notice landed, it landed on ten apps at once. Each one said the same thing: I couldn't submit an update unless it targeted a recent enough Android version, with a hard date of August 31, 2026. Seven of the ten also carried a second notice — they had to move to Google Play Billing Library 8. I had a weekend, a to-do list of ten projects built at different times with different tooling, and a strong suspicion that "just bump one number" was a lie. It was.</p>
+
+  <p>This is the field log. Not a tidy tutorial — the actual order I did things in, the errors in the order they appeared, and where I burned time. If you're staring at the same notice, you can skip the traps I walked into.</p>
+
+  <h2>The version chain nobody mentions up front</h2>
+  <p>The requirement reads as "set <code>targetSdk = 36</code>." What it actually means, once you follow the errors, is closer to a small tooling upgrade per project. Here's the chain I ended up applying to every app, because each link forces the next:</p>
+  <ul>
+    <li><code>targetSdk = 36</code> requires <code>compileSdk = 36</code> — you can't target an API you don't compile against.</li>
+    <li><code>compileSdk = 36</code> requires <b>Android Gradle Plugin 8.9.0+</b>. Anything older simply doesn't know Android 16 exists. My projects ranged from AGP 8.2.2 to 8.7.3; all of them had to move to 8.9.1.</li>
+    <li>AGP 8.9 requires <b>Gradle 8.11.1+</b>. Every wrapper that was on 8.2, 8.7, or 8.9 had to be bumped, or the build stopped with a plain version-mismatch message.</li>
+    <li>The oldest projects were on <b>Kotlin 1.9.x</b>, which the newer AGP complains about. Moving those to Kotlin 2.0.21 cleared it.</li>
+    <li>And of course the machine needs the <b>Android 16 SDK platform and Build-Tools 36</b> installed, plus <b>JDK 17</b> to run AGP 8.x.</li>
+  </ul>
+
+  <p>The thing that made this tedious rather than hard: my ten projects used three different build styles. Some used Groovy <code>build.gradle</code> with a <code>buildscript</code> classpath. Some used Groovy with the <code>plugins {}</code> block. Two used Kotlin DSL <code>build.gradle.kts</code>, and one of those drove everything through a <code>libs.versions.toml</code> version catalog. The <i>edit</i> was the same idea each time, but <i>where</i> the version string lived moved around constantly. If you maintain more than a couple of apps, expect to context-switch between these formats and double-check you're editing the right file.</p>
+
+  <div class="callout">
+    <p>My rule of thumb after ten of these: do the bumps in dependency order (SDK → AGP → Gradle → Kotlin), sync once after each, and let each error message tell you the next step. Trying to change everything at once just merges five error causes into one confusing stack trace.</p>
+  </div>
+
+  <h2>The billing change was smaller than I feared</h2>
+  <p>Seven apps needed Play Billing Library 8. I'd blocked out hours for this and it took minutes each, because my integrations were already on the modern <code>ProductDetails</code> API. In v8, exactly one thing broke in each app: the <code>queryProductDetailsAsync</code> callback used to hand back a <code>List&lt;ProductDetails&gt;</code>; now it hands back a <code>QueryProductDetailsResult</code>, and you pull the list off it.</p>
+<pre>// v7
+client.queryProductDetailsAsync(params) { _, list -&gt;
+    list.forEach { /* ... */ }
+}
+// v8
+client.queryProductDetailsAsync(params) { _, result -&gt;
+    result.productDetailsList.forEach { /* ... */ }
+}</pre>
+  <p>Everything else I use — <code>enablePendingPurchases(PendingPurchasesParams…)</code>, <code>queryPurchasesAsync(QueryPurchasesParams…)</code>, acknowledge, consume, subscription replacement — was untouched. The one variation worth noting: apps differed in how many call sites they had. Most had one; Nuvio had two (a subscription query with a nested top-up query), and Everwise had two identical blocks. If your billing code predates <code>ProductDetails</code> and still calls <code>querySkuDetailsAsync</code> or the no-argument <code>enablePendingPurchases()</code>, you have real removal work first — those are gone in v8.</p>
+
+  <h2>The error that wasn't a code error #1: a lint wall on release</h2>
+  <p>This is where the weekend stopped being smooth. One app built fine in debug and then died assembling the release with a fatal lint error I hadn't seen in years:</p>
+<pre>Error: "pro_active" is translated here but not found in
+default locale [ExtraTranslation]
+    values-en/strings.xml
+2 errors, 0 warnings</pre>
+  <p>Two strings existed in the English translation file but not in the default <code>values/strings.xml</code>. Lint treats that as a crash risk — a lookup on any locale without the string would throw — and release builds run <code>lintVital</code>, which is fatal by default. The strings turned out to be dead leftovers from a "Pro" tier I'd removed long ago; nothing referenced them anywhere in code or layouts. The correct fix wasn't to suppress the check with a baseline, it was to delete the two orphaned strings. I then wrote a quick script to compare every locale's keys against the default across all my apps, so this couldn't ambush me again on the next one. It's the kind of pre-existing debt that stays invisible until a stricter release build drags it into the light.</p>
+
+  <h2>The error that wasn't a code error #2: a file lock on Windows</h2>
+  <p>The one that genuinely made me question my changes turned out to have nothing to do with them:</p>
+<pre>:app:lintVitalAnalyzeRelease
+...androidx.compose.runtime.lint.RuntimeIssueRegistry-....jar:
+The process cannot access the file because it is being used
+by another process</pre>
+  <p>It looks like a Compose lint failure. It isn't. It's Windows telling you another process is holding a lint-cache <code>.jar</code> — usually a stray Gradle daemon, an antivirus scan, or a file-sync client (OneDrive/Dropbox) watching the <code>build</code> folder. The fix has nothing to do with Kotlin or Compose: stop the daemons with <code>gradlew --stop</code>, clean, and rebuild; if it persists, close the IDE and delete the <code>app/build</code> folder, or just reboot. I lost twenty minutes reading Compose lint documentation before I actually read the second half of the error message. Read the whole line first — the interesting part is often at the end.</p>
+
+  <h2>Edge-to-edge: the visual surprise</h2>
+  <p>Targeting recent Android enforces edge-to-edge — the system draws your content behind the status and navigation bars. On my View-based game screens, toolbars slid under the clock and buttons sat under the navigation pill. The fix is to enable it explicitly and then consume the insets as padding:</p>
+<pre>// once, ideally in a shared BaseActivity
+WindowCompat.setDecorFitsSystemWindows(window, false)
+
+ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets -&gt;
+    val bars = insets.getInsets(
+        WindowInsetsCompat.Type.systemBars()
+            or WindowInsetsCompat.Type.displayCutout())
+    v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+    insets
+}</pre>
+  <p>The Compose screens were mostly fine — <code>Scaffold</code> already applies its insets once you call <code>enableEdgeToEdge()</code>. While I was in the themes, I also deleted <code>android:statusBarColor</code> and <code>android:navigationBarColor</code>, which are deprecated and ignored in edge-to-edge and which Play Console had been flagging as "deprecated parameters for wider screens."</p>
+
+  <h2>The odd one out: a transitive dependency I didn't declare</h2>
+  <p>One app got a "your app uses an outdated SDK version (androidx.fragment 1.1.0)" notice. I don't use Fragments in that app — it's Compose. The old version was being pulled in transitively by a Google library. The fix was to declare a modern version explicitly so it wins the resolution:</p>
+<pre>implementation("androidx.fragment:fragment:1.8.5")</pre>
+  <p>That's a good reminder that Play Console reports on your <i>resolved</i> dependency graph, not just what you wrote in your build file. Sometimes the thing it flags is three libraries deep.</p>
+
+  <h2>What I'd do differently</h2>
+  <p>Two lessons stuck. First, <b>the tooling upgrade is the real work, not the target number</b> — if I'd bumped AGP/Gradle/Kotlin across all ten apps as a batch <i>first</i>, then flipped <code>targetSdk</code>, I'd have hit the version-matrix errors once instead of ten times. Second, <b>release lint surfaces years of small debt at once</b>. Orphaned translations, deprecated theme attributes, outdated transitive deps — none of them mattered until a stricter build cared. Budget time for that, not just for the migration itself.</p>
+
+  <p>Net result: ten apps compiling against API 36, seven of them on Billing 8, all with bumped version codes and ready to upload. The mandatory part — the target level and billing — was maybe 30% of the effort. The other 70% was pre-existing debt that the deadline finally forced me to pay down. Which, honestly, is not the worst outcome.</p>
+
+  <p class="note">Versions, Play requirements, and deadlines change over time; treat the specifics here as a snapshot from my own migration and confirm the current numbers in the Play Console and official docs before you ship.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-target-api-level-36-requirement.html">The target API 36 requirement, explained</a> · <a href="/debug-play-billing-library-8-migration.html">Play Billing Library 8 migration</a> · <a href="/debug-edge-to-edge-enforced-target-36.html">Content hidden behind system bars</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

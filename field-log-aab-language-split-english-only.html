@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: my app shipped English-only even though I translated everything (AAB language splits) | Mr.AndroidShin</title>
+<meta name="description" content="Every string was translated, the locale folders were all there, yet users on the Play Store only saw English. The cause was the App Bundle's per-language splits and on-demand language delivery — here's how I found it and the two ways to fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-aab-language-split-english-only.html">
+<meta property="og:title" content="Field log: my app shipped English-only despite full translations">
+<meta property="og:description" content="Why AAB per-language splits can strand your translations, and the two reliable fixes.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Localization</p>
+  <h1>My app shipped English-only — and I'd translated everything</h1>
+  <p class="lede">Thirteen languages of <code>strings.xml</code>, every folder in place, the app perfect in every locale on my own device. On the Play Store, users kept seeing English. The bug wasn't in my translations at all — it was in how the App Bundle splits them.</p>
+
+  <p>This one is nasty precisely because everything looks correct. You do the localization work properly: <code>values-ko</code>, <code>values-ja</code>, <code>values-es</code>, a dozen more, every key translated. You switch your phone's language, launch the app, and it's flawless. You ship. Then a user messages you that the app is in English even though their phone is in Korean, and you have no idea how that's even possible, because you can see the Korean strings sitting right there in your project.</p>
+
+  <h2>The culprit: per-language splits in the App Bundle</h2>
+  <p>When you publish an Android App Bundle, Google Play doesn't send every user your entire app. It generates optimized splits and delivers only what each device needs — the right screen density, the right ABI, and the right <b>language</b>. That last one is the trap. By default the bundle carries each locale as its own configuration split, and the Play Store delivers a device only the language split matching its system locale at install time.</p>
+  <p>On your own phone, testing from Android Studio, you install the <i>universal</i> build with every language included, so everything works. Real users installing from the Store get a language-stripped copy. If the delivery of non-default language splits isn't set up the way you expect — or if a device's locale doesn't exactly match a split you shipped — the user falls back to your default <code>values/</code> language, which for many of us is English. Your translations exist; they just never got delivered to that device.</p>
+
+  <div class="callout">
+    <p>The tell that points straight at this: <b>it's perfect from Android Studio and wrong from the Store.</b> Any bug that only appears on the Play Store copy and never on your direct install is almost always an App Bundle split issue — language, density, or ABI. Same code, different delivered artifact.</p>
+  </div>
+
+  <h2>How I confirmed it</h2>
+  <p>The confirmation is worth doing rather than guessing, because "the Store copy differs" has a few possible causes. The App Bundle format lets you build the exact APKs the Store would generate for a given device and install those instead of the universal build. When I generated the split APKs and installed the set for a Korean device configuration — rather than the all-languages universal APK — I reproduced the English fallback locally. That was the proof: the code was fine, the <i>delivered</i> APK set for that locale simply didn't contain, or didn't apply, the Korean split. Reproducing a Store-only bug on your own machine turns a mystery into a fixable defect.</p>
+
+  <h2>The fixes</h2>
+  <p>There are two reliable directions, and which you want depends on how much you care about download size.</p>
+  <h3>Option 1 — turn off language splitting</h3>
+  <p>The bluntest, most predictable fix: tell the bundle not to split by language, so every install includes every language exactly like your universal build did.</p>
+<pre>android {
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+}</pre>
+  <p>Now every user gets all your translations regardless of their locale at install time, and the class of bug disappears. The cost is a slightly larger download, since everyone carries every language. For an app with modest string resources — which is most apps — that cost is tiny and the reliability is worth it. This is what I reach for first.</p>
+  <h3>Option 2 — keep splits, deliver languages on demand</h3>
+  <p>If you localize heavily and download size genuinely matters, keep the splits but handle language delivery deliberately: fetch additional languages at runtime through the Play delivery APIs when a user selects a locale you didn't ship by default, and make sure your in-app language switcher requests the split it needs before applying it. This keeps installs lean but adds real complexity, and it's only worth it when your translated resources are large enough to matter.</p>
+
+  <h2>The takeaway</h2>
+  <p>The mental model that would have saved me hours: <b>with App Bundles, "it's in my project" and "it's on the user's device" are two different statements.</b> The bundle is a recipe, not the meal — Google Play cooks a per-device APK set from it, and anything that's optional (languages, densities, native libs) can be absent from a given device's serving. When something is present in your source but missing for real users, stop looking at your code and start looking at what the bundle actually delivered. For localization specifically, if you want certainty over a few hundred kilobytes, disabling the language split is the boring answer that just works.</p>
+
+  <p class="note">Gradle DSL and Play delivery options evolve; verify the current bundle configuration syntax against the official Android documentation before relying on a specific snippet.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-target-api-36-ten-apps.html">Migrating 10 apps to target API 36</a> · <a href="/debug-aab-english-only-language-split.html">AAB English-only language split</a> · <a href="/android-app-bundle-missing-translations.html">App Bundle missing translations</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
