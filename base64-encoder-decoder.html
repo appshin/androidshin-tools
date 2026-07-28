@@ -10,7 +10,7 @@
 <title>Base64 Encoder / Decoder — UTF-8 safe, URL-safe, data URI | Mr.AndroidShin</title>
 <meta name="description" content="Encode text to Base64 or decode it back, with proper UTF-8 handling for non-ASCII characters. Toggle URL-safe output and wrap the result as a data URI. Runs entirely in your browser — nothing is uploaded.">
 <meta name="theme-color" content="#0B0E14">
-<link rel="canonical" href="https://androidshin.dev/base64-encoder-decoder.html">
+<link rel="canonical" href="https://androidshin.dev/base64-encoder-decoder">
 <meta property="og:title" content="Base64 Encoder / Decoder">
 <meta property="og:description" content="Encode and decode Base64 with correct UTF-8 handling, URL-safe mode and data URIs. Runs locally.">
 <meta property="og:type" content="website">
@@ -77,7 +77,7 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
-    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about.html">About</a></nav>
+    <nav><a href="#tool">Tool</a><a href="#learn">Guide</a><a href="/about">About</a></nav>
   </div>
 </header>
 
@@ -152,7 +152,7 @@
     <p>A common misconception is that encoding "packs" data. It's the opposite: Base64 represents 3 bytes with 4 characters, so the output is about 33% larger than the input. That's a fine trade when you need binary to survive a text-only channel, but it's the reason you don't Base64 large files into a page &mdash; a big inlined image bloats the HTML and can't be cached separately. Use it for small assets and for moving bytes safely, not as a way to shrink anything.</p>
 
     <div class="related">
-      Related: <a href="/jwt-decoder.html">JWT decoder</a> · <a href="/json-formatter.html">JSON formatter</a> · <a href="/android-strings-xml-escaper.html">strings.xml escaper</a>
+      Related: <a href="/jwt-decoder">JWT decoder</a> · <a href="/json-formatter">JSON formatter</a> · <a href="/android-strings-xml-escaper">strings.xml escaper</a>
     </div>
   </section>
 
@@ -164,9 +164,9 @@
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
     <div>
-      <a href="/about.html">About</a> ·
-      <a href="/privacy.html">Privacy</a> ·
-      <a href="/contact.html">Contact</a>
+      <a href="/about">About</a> ·
+      <a href="/privacy">Privacy</a> ·
+      <a href="/contact">Contact</a>
     </div>
   </div>
 </footer>

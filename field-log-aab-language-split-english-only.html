@@ -10,7 +10,7 @@
 <title>Field log: my app shipped English-only even though I translated everything (AAB language splits) | Mr.AndroidShin</title>
 <meta name="description" content="Every string was translated, the locale folders were all there, yet users on the Play Store only saw English. The cause was the App Bundle's per-language splits and on-demand language delivery — here's how I found it and the two ways to fix it.">
 <meta name="theme-color" content="#0B0E14">
-<link rel="canonical" href="https://androidshin.dev/field-log-aab-language-split-english-only.html">
+<link rel="canonical" href="https://androidshin.dev/field-log-aab-language-split-english-only">
 <meta property="og:title" content="Field log: my app shipped English-only despite full translations">
 <meta property="og:description" content="Why AAB per-language splits can strand your translations, and the two reliable fixes.">
 <meta property="og:type" content="article">
@@ -56,7 +56,7 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
-    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
   </div>
 </header>
 
@@ -99,14 +99,14 @@
   <p class="note">Gradle DSL and Play delivery options evolve; verify the current bundle configuration syntax against the official Android documentation before relying on a specific snippet.</p>
 
   <div class="related">
-    <p>Related: <a href="/field-log-target-api-36-ten-apps.html">Migrating 10 apps to target API 36</a> · <a href="/debug-aab-english-only-language-split.html">AAB English-only language split</a> · <a href="/android-app-bundle-missing-translations.html">App Bundle missing translations</a></p>
+    <p>Related: <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a> · <a href="/debug-aab-english-only-language-split">AAB English-only language split</a> · <a href="/android-app-bundle-missing-translations">App Bundle missing translations</a></p>
   </div>
 </main>
 
 <footer>
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
-    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
   </div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>

@@ -10,7 +10,7 @@
 <title>Debugging log: "Your app must target Android 16 (API 36)" — the Aug 31, 2026 Play deadline | Mr.AndroidShin</title>
 <meta name="description" content="Google Play now requires app updates to target API level 36 (Android 16) from August 31, 2026. What the requirement actually blocks, why bumping targetSdk drags in AGP 8.9 and Gradle, and the exact steps I used across ten apps.">
 <meta name="theme-color" content="#0B0E14">
-<link rel="canonical" href="https://androidshin.dev/debug-target-api-level-36-requirement.html">
+<link rel="canonical" href="https://androidshin.dev/debug-target-api-level-36-requirement">
 <meta property="og:title" content="Debugging log: the target API level 36 (Android 16) Play deadline">
 <meta property="og:description" content="What the Aug 31, 2026 targetSdk 36 requirement blocks, and the exact build-system chain reaction it sets off.">
 <meta property="og:type" content="article">
@@ -56,7 +56,7 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
-    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
   </div>
 </header>
 
@@ -109,14 +109,14 @@
   <p class="note">This touches Play policy and dates that can change; check the current requirement in the Play Console before your final upload.</p>
 
   <div class="related">
-    <p>Related: <a href="/debug-edge-to-edge-enforced-target-36.html">Content hidden behind system bars on API 36</a> · <a href="/debug-dependency-requires-compilesdk.html">Requires compiling against a newer API</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+    <p>Related: <a href="/debug-edge-to-edge-enforced-target-36">Content hidden behind system bars on API 36</a> · <a href="/debug-dependency-requires-compilesdk">Requires compiling against a newer API</a> · <a href="/minsdk-targetsdk-compilesdk">minSdk vs targetSdk vs compileSdk</a></p>
   </div>
 </main>
 
 <footer>
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
-    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
   </div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>

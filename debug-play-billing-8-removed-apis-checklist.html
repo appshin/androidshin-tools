@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Play Billing Library 8: the removed & changed APIs checklist | Mr.AndroidShin</title>
+<meta name="description" content="A practical checklist of what changed and what was removed in Google Play Billing Library 8, so you can grep your billing code and know exactly what needs fixing before the deadline — the callback change, removed queries, and what stayed the same.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-play-billing-8-removed-apis-checklist">
+<meta property="og:title" content="Play Billing Library 8: removed & changed APIs checklist">
+<meta property="og:description" content="Grep your billing code against this list: what changed, what's gone, and what you don't need to touch in PBL 8.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface);font-family:var(--disp);color:var(--text)}
+  td{color:#C7CDDA}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Billing</p>
+  <h1>Play Billing Library 8: the removed &amp; changed APIs checklist</h1>
+
+  <p>When I migrated seven apps to Play Billing Library 8, the fastest way to know how much work each one needed was to grep the billing code against a short list. Most of the time the answer was "one line." This is that list, so you can scan your own <code>BillingManager</code> and know in two minutes whether you have a quick bump or real removal work.</p>
+
+  <div class="callout">
+    <p><b>How to use this:</b> search your project for each symbol below. If you only hit the "changed" row, you have a five-minute migration. If you hit any "removed" row, fix those first — they won't compile against v8 at all.</p>
+  </div>
+
+  <h2>Changed — you must edit this</h2>
+  <h3>queryProductDetailsAsync callback</h3>
+  <p>The single change that touched every app. The callback's second parameter changed from a list to a result object:</p>
+<pre>// v7: second param is List&lt;ProductDetails&gt;
+client.queryProductDetailsAsync(params) { _, list -&gt;
+    list.forEach { /* ... */ }
+}
+
+// v8: second param is QueryProductDetailsResult
+client.queryProductDetailsAsync(params) { _, result -&gt;
+    result.productDetailsList.forEach { /* ... */ }
+}</pre>
+  <p>In Java it's the same idea: the listener now receives a <code>QueryProductDetailsResult</code>, and you call <code>getProductDetailsList()</code> on it. The result object also exposes an unfetched-products list if you want to detect product IDs that returned nothing.</p>
+
+  <h2>Removed — replace before you compile</h2>
+  <table>
+    <tr><th>Removed API</th><th>Replace with</th></tr>
+    <tr><td><code>querySkuDetailsAsync</code> / <code>SkuDetails</code></td><td><code>queryProductDetailsAsync</code> with <code>ProductDetails</code></td></tr>
+    <tr><td><code>queryPurchaseHistoryAsync</code></td><td><code>queryPurchasesAsync</code> (or drop it if you only needed current purchases)</td></tr>
+    <tr><td><code>enablePendingPurchases()</code> (no arguments)</td><td><code>enablePendingPurchases(PendingPurchasesParams…)</code></td></tr>
+    <tr><td>Old <code>launchBillingFlow</code> subscription-update fields (<code>setOldSkuPurchaseToken</code>, etc.)</td><td><code>setOldPurchaseToken</code> + <code>setSubscriptionReplacementMode</code></td></tr>
+  </table>
+  <p>These are the symptoms of a genuinely old integration. The good news: if you already migrated from <code>SkuDetails</code> to <code>ProductDetails</code> in an earlier version, you almost certainly don't hit any of these.</p>
+
+  <h2>Unchanged — leave it alone</h2>
+  <p>Just as useful is knowing what <i>not</i> to touch. In every app I migrated, these were identical between v7 and v8:</p>
+  <ul>
+    <li><code>enablePendingPurchases(PendingPurchasesParams.newBuilder()…)</code> — the parameterized form is correct and stays.</li>
+    <li><code>queryPurchasesAsync(QueryPurchasesParams, listener)</code> — the params-object form is unchanged.</li>
+    <li><code>launchBillingFlow(activity, params)</code> — unchanged.</li>
+    <li><code>acknowledgePurchase</code> and <code>consumeAsync</code> — unchanged.</li>
+    <li>Subscription replacement via <code>setSubscriptionReplacementMode</code> / <code>setOldPurchaseToken</code> — unchanged.</li>
+  </ul>
+
+  <h2>The dependency bump</h2>
+<pre>implementation("com.android.billingclient:billing:8.0.0")
+// or, if you use the KTX artifact:
+implementation("com.android.billingclient:billing-ktx:8.0.0")</pre>
+  <p>After the Play deadline you can't publish updates built against v7, so this is required if you plan to ship again — not just a nice-to-have.</p>
+
+  <h2>Before you call it done</h2>
+  <p>A compile-clean migration is not a tested migration, and this is real money. Build a release and actually run, on a device: a subscription purchase, a subscription upgrade/downgrade, a consumable purchase, and a restore after reinstall. The callback change is mechanical, but the only way to be sure your purchase flow still resolves products correctly is to watch a real one complete.</p>
+
+  <p class="note">Library contents and Play requirements shift between releases; confirm the exact removed-API list and current minimum version against the official Play Billing migration guide before shipping.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-play-billing-library-8-migration">Play Billing Library 8 migration</a> · <a href="/debug-target-api-level-36-requirement">The target API 36 requirement</a> · <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

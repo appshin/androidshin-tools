@@ -10,7 +10,7 @@
 <title>Debugging log: "Cannot fit requested classes in a single dex file" | Mr.AndroidShin</title>
 <meta name="description" content="The build failed with 'Cannot fit requested classes in a single dex file (# methods: 65536 > 65536)'. What the 64K method-reference limit really is, when multidex fixes it, and why shrinking is often the better answer.">
 <meta name="theme-color" content="#0B0E14">
-<link rel="canonical" href="https://androidshin.dev/debug-cannot-fit-classes-single-dex.html">
+<link rel="canonical" href="https://androidshin.dev/debug-cannot-fit-classes-single-dex">
 <meta property="og:title" content="Debugging log: 'Cannot fit requested classes in a single dex file'">
 <meta property="og:description" content="The 64K method-reference limit explained — when multidex is the fix, and when shrinking your method count is the better one.">
 <meta property="og:type" content="article">
@@ -56,7 +56,7 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
-    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
   </div>
 </header>
 
@@ -126,14 +126,14 @@ Execution failed for task ':app:mergeDexDebug'.
   <p class="note">Version numbers above are examples — check for the current multidex release when you add it.</p>
 
   <div class="related">
-    <p>Related: <a href="/debug-release-crash-proguard-r8-keep-rules.html">Debug works, release crashes (R8 keep rules)</a> · <a href="/debug-duplicate-class-dependency-conflict.html">"Duplicate class" found in modules</a> · <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk</a></p>
+    <p>Related: <a href="/debug-release-crash-proguard-r8-keep-rules">Debug works, release crashes (R8 keep rules)</a> · <a href="/debug-duplicate-class-dependency-conflict">"Duplicate class" found in modules</a> · <a href="/minsdk-targetsdk-compilesdk">minSdk vs targetSdk vs compileSdk</a></p>
   </div>
 </main>
 
 <footer>
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
-    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
   </div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>

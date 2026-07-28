@@ -10,7 +10,7 @@
 <title>Android API Level ↔ Version ↔ Codename Lookup | Mr.AndroidShin</title>
 <meta name="description" content="Searchable Android API level reference: map any API level to its Android version, codename, and Build.VERSION_CODES constant — from API 19 up to API 37 (Android 17, Cinnamon Bun). Free, no sign-up.">
 <meta name="theme-color" content="#0B0E14">
-<link rel="canonical" href="https://androidshin.dev/android-api-levels.html">
+<link rel="canonical" href="https://androidshin.dev/android-api-levels">
 <meta property="og:title" content="Android API Level ↔ Version ↔ Codename Lookup">
 <meta property="og:description" content="Map any Android API level to its version, codename and VERSION_CODES constant. Searchable.">
 <meta property="og:type" content="website">
@@ -69,7 +69,7 @@
 <header>
   <div class="wrap bar">
     <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
-    <nav><a href="/#tools">Tools</a><a href="/about.html">About</a></nav>
+    <nav><a href="/#tools">Tools</a><a href="/about">About</a></nav>
   </div>
 </header>
 
@@ -99,7 +99,7 @@
     <h2>FAQ</h2>
     <details><summary>What API level is Android 14?</summary><p>API level 34, codename Upside Down Cake, constant <code>UPSIDE_DOWN_CAKE</code>.</p></details>
     <details><summary>What is the latest Android API level?</summary><p>API 37 — Android 17, internal codename Cinnamon Bun — which reached stable in June 2026. API 36 is Android 16 (Baklava).</p></details>
-    <details><summary>What minSdk should I choose?</summary><p>It's a trade-off between reach and maintenance. Many teams sit around API 24–26 today; check current device distribution and see the <a href="/minsdk-targetsdk-compilesdk.html">minSdk vs targetSdk vs compileSdk guide</a>.</p></details>
+    <details><summary>What minSdk should I choose?</summary><p>It's a trade-off between reach and maintenance. Many teams sit around API 24–26 today; check current device distribution and see the <a href="/minsdk-targetsdk-compilesdk">minSdk vs targetSdk vs compileSdk guide</a>.</p></details>
 
     <h2>Why the number matters more than the name</h2>
     <p>Dessert names are fun trivia, but the API level integer is what your build and your code actually care about. Gradle compares integers to decide which APIs are available, and <code>Build.VERSION.SDK_INT</code> is an integer you branch on at runtime. When a library says it "requires API 26+", it means the integer, not the marketing version — so the mapping in the table above is the thing you reach for when a dependency, a permission, or a platform behavior is gated behind a particular release. Knowing that Android 8.0 is API 26 turns a vague requirement into a concrete <code>minSdk</code> decision.</p>
@@ -118,7 +118,7 @@
 <footer>
   <div class="wrap foot">
     <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
-    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
   </div>
 </footer>
 
