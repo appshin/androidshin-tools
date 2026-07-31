@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: measuring a child's height with ARCore (and why calibration matters more than AR) | Mr.AndroidShin</title>
+<meta name="description" content="Building an app that measures a child's height with the phone camera using ARCore, then plots it on growth percentile curves. The accuracy problems nobody warns you about — plane detection drift, the top-of-head point, and why a calibration step carried the whole thing.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-arcore-child-height-who-percentile">
+<meta property="og:title" content="Field log: measuring a child's height with ARCore">
+<meta property="og:description" content="Plane drift, the top-of-head problem, and why calibration mattered more than the AR — building a camera height-measurement app.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · ARCore</p>
+  <h1>Measuring a child's height with ARCore</h1>
+  <p class="lede">The pitch was simple: point your phone, measure how tall your kid is, plot it on a growth curve. The AR part was the easy 20%. The other 80% was accuracy — and the fix that mattered most wasn't clever computer vision, it was a humble calibration step.</p>
+
+  <p>I wanted an app that measures a child's standing height from the phone camera and drops that number onto standard growth percentile curves, so a parent can see where their kid sits over time. ARCore gives you the raw capability — understand the floor, place points in 3D space, measure the distance between them. Getting from that capability to a number a parent will trust is the entire project, and it's mostly a fight with error.</p>
+
+  <h2>The three accuracy problems</h2>
+  <h3>1. The floor is a guess</h3>
+  <p>ARCore builds its sense of the world from detected planes, and the floor plane is the reference everything else hangs off. In good light on a textured floor it's solid. On a plain, glossy, or dim floor, the plane can sit slightly above or below the real surface, and every measurement inherits that offset. A centimetre of floor error is a centimetre of height error, invisibly. You have to design the flow to get a good plane <i>first</i> — move the phone, let tracking settle — before you let anyone measure anything.</p>
+  <h3>2. Where exactly is the top of the head?</h3>
+  <p>A tape measure touches the crown of the head. A camera has to <i>decide</i> where that is, and hair, posture, and a wriggling child all conspire against you. Marking the top point is where most of the run-to-run variation came from — the same child measured twice, seconds apart, could differ by more than the floor error did. This is the human-input problem, and no amount of AR precision downstream saves you if the point you started from wandered.</p>
+  <h3>3. Drift over the session</h3>
+  <p>ARCore's world tracking is relative and accumulates small errors as the phone moves. Take too long, walk around too much, and the coordinate you placed thirty seconds ago has quietly shifted. Fast, deliberate measurements beat slow, careful ones here — the longer the session, the more drift you bank.</p>
+
+  <div class="callout">
+    <p>The reframing that saved the project: <b>I couldn't make the AR perfectly accurate, so I made the error correctable.</b> Instead of chasing an absolute measurement, I added a calibration step against a known reference — measure something whose height you know, compute the offset, and apply that correction to real measurements. Calibration turned an unpredictable error into a constant one I could subtract out.</p>
+  </div>
+
+  <h2>Why calibration carried everything</h2>
+  <p>Absolute AR measurement is at the mercy of the floor plane, the device, and the lighting — all of which vary. But if you first measure a reference of known height in the <i>same</i> conditions, the difference between what the app reports and the truth is your systematic error for that session. Apply that same correction to the child's measurement and most of the floor-and-device error cancels out, because it was present in both. It doesn't fix the top-of-head input problem, but it removes the single largest source of between-session inconsistency. A slightly tedious calibration step bought more accuracy than any tweak to the measurement math.</p>
+
+  <h2>The other half: turning a number into meaning</h2>
+  <p>A height in centimetres is data, not insight. The value for a parent is <i>where does this sit for a child this age and sex</i> — the percentile. That means plotting the measurement against standardized growth references (such as the WHO child growth standards, and locale-specific ones like the KDCA charts in Korea). The engineering there is unglamorous but exact: store the reference curves, interpolate to the child's precise age, and place the measurement as a percentile. This is the part that makes the app feel like more than a novelty ruler — and it's a good reminder that the domain data (the growth curves) is as much of the product as the AR.</p>
+
+  <h2>What I'd tell myself starting over</h2>
+  <ul>
+    <li><b>Budget your time by error source, not by feature.</b> The AR SDK call was an afternoon; accuracy was weeks. Plan for that ratio.</li>
+    <li><b>Make error correctable instead of chasing perfection.</b> A calibration step against a known reference beat every attempt to make the raw measurement absolutely right.</li>
+    <li><b>The human input point is your biggest variance.</b> Design the UI to make marking the top of the head as unambiguous and repeatable as possible.</li>
+    <li><b>Fast measurements beat careful ones</b> when your tracking drifts over time.</li>
+    <li><b>The reference data is half the product.</b> A number without a percentile is just a number.</li>
+  </ul>
+
+  <p>None of these are ARCore-specific tricks — they're what any real-world measurement app teaches you. The camera can tell you a distance; making that distance <i>true and meaningful</i> is the actual work, and it lives in calibration and domain data far more than in the AR API.</p>
+
+  <p class="note">This describes a hobby engineering project. A phone-camera measurement is not a medical instrument, and growth-percentile results from such an app should never replace a clinician's assessment — treat any concern about a child's growth as a conversation for a doctor.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-llm-api-key-android-proxy">Calling an LLM without shipping your key</a> · <a href="/field-log-ble-brake-sensor-engine-vibration">Fighting engine vibration in a BLE sensor</a> · <a href="/dp-sp-px-converter">dp / sp / px converter</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

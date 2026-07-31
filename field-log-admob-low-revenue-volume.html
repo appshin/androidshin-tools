@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: my AdMob revenue looked broken — it wasn't, it was volume | Mr.AndroidShin</title>
+<meta name="description" content="Near-zero AdMob earnings feel like a bug. Before you tear apart your integration, read the four dashboard numbers that tell you whether it's actually broken or just low traffic — and how I confirmed mine was working perfectly.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-admob-low-revenue-volume">
+<meta property="og:title" content="Field log: my AdMob revenue looked broken — it was just volume">
+<meta property="og:description" content="The four numbers that prove your AdMob is working, and why near-zero earnings are usually traffic, not config.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface);font-family:var(--disp);color:var(--text)}
+  td{color:#C7CDDA}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Monetization</p>
+  <h1>My AdMob revenue looked broken — it was just volume</h1>
+  <p class="lede">Opening the AdMob dashboard to a few cents after a month of work feels like something is wired wrong. I was convinced my integration was broken. It wasn't — and the four numbers that proved it are the same ones that tell you whether to touch your code at all.</p>
+
+  <p>Here's the scene: a handful of published apps, a full AdMob setup, and a home screen showing this month "US$0.11," last month "US$1.69." My first instinct was the same as everyone's — <i>the ads must not be working.</i> Wrong ad unit ID, a broken SDK call, a mediation misconfiguration, something. I almost started ripping the integration apart. Then I actually read the dashboard, and it told me, plainly, that everything was working. The problem was somewhere else entirely.</p>
+
+  <h2>The four numbers that settle "broken vs. low traffic"</h2>
+  <p>AdMob's activity card has four metrics that, read together, answer the only question that matters first: is this a <b>technical</b> problem or a <b>volume</b> problem? Here's how to read them, using my own numbers for a recent 7-day window.</p>
+  <table>
+    <tr><th>Metric</th><th>Mine</th><th>What it proves</th></tr>
+    <tr><td>Requests</td><td>30</td><td>The SDK is asking for ads. If this is 0, your integration or initialization is broken.</td></tr>
+    <tr><td>Match rate</td><td>100%</td><td>Of the ads requested, this share got filled. High match rate means your ad units and config are fine.</td></tr>
+    <tr><td>Impressions</td><td>10</td><td>Ads actually shown on screen. This is what you get paid for.</td></tr>
+    <tr><td>eCPM</td><td>(low)</td><td>Earnings per 1,000 impressions. Depends on format, geography, and demand.</td></tr>
+  </table>
+
+  <div class="callout">
+    <p><b>The tell:</b> if requests are happening and match rate is high, your ads are <i>not broken</i>. A broken integration shows up as zero requests or a match rate on the floor. Mine were 30 requests at 100% match — the pipeline was flawless. The revenue was tiny for one boring reason: only 10 impressions.</p>
+  </div>
+
+  <h2>Why 10 impressions can only ever be pennies</h2>
+  <p>Ad revenue is almost insultingly simple math:</p>
+<pre>revenue ≈ impressions × eCPM ÷ 1000</pre>
+  <p>Plug in reality. If your eCPM is, say, $2, then ten impressions is <code>10 × 2 ÷ 1000 = $0.02</code>. There is no configuration on earth that turns ten impressions into real money. The number that was killing me wasn't a broken switch — it was the impression count, and impressions are a function of <b>how many people use your app and how often they see an ad</b>, not of your setup.</p>
+  <p>The mental model that fixed my thinking: the ad stack is a cash register. Mine was working perfectly — it rang up every sale correctly. But a perfect register in an empty shop still totals almost nothing. I'd been trying to fix the register when the actual issue was that almost nobody had walked in.</p>
+
+  <h2>When it IS worth touching the integration</h2>
+  <p>So config wasn't my problem — but it's fair to ask when it <i>is</i>. There are a few genuine levers, and they only matter once you have enough impressions for them to move anything:</p>
+  <ul>
+    <li><b>Ad format.</b> This is the biggest one. Banners earn a fraction of what interstitials and rewarded ads do. If you're running banner-only, the same users can produce several times the revenue once you add a well-placed interstitial (between levels, on natural stopping points) or a rewarded ad (opt-in for a perk). Format is a real, code-side improvement.</li>
+    <li><b>Impression opportunities.</b> Are you actually giving users moments to see an ad? A utility they open for four seconds barely has a surface for it. Design natural break points where an ad fits without wrecking the experience.</li>
+    <li><b>Per-app zeros.</b> Check whether impressions come from all your apps or just one. If some apps show zero, <i>those</i> might have a real wiring problem worth a look — but you diagnose that per app, not from the account total.</li>
+    <li><b>Fill by geography.</b> eCPM varies wildly by country. You can't fully control who installs, but it explains a lot of the variance and is worth knowing before you blame yourself.</li>
+  </ul>
+
+  <h2>The uncomfortable conclusion</h2>
+  <p>I wanted the answer to be a bug, because a bug is fixable in an afternoon. The real answer was harder: near-zero revenue across a healthy integration is a <b>distribution problem</b>. The lever isn't in the AdMob console at all — it's downloads and active usage. Optimizing store listings, actually getting the apps in front of people, keeping users coming back: that's the work that moves impressions, and impressions are the only thing that moves revenue.</p>
+  <p>So I did two things. I stopped refreshing the earnings dashboard, because watching pennies doesn't change them. And I made one legitimate code change where it applied — adding higher-value ad formats to the apps that only had banners — so that when the traffic does grow, each user is worth more. Everything else is a traffic problem wearing a revenue problem's clothes.</p>
+
+  <div class="callout">
+    <p>Before you debug an integration that "isn't earning," check requests and match rate first. If both look healthy, close the code editor — the fix you need is users, not a patch.</p>
+  </div>
+
+  <p class="note">This is a personal account of reading my own dashboards, not financial or business advice; ad metrics, eCPM ranges, and AdMob policies vary and change, so verify against your own console and the official documentation.</p>
+
+  <div class="related">
+    <p>Related: <a href="/admob-ecpm-calculator">AdMob eCPM calculator</a> · <a href="/debug-real-admob-ids-in-testing">Real AdMob IDs in testing</a> · <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

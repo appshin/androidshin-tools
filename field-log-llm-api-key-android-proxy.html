@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: calling an LLM from an Android app without shipping your API key | Mr.AndroidShin</title>
+<meta name="description" content="Hardcoding an AI provider key in your app ships it to every user who decompiles the APK. The near-miss that taught me to route every LLM call through a server proxy — why buildConfigField isn't safe, and the Firebase Functions pattern I use instead.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-llm-api-key-android-proxy">
+<meta property="og:title" content="Field log: calling an LLM from Android without shipping your API key">
+<meta property="og:description" content="Why a key in buildConfigField ends up in the APK, and the server-proxy pattern that keeps it out of users' hands.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Security · AI</p>
+  <h1>Calling an LLM from Android without shipping your API key</h1>
+  <p class="lede">I build a lot of apps that talk to an AI model, and there's a mistake I made early that could have cost me real money: putting the provider's API key inside the app. It felt safe because it was "in the build config." It wasn't safe at all. Here's why, and the pattern I use now.</p>
+
+  <p>If your app calls an AI API — a chat companion, a tutor, an image describer — something in that request has to authenticate with the provider. The tempting shortcut is to drop the key into your Gradle config and read it from <code>BuildConfig</code> at runtime. It compiles, it works, and it quietly hands your secret to anyone who downloads the app.</p>
+
+  <h2>Why "it's in buildConfigField" is not safe</h2>
+  <p>Here's the version that looks responsible — the key isn't even in your source, it's injected at build time:</p>
+<pre>// build.gradle
+buildConfigField "String", "AI_API_KEY", "\"sk-....\""
+
+// somewhere in the app
+val key = BuildConfig.AI_API_KEY
+callProvider(key, prompt)</pre>
+  <p>The problem is that <code>BuildConfig</code> constants are compiled into the APK as plain values. Anyone can pull your app from the store, run a standard decompiler, and read that string in a couple of minutes. There's no obfuscation setting that fixes this — the app has to have the key in a usable form to use it, so the key is extractable, full stop. Once it's out, someone can burn through your quota, run up a bill in your name, or abuse the provider under your account. This isn't theoretical; scanning APKs for leaked keys is an automated hobby for a lot of people.</p>
+
+  <div class="callout">
+    <p><b>The rule I wish I'd started with:</b> a secret that ships inside the app is not a secret. If the client can read it, so can an attacker. The only place an AI provider key belongs is on a server you control — never in the APK, never in <code>BuildConfig</code>, never in a committed file.</p>
+  </div>
+
+  <h2>The fix: put a thin proxy between the app and the provider</h2>
+  <p>The pattern is simple. Your app never talks to the AI provider directly. Instead it calls <i>your</i> endpoint, and that endpoint — running on a server, holding the real key — forwards the request to the provider and streams back the response. The key lives only in the server's environment.</p>
+<pre>Android app  ──►  your endpoint (holds the key)  ──►  AI provider
+             ◄──  response                        ◄──</pre>
+  <p>I use Firebase Cloud Functions for this because it slots into the Firebase stack these apps already use, but the shape is the same on any serverless platform. The function reads the key from its environment config (not from code), calls the provider, and returns the result:</p>
+<pre>// Cloud Function (sketch)
+export const chat = onCall(async (req) => {
+  const key = process.env.AI_API_KEY;      // server-side only
+  const reply = await callProvider(key, req.data.prompt);
+  return { reply };
+});</pre>
+  <p>On the device, the app just calls the function. No key anywhere in the client:</p>
+<pre>// Android (sketch)
+val result = functions
+    .getHttpsCallable("chat")
+    .call(mapOf("prompt" to userText))
+    .await()</pre>
+
+  <h2>What the proxy buys you beyond hiding the key</h2>
+  <p>Moving the call server-side isn't just damage control — it unlocks things you can't do from the client:</p>
+  <ul>
+    <li><b>Rotate the key without shipping an update.</b> Change it in the server env and every user is instantly on the new key. A key baked into the app can only be changed by publishing a new version and waiting for people to update.</li>
+    <li><b>Rate-limit and authenticate.</b> Require the caller to be a signed-in user, cap requests per user per day, and block obvious abuse — all before you spend a token.</li>
+    <li><b>Swap providers or models centrally.</b> Change which model you call, or move to a different provider, on the server. The app doesn't know or care.</li>
+    <li><b>Keep prompt logic private.</b> Your system prompt and any business logic stay on the server instead of being readable in the decompiled app.</li>
+  </ul>
+
+  <h2>If you've already shipped a key</h2>
+  <p>The uncomfortable but necessary steps, in order: <b>revoke the exposed key immediately</b> in the provider's console — assume it's compromised the moment it shipped. Generate a new one and put it only in your server environment. Move the call behind a proxy as above. Then release an app update that talks to the proxy instead of the provider. Revoking first is the important part; the leaked key can be abused for as long as it stays valid, and there's no way to claw it back out of the APKs already on people's phones.</p>
+
+  <p>The lesson cost me nothing in the end only because I caught it before it mattered. The fix is not much more work than the shortcut — a small function and one changed call site — and it converts "a secret every user can read" into "a secret only my server holds." For anything that costs money per request, that's not optional.</p>
+
+  <p class="note">Platform APIs and pricing evolve; treat the code here as illustrative sketches, and follow your AI provider's and cloud platform's current security guidance for production use.</p>
+
+  <div class="related">
+    <p>Related: <a href="/jwt-decoder">JWT decoder</a> · <a href="/field-log-admob-low-revenue-volume">My AdMob revenue looked broken</a> · <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
