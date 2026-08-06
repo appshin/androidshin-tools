@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Field log: where to actually find 12 testers for Google Play closed testing | Mr.AndroidShin</title>
+<meta name="description" content="The 12-tester closed-testing rule is easy to state and hard to satisfy — the real problem is finding twelve real people who opt in and stay. Where I looked, what worked, what wasted my time, and how to keep them from dropping off.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/field-log-finding-12-testers-closed-testing">
+<meta property="og:title" content="Field log: where to actually find 12 testers for closed testing">
+<meta property="og:description" content="Finding twelve real opted-in testers is the hard part of the Play rule. Where to look, what works, and how to keep them.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.7;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.1;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 26px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.4rem;margin:38px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.1rem;margin:24px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:20px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Field log · Play Console</p>
+  <h1>Where to actually find 12 testers for closed testing</h1>
+  <p class="lede">The rule is one sentence: 12 testers, opted in, for 14 days. Satisfying it is a different thing entirely, because the hard part isn't the number — it's finding twelve real people who will opt in properly and not vanish. Here's where I looked, what actually worked, and what wasted my time.</p>
+
+  <p>If you made a personal Google Play developer account recently, you can't reach production until you've run a closed test with at least 12 testers who stay opted in for 14 continuous days. I've written separately about <a href="/field-log-closed-testing-12-testers-14-days">the mechanics and the trap that resets the clock</a> — this post is about the part everyone actually gets stuck on: <i>who are these twelve people?</i></p>
+
+  <div class="callout">
+    <p><b>First, the definition that makes recruiting harder than it sounds:</b> a tester only counts once they open your opt-in link, accept, and install under the same Google account they accepted with. "I'll test it for you" from a friend who never installs counts as zero. So you're not looking for twelve yeses — you're looking for twelve completed opt-ins. Recruit accordingly.</p>
+  </div>
+
+  <h2>Recruit more than twelve — a lot more</h2>
+  <p>The single most useful thing I did was stop treating twelve as the target. Between people who say yes and never finish, people on iPhones who can't help, and people who install once and drift, the completion rate on invites is low. Aim for fifteen to twenty committed opt-ins so that normal drop-off doesn't drag you back under the line and reset your streak. Padding the roster is cheaper than restarting the clock.</p>
+
+  <h2>Where the testers actually came from</h2>
+  <h3>People you already know</h3>
+  <p>The least glamorous source is the most reliable: friends, family, coworkers, anyone with an Android phone who'll follow two links. They won't give you great feedback, but for clearing the requirement they're solid because they'll actually complete the opt-in when you walk them through it. The catch is you need enough Android users in your circle — if most of your people are on iPhones, this dries up fast and you move to the next options.</p>
+  <h3>Tester-exchange communities</h3>
+  <p>There are communities built specifically around this rule, where developers test each other's apps to clear the same requirement. Reddit has active threads for it, and there are dedicated groups and Discord/Telegram servers where you swap installs — you test twelve of theirs, they test yours. It's the fastest way to hit the number if your personal network is thin. Two cautions: read each community's rules before posting, and understand these testers are clearing a requirement, not evaluating your app — so treat their "activity" as box-checking, not real feedback.</p>
+  <h3>Your own audience, if you have one</h3>
+  <p>If you have any following — a small YouTube channel, a dev-community presence, users of your other apps — a direct call for testers works and brings people who might actually care about the app. For a first-time developer this is usually the smallest source, but it produces the best testers, because they opted in out of interest rather than reciprocity.</p>
+
+  <h2>The mistakes that cost me testers</h2>
+  <ul>
+    <li><b>Wrong target countries.</b> If your closed-testing track's country list doesn't include where your testers live, they open the link and see "app not available." Set the countries to cover your actual testers before you send a single invite — this one silently wastes people.</li>
+    <li><b>No walkthrough.</b> The opt-in flow (open web link → accept → install from the Store under that account) is not obvious to non-developers. Send a two-line instruction with the exact steps, or half your recruits stall at the install step and never count.</li>
+    <li><b>Assuming an install is permanent.</b> Uninstalling doesn't remove someone's opt-in, so your raw count can look fine while your testers have all quietly left. That reads as "no real testing" at review time. Nudge them to actually open the app once or twice during the window.</li>
+    <li><b>Recruiting exactly twelve.</b> One opt-out drops you to eleven and puts the streak at risk. The buffer isn't optional; it's insurance.</li>
+  </ul>
+
+  <h2>Keeping them for the full 14 days</h2>
+  <p>Getting to twelve is day one; staying at twelve for fourteen continuous days is the actual task. A few things that helped: push at least one small update during the window so the test looks alive rather than frozen; send a single friendly reminder partway through so install-once-and-vanish testers reopen the app; and keep a couple of spare recruits warm in case someone opts out. And the discipline from <a href="/field-log-closed-testing-12-testers-14-days">the mechanics post</a> applies here too — once the clock is running, don't re-apply early, or you can reset the very window your testers are helping you complete.</p>
+
+  <p>None of this is about the quality of your app. It's a logistics problem: find more than twelve Android users, make opting in idiot-proof, cover the right countries, and protect the count for two weeks. Do that and the gate opens on schedule. Treat it as recruiting rather than engineering and it stops feeling unfair — it's just a checklist with people in it.</p>
+
+  <p class="note">Google's testing requirements and numbers have changed before and can change again; confirm the current rule on the Play Console Help pages before planning around specific figures.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-closed-testing-12-testers-14-days">The 12-tester, 14-day gate: what resets the clock</a> · <a href="/google-play-closed-testing-12-testers">Closed testing: 12 testers explained</a> · <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
