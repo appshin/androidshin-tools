@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Internal testing vs closed testing on Google Play: which one counts | Mr.AndroidShin</title>
+<meta name="description" content="Google Play has internal, closed, and open testing tracks and they're easy to confuse. What each is for, which one satisfies the 12-tester / 14-day production-access requirement, and the mistake of testing on the wrong track.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-internal-vs-closed-testing">
+<meta property="og:title" content="Internal testing vs closed testing on Google Play: which one counts">
+<meta property="og:description" content="What each track is for, and which one actually satisfies the 12-tester, 14-day production requirement.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:32px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin:20px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--surface);font-family:var(--disp);color:var(--text)}
+  td{color:#C7CDDA}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Play Console</p>
+  <h1>Internal vs closed testing: which one actually counts</h1>
+
+  <p>Google Play gives you three testing tracks — internal, closed, and open — and for a new developer they blur together fast. Picking the wrong one is a real mistake, because only one of them satisfies the requirement that gates production access. Here's the plain-English difference and which track does what.</p>
+
+  <h2>The three tracks in one line each</h2>
+  <ul>
+    <li><b>Internal testing</b> — fastest, up to a small fixed number of testers (around 100), for your own quick QA. Builds are available almost immediately with little or no review.</li>
+    <li><b>Closed testing</b> — a controlled group you invite (via email lists or an opt-in link), meant for a real testing phase before release. This is the track tied to the production-access requirement.</li>
+    <li><b>Open testing</b> — anyone can join from your store listing; a public beta. Good for scale, less for a controlled 14-day phase.</li>
+  </ul>
+
+  <div class="callout">
+    <p><b>The one that counts:</b> for a personal account created recently, the requirement to unlock production is <b>closed testing</b> with at least 12 testers opted in for 14 continuous days. Internal testing is great for speed but does <i>not</i> satisfy that requirement. If you run your 14 days on the internal track, you'll reach the end and find the production gate still locked.</p>
+  </div>
+
+  <h2>Side by side</h2>
+  <table>
+    <tr><th></th><th>Internal</th><th>Closed</th><th>Open</th></tr>
+    <tr><td>Who can join</td><td>Small fixed list</td><td>People you invite</td><td>Anyone</td></tr>
+    <tr><td>Speed to availability</td><td>Fastest</td><td>After review</td><td>After review</td></tr>
+    <tr><td>Best for</td><td>Your own QA</td><td>Controlled test phase</td><td>Public beta</td></tr>
+    <tr><td>Counts for production access?</td><td>No</td><td>Yes</td><td>Not the intended track</td></tr>
+  </table>
+
+  <h2>How to actually use them together</h2>
+  <p>The tracks aren't either/or — the sensible flow uses more than one. I keep a signed build on <b>internal testing</b> for fast, private QA while I'm still fixing things, because it's the quickest way to get an install onto my own devices and a couple of trusted people. Then, when the build is stable enough to start the clock, I promote it to <b>closed testing</b> and recruit the 12 opted-in testers there, because that's the track that counts toward production. Internal is your workshop; closed is the phase Google actually watches.</p>
+
+  <h2>The common mistake</h2>
+  <p>The trap is running your two weeks on the wrong track. Because internal testing is so much easier to set up — no opt-in link to share, testers added directly — it's tempting to do all your testing there and then wonder why the production requirement never clears. It never clears because internal doesn't count. If your goal is production access, the 14-day, 12-tester clock has to run on the <b>closed</b> track. Set that up first, then use internal alongside it for your own quick iterations.</p>
+
+  <p>Once you're on the right track, the rest is logistics: recruiting and keeping the testers (<a href="/field-log-finding-12-testers-closed-testing">where to find 12</a>), understanding the clock (<a href="/field-log-closed-testing-12-testers-14-days">what resets it</a>), and not panicking when it says "needs more testing" (<a href="/debug-closed-testing-production-access-rejected">why that happens</a>).</p>
+
+  <p class="note">Track limits, review behavior, and the production-access requirement change over time; confirm the current details on the Play Console Help pages before planning your release.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-closed-testing-12-testers-14-days">The 12-tester, 14-day gate</a> · <a href="/field-log-finding-12-testers-closed-testing">Where to find 12 testers</a> · <a href="/debug-closed-testing-production-access-rejected">Production access "needs more testing"</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

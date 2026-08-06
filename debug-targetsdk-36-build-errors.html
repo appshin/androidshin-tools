@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>targetSdk 36 build errors: the ones I actually hit, and their fixes | Mr.AndroidShin</title>
+<meta name="description" content="A roundup of the real build errors that appear when you bump an Android app to compileSdk/targetSdk 36 — AGP too old, Gradle mismatch, Kotlin version, lint-vital failures, and a Windows file lock — each with the fix that worked.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-targetsdk-36-build-errors">
+<meta property="og:title" content="targetSdk 36 build errors: the ones I actually hit, and their fixes">
+<meta property="og:description" content="AGP/Gradle/Kotlin version chain, lint-vital failures, and a Windows file lock — the real errors from bumping to API 36 and how to clear each.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.3rem;margin:32px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.05rem;margin:20px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}.callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><svg width="26" height="26" viewBox="0 0 512 512" aria-hidden="true" style="display:block;flex:none" class="mark"><rect x="8" y="8" width="496" height="496" rx="118" fill="#FFB454"/><path fill="#0B0E14" fill-rule="evenodd" d="M214 92 L298 92 L436 420 L356 420 L320 334 L192 334 L156 420 L76 420 Z M256 172 L212 300 L300 300 Z"/></svg>Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Build</p>
+  <h1>targetSdk 36 build errors: the ones I actually hit</h1>
+
+  <p>Bumping ten apps to <code>compileSdk</code>/<code>targetSdk</code> 36 produced a predictable sequence of build errors — the same few, in roughly the same order, across projects. If your build just went red after setting the target to 36, here's the roundup with the fix for each, so you can jump to yours. For the wider story, see <a href="/field-log-target-api-36-ten-apps">migrating 10 apps to target API 36</a>.</p>
+
+  <h2>1. AGP doesn't know about API 36</h2>
+  <p>Set <code>compileSdk = 36</code> on an older Android Gradle Plugin and the build refuses — it can't compile against an API level it's never heard of. The fix is to move to an AGP that supports Android 16:</p>
+<pre>// build.gradle(.kts) — plugins / classpath
+com.android.tools.build:gradle  →  8.9.1   // 8.9.0+ supports API 36</pre>
+  <p>If you were on AGP 8.6 or 8.7, this is your first stop; nothing else compiles until AGP is new enough.</p>
+
+  <h2>2. Gradle version too low for the new AGP</h2>
+  <p>Bumping AGP triggers the next link in the chain — a plain version-compatibility message that the Gradle wrapper is too old:</p>
+<pre>distributionUrl=...gradle-8.11.1-bin.zip   // AGP 8.9 needs Gradle 8.11.1+</pre>
+  <p>Update <code>gradle/wrapper/gradle-wrapper.properties</code> and re-sync. These first two errors are a cascade: SDK forces AGP, AGP forces Gradle.</p>
+
+  <h2>3. Kotlin plugin complains about the AGP version</h2>
+  <p>On older projects (Kotlin 1.9.x) the Kotlin Gradle plugin warns or errors that the applied AGP is newer than it was tested with. Moving Kotlin to <code>2.0.21</code>+ clears it. Note that with a newer Kotlin and an older-but-supported AGP you may still see a non-fatal "higher than the maximum tested" warning — that one is safe to ignore and the build still completes.</p>
+
+  <h2>4. "SDK location not found" / missing platform</h2>
+  <p>Even with the right AGP, the build fails if the Android 16 platform isn't installed. Open the SDK Manager and install <b>Android 16 (API 36)</b> and <b>Build-Tools 36</b>. Also confirm your Gradle JDK is <b>17</b>, which AGP 8.x requires. This is environment, not code — the fix is in the SDK Manager, not the build file.</p>
+
+  <h2>5. lint-vital fails the release build</h2>
+  <p>This one only appears on the release build, because release runs <code>lintVital</code>, which is fatal by default. A common trigger is <code>ExtraTranslation</code>:</p>
+<pre>Error: "some_key" is translated here but not found in
+default locale [ExtraTranslation]</pre>
+  <p>It means a string exists in a locale file (e.g. <code>values-en</code>) but not in the default <code>values/strings.xml</code>. These are usually dead strings left over from a removed feature. The right fix is to <b>delete the orphaned strings</b> from the locale file, not to silence the check with a baseline. A quick way to catch them all: compare each locale's string keys against the default and remove any that don't exist in the default.</p>
+
+  <h2>6. "The process cannot access the file" (Windows)</h2>
+  <p>This looks alarming and code-related but isn't:</p>
+<pre>...lint-cache/...RuntimeIssueRegistry-....jar:
+The process cannot access the file because it is being
+used by another process</pre>
+  <p>It's a Windows file lock on a lint-cache jar — a stray Gradle daemon, an antivirus scan, or a file-sync client (OneDrive/Dropbox) holding the file. Nothing to do with your code. Fix: <code>gradlew --stop</code>, then clean and rebuild; if it persists, close the IDE and delete the module's <code>build</code> folder, or reboot. Read the whole error line — the useful part ("used by another process") is at the end.</p>
+
+  <h2>7. Runtime, not build: content under the system bars</h2>
+  <p>Not a compile error, but it shows up the first time you run the app: targeting 36 enforces edge-to-edge, so toolbars and buttons can slide under the status and navigation bars. That has its own fix — see <a href="/debug-edge-to-edge-enforced-target-36">content hidden behind the status bar</a>. Worth knowing so you don't mistake it for a layout regression you caused.</p>
+
+  <div class="callout">
+    <p><b>Order matters.</b> Do the bumps in dependency order — SDK → AGP → Gradle → Kotlin — and sync after each. Change everything at once and the errors merge into one confusing stack trace; do them in sequence and each message points cleanly at the next step.</p>
+  </div>
+
+  <p class="note">Tooling versions and Play requirements change over time; confirm the current AGP/Gradle/SDK combination and the target API requirement against the official Android and Play Console documentation before shipping.</p>
+
+  <div class="related">
+    <p>Related: <a href="/field-log-target-api-36-ten-apps">Migrating 10 apps to target API 36</a> · <a href="/debug-target-api-level-36-requirement">The target API 36 requirement</a> · <a href="/debug-edge-to-edge-enforced-target-36">Content hidden behind system bars</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
