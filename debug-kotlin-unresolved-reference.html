@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: Kotlin "Unresolved reference" that isn't a typo | Mr.AndroidShin</title>
+<meta name="description" content="Kotlin reports 'Unresolved reference' for something you're sure exists. Beyond typos, the real causes are a missing import, a missing dependency, generated code that hasn't been built, or a stale Gradle sync — here's how to tell which.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-kotlin-unresolved-reference">
+<meta property="og:title" content="Debugging log: Kotlin 'Unresolved reference' that isn't a typo">
+<meta property="og:description" content="Missing import, missing dependency, ungenerated code, or a stale sync — how to tell which.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Kotlin</p>
+  <h1>"Unresolved reference" — when it isn't a typo</h1>
+
+  <p>Kotlin underlines a name in red and calls it an <b>unresolved reference</b>, but you can see the class or function right there, spelled correctly. When it's genuinely not a typo, the compiler is telling you it can't <i>find</i> the thing from where you're standing — and there are four everyday reasons for that, each with a different fix.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the name exists, but it isn't visible here. Either you haven't imported it, the dependency that provides it isn't on your classpath, it's generated code that hasn't been built yet, or your IDE is working from a stale sync. Work through those four and it resolves.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>e: Example.kt: (12, 9): Unresolved reference: SomeClass</pre>
+
+  <h2>Cause 1 — a missing import</h2>
+  <p>The most common non-typo cause. The class exists in another package and you simply haven't imported it. In the editor, put the cursor on the red name and let it offer the import (Alt+Enter). If nothing is offered, that's a clue the problem is deeper — the symbol isn't on the classpath at all, which points at the next cause.</p>
+
+  <h2>Cause 2 — a missing (or wrong) dependency</h2>
+  <p>If a whole library's classes are unresolved, the dependency that provides them isn't declared, or was declared in the wrong scope or module. Check your module's <code>build.gradle</code>:</p>
+<pre>dependencies {
+    implementation("com.example:some-library:1.0.0")
+}</pre>
+  <p>Watch for scope mistakes: something added only to the <code>test</code> configuration won't resolve in main code, and a dependency added to the wrong module in a multi-module project won't be visible where you're using it. After adding it, sync Gradle so the classpath updates.</p>
+
+  <h2>Cause 3 — generated code that hasn't been built</h2>
+  <p>This one fools everyone. Some references only exist <i>after</i> a build generates them: <code>BuildConfig</code>, <code>R</code>, View Binding classes, and code from annotation processors (Room, Hilt, and similar). On a fresh checkout or after a clean, these don't exist yet, so the editor flags them as unresolved even though your code is correct. The fix is to build:</p>
+<pre>./gradlew assembleDebug</pre>
+  <p>Once the generated sources exist, the references resolve. If a Binding or a Room DAO is unresolved specifically, it's almost always this — build first, judge later.</p>
+
+  <h2>Cause 4 — a stale IDE / Gradle sync</h2>
+  <p>Sometimes everything is declared correctly and the IDE just hasn't caught up. Its model of your project is out of date, so it can't see a dependency or generated class that really is there. Trigger a <b>Sync Project with Gradle Files</b>, and if that doesn't clear it, invalidate caches and restart. This is the "I changed nothing and it broke" case, and a sync is the reset button.</p>
+
+  <div class="callout">
+    <p>Order matters: check the import first (cheap), then the dependency, then build to generate code, then sync. Jumping straight to "invalidate caches" works often enough that people do it reflexively — but it hides which of the real causes it was, so you learn nothing for next time.</p>
+  </div>
+
+  <h2>A quick decision guide</h2>
+  <ul>
+    <li><b>One symbol, IDE offers an import</b> → missing import. Accept it.</li>
+    <li><b>A whole library unresolved</b> → missing or mis-scoped dependency. Fix <code>build.gradle</code> and sync.</li>
+    <li><b>It's <code>R</code>, <code>BuildConfig</code>, a Binding, or a DAO</b> → generated code. Build the project.</li>
+    <li><b>It's clearly declared and still red</b> → stale sync. Sync, then invalidate caches if needed.</li>
+  </ul>
+
+  <p class="note">Package and library names above are placeholders — use your own.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-compose-preview-render-error.html">@Preview fails but the app runs</a> · <a href="/debug-kotlin-metadata-version-firebase-bom.html">Firebase broke my build with a Kotlin error</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

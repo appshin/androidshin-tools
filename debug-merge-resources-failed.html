@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Execution failed for task ':app:mergeDebugResources'" | Mr.AndroidShin</title>
+<meta name="description" content="The build failed at mergeDebugResources. It's almost never the merge itself — it's one bad resource file: an invalid name, malformed XML, a duplicate, or a corrupt image. How to read the real cause and fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-merge-resources-failed">
+<meta property="og:title" content="Debugging log: mergeDebugResources failed">
+<meta property="og:description" content="The merge task fails because of one bad resource. How to find which file and fix it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about.html">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Resources</p>
+  <h1>"Execution failed for task ':app:mergeDebugResources'"</h1>
+
+  <p>The build stopped at a task called <code>mergeDebugResources</code>, and the headline error is almost useless on its own — it just says the merge failed. But the merge itself is rarely the problem. One resource file in your project is malformed, and the merge is simply the first step that trips over it. The fix is to find that one file.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Gradle merges every resource from your app and its libraries into one set. If a single file is invalid — a bad name, broken XML, a duplicate, or a corrupt image — the merge halts. Scroll <b>past</b> the headline to the "Caused by" line; it names the actual file and problem.</p>
+  </div>
+
+  <h2>Read past the headline</h2>
+  <p>The top line (<code>Execution failed for task ':app:mergeDebugResources'</code>) is the same no matter the cause. The useful information is underneath, usually after <code>Caused by:</code> or in an <code>&gt; </code> detail line. Run the build with more output if you need it:</p>
+<pre>./gradlew assembleDebug --stacktrace</pre>
+  <p>Somewhere in there is a path to a specific file under <code>res/</code> and a reason. That file is your target — everything below is just categories of what that reason tends to be.</p>
+
+  <h2>Cause 1 — an invalid resource file name</h2>
+  <p>Resource file names are strict: lowercase letters, digits and underscores only, and they must start with a letter. A file like <code>Icon-2.png</code> or <code>menu item.xml</code> — capital letters, hyphens, spaces — breaks the merge. This bites most often when you drop in an asset exported from a design tool with a human-friendly name. Rename it to something like <code>icon_2.png</code> and the merge proceeds.</p>
+
+  <h2>Cause 2 — malformed XML</h2>
+  <p>A layout, drawable, or values file with a syntax error — an unclosed tag, a stray character, a bad attribute — fails to parse during the merge. If the "Caused by" points at an XML file with a line number, open it there; it's usually a tag that never closed or an attribute missing its quote. Vector drawables are a common offender because their path data is easy to corrupt when hand-edited or pasted.</p>
+
+  <h2>Cause 3 — a duplicate resource</h2>
+  <p>If two files define the same resource — say <code>colors.xml</code> and another values file both declaring <code>&lt;color name="primary"&gt;</code> — the merge can't decide which wins. The error names the duplicated resource and both locations. Remove or rename one. This also happens across a library and your app; in that case you're overriding intentionally, and the fix is to keep just one definition or use the resource the library expects.</p>
+
+  <h2>Cause 3b — case-insensitive filesystem clashes</h2>
+  <p>On macOS and Windows the filesystem is case-insensitive, so <code>Background.png</code> and <code>background.png</code> collide as duplicates even though they look distinct. If the error mentions two files that differ only in case, that's the cause — pick one name.</p>
+
+  <h2>Cause 4 — a corrupt or unsupported image</h2>
+  <p>A truncated PNG, a WebP the build tools can't process, or a "PNG" that's actually a renamed JPEG will fail during resource processing. If the named file is an image, try re-exporting it cleanly from your source, and make sure the extension matches the real format.</p>
+
+  <div class="callout">
+    <p>Reaching for <code>--stacktrace</code> or the full Gradle console output is the whole game here. The moment you have the file path from "Caused by", the fix is usually obvious — the hard part is realizing the headline task name isn't the thing to debug.</p>
+  </div>
+
+  <h2>A fast way to narrow it down</h2>
+  <ul>
+    <li><b>Think about what changed.</b> This error usually appears right after you added or edited a resource — start with that file.</li>
+    <li><b>Clean and rebuild</b> once you've fixed it, so stale merged outputs don't keep reporting the old failure.</li>
+    <li><b>Check <code>res/</code> for odd names</b> — capitals, hyphens, spaces — if the message is vague; these are the silent, common causes.</li>
+  </ul>
+
+  <p class="note">File names above are examples — act on the exact path in your own "Caused by" line.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-duplicate-class-dependency-conflict.html">"Duplicate class" found in modules</a> · <a href="/debug-manifest-merger-failed.html">Manifest merger failed</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/contact.html">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

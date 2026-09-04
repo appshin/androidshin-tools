@@ -406,6 +406,21 @@
       <h3>Keystore was tampered with</h3>
       <p>The scariest message in Android signing almost always just means a wrong password. How to tell which one, with keytool.</p>
     </a>
+    <a class="card" href="/debug-merge-resources-failed">
+      <div class="k"><span class="pill">War story</span> Resources</div>
+      <h3>mergeDebugResources failed</h3>
+      <p>The merge task fails because of one bad resource file — a name, some XML, a duplicate, or an image. How to find which and fix it.</p>
+    </a>
+    <a class="card" href="/debug-kotlin-unresolved-reference">
+      <div class="k"><span class="pill">War story</span> Kotlin</div>
+      <h3>Unresolved reference (not a typo)</h3>
+      <p>The name exists but isn't visible: missing import, missing dependency, ungenerated code, or a stale sync. How to tell which.</p>
+    </a>
+    <a class="card" href="/adb-device-not-found-unauthorized-guide">
+      <div class="k"><span class="pill">Read</span> Tooling</div>
+      <h3>adb device not found / unauthorized</h3>
+      <p>Your phone won't show up for adb, or shows as unauthorized. A practical checklist to get it recognized for debugging.</p>
+    </a>
   </div>
 
   <div class="section-label">Coming soon</div>
@@ -439,5 +454,22 @@
 </footer>
 
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
 </body>
 </html>

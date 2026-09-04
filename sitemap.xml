@@ -61,4 +61,7 @@
   <url><loc>https://androidshin.dev/debug-targetsdk-36-build-errors</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://androidshin.dev/debug-closed-testing-production-access-rejected</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://androidshin.dev/debug-internal-vs-closed-testing</loc><lastmod>2026-08-01</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://androidshin.dev/debug-merge-resources-failed</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-kotlin-unresolved-reference</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/adb-device-not-found-unauthorized-guide</loc><lastmod>2026-07-19</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
