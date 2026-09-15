@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Program type already present" during dexing | Mr.AndroidShin</title>
+<meta name="description" content="The build failed with 'Program type already present: com.example.Foo'. It means the same class reached the dexer twice, usually from a duplicate or overlapping dependency. How to find the two sources and remove the collision.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-program-type-already-present">
+<meta property="og:title" content="Debugging log: 'Program type already present' during dexing">
+<meta property="og:description" content="The same class reached the dexer twice. How to find the two sources and remove the collision.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Build</p>
+  <h1>"Program type already present" during dexing</h1>
+
+  <p>Late in the build — during dexing, the step that turns compiled classes into the format Android runs — it stopped with <b>Program type already present</b> and a class name. The message is blunt: this exact class showed up twice, and the dexer can't put two copies of the same type into the app. It's a close cousin of the "Duplicate class" compile error, arriving at a later stage.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> two things on your classpath contain the same class. Usually one dependency bundles a library that another also pulls in, or you've added the same library under two different coordinates. Find the two sources and exclude or align one.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Program type already present: com.example.util.Foo
+  ... com.android.tools.r8.errors...</pre>
+  <p>The class name is the thread to pull. Search your dependency graph for who provides <code>com.example.util.Foo</code>, and you'll almost always find two answers.</p>
+
+  <h2>Why it happens at dex time</h2>
+  <p>By the time dexing runs, everything has compiled and the tool is merging all classes into the app's dex files. If the same fully-qualified class arrives from two paths, there's no way to keep both — they'd occupy the same slot. Two common shapes: a library that <b>embeds</b> (fat-jars) another library you also depend on directly, or the same artifact pulled in under an old and a new coordinate (a renamed group, or a support-library class that also exists in AndroidX).</p>
+
+  <h2>Find the two sources</h2>
+  <p>Print the dependency tree and search for the class's library:</p>
+<pre>./gradlew app:dependencies --configuration releaseRuntimeClasspath</pre>
+  <p>Look for the same package appearing under two different parents. Those two parents are what you'll reconcile. If the class is something generic (a JSON or annotations helper), the culprit is often a heavy SDK that bundled its own copy instead of depending on it cleanly.</p>
+
+  <h2>Fix 1 — exclude the bundled copy</h2>
+  <p>If one dependency drags in a duplicate you already get elsewhere, exclude it there:</p>
+<pre>implementation("com.example:big-sdk:2.0.0") {
+    exclude(group = "com.example", module = "util")
+}</pre>
+  <p>Now only one copy of <code>util</code> survives. This is the right move when a bulky SDK re-bundles a common library.</p>
+
+  <h2>Fix 2 — align to one version/coordinate</h2>
+  <p>If both dependencies legitimately need the library but pull different versions or coordinates, force a single one so only one artifact resolves:</p>
+<pre>configurations.all {
+    resolutionStrategy {
+        force("com.example:util:1.5.0")
+    }
+}</pre>
+
+  <h2>Fix 3 — the AndroidX / support-library case</h2>
+  <p>If the duplicated class is an <code>android.support.*</code> type clashing with its <code>androidx.*</code> equivalent, don't exclude class by class — that's a losing game. Make sure the whole project is on AndroidX:</p>
+<pre># gradle.properties
+android.useAndroidX=true
+android.enableJetifier=true</pre>
+  <p>Then remove or update the last dependency still bringing in old support-library artifacts.</p>
+
+  <div class="callout">
+    <p>This is the same root cause as the compile-time "Duplicate class" error, just caught at a different stage. If you've read that write-up, the toolkit is identical: dependency tree, then exclude or force. The class name in the message is always where to start.</p>
+  </div>
+
+  <h2>Confirming the fix</h2>
+  <ul>
+    <li>Re-run the dependencies report and check the library now resolves to a single artifact.</li>
+    <li>Clean and rebuild — dexing works on merged output, so stale artifacts can keep reporting the old clash.</li>
+    <li>Change one exclude or force at a time so you know which one resolved it.</li>
+  </ul>
+
+  <p class="note">Class, group and module names above are placeholders — target the exact class in your own error.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-duplicate-class-dependency-conflict">"Duplicate class" found in modules</a> · <a href="/debug-release-crash-proguard-r8-keep-rules">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

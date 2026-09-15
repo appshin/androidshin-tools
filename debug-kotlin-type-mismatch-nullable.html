@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: Kotlin "Type mismatch: inferred type is String? but String was expected" | Mr.AndroidShin</title>
+<meta name="description" content="Kotlin refuses to compile with 'inferred type is String? but String was expected'. It's the null-safety system doing its job: a nullable value can't go where a non-null one is required. What the ? means and the right ways to resolve it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-kotlin-type-mismatch-nullable">
+<meta property="og:title" content="Debugging log: Kotlin 'inferred type is String? but String was expected'">
+<meta property="og:description" content="Null safety doing its job: a nullable value can't go where non-null is required. The right ways to fix it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Kotlin</p>
+  <h1>"Inferred type is String? but String was expected"</h1>
+
+  <p>Kotlin stopped my build over a value I was sure held text: <b>inferred type is String? but String was expected</b>. The frustrating first reaction is "but it clearly has a value" — and that's exactly the point Kotlin is making. It doesn't care what the value happens to be at runtime; it cares that the type <i>allows</i> null, and you're using it somewhere null isn't permitted.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the trailing <code>?</code> means "might be null". You're passing a <code>String?</code> where a non-null <code>String</code> is required. Fix it by proving it's not null (a check, <code>?:</code>, or <code>let</code>) rather than forcing it with <code>!!</code>.</p>
+  </div>
+
+  <h2>What the ? actually means</h2>
+  <p>In Kotlin, <code>String</code> and <code>String?</code> are different types. <code>String</code> can never be null; <code>String?</code> might be. This is the whole point of Kotlin's null safety: the compiler tracks nullability in the type system so a <code>NullPointerException</code> becomes a compile error instead of a crash. The message isn't a bug in your code — it's the safety net catching a place where a possibly-null value would flow into code that can't handle null.</p>
+
+  <h2>Where the ? sneaks in</h2>
+  <ul>
+    <li><b>Platform types from Java.</b> A Java method with no nullability annotation returns a type Kotlin treats cautiously — often inferred as nullable.</li>
+    <li><b>Nullable map/collection lookups.</b> <code>map[key]</code> returns <code>V?</code> because the key might be absent.</li>
+    <li><b>findViewById, intent extras, arguments.</b> Many Android APIs return nullable by design.</li>
+    <li><b>A property declared <code>var name: String?</code></b> that you later use where non-null is required.</li>
+  </ul>
+
+  <h2>Fix 1 — the Elvis operator (a sensible default)</h2>
+  <p>Provide a fallback for the null case with <code>?:</code>:</p>
+<pre>val name: String = maybeName ?: "Unknown"</pre>
+  <p>Now the result is a non-null <code>String</code>: the real value if present, the fallback if null. This is usually the cleanest fix when a reasonable default exists.</p>
+
+  <h2>Fix 2 — check, then use</h2>
+  <p>If you only want to act when the value is present, a null check narrows the type inside the block:</p>
+<pre>val n = maybeName
+if (n != null) {
+    // n is smart-cast to non-null String here
+    greet(n)
+}
+// or scope it with let:
+maybeName?.let { greet(it) }</pre>
+  <p>Kotlin's smart casts mean that after you've checked for null, it treats the value as non-null within that scope — no extra syntax needed.</p>
+
+  <h2>Fix 3 — fix the source's nullability</h2>
+  <p>Sometimes the right fix is upstream. If a property never should be null, declare it non-null (<code>val name: String</code>) and initialize it properly, rather than declaring it nullable and fighting the <code>?</code> at every use. Making the type honest removes the error everywhere at once.</p>
+
+  <div class="callout">
+    <p><b>Resist <code>!!</code>.</b> The double-bang asserts "this is never null, trust me" and turns the compile error back into a runtime crash the moment you're wrong. It's occasionally justified, but reaching for it to silence this message trades a safe compile-time signal for an unsafe runtime one. Prefer <code>?:</code>, a check, or fixing the type.</p>
+  </div>
+
+  <h2>Quick decision guide</h2>
+  <ul>
+    <li><b>Have a sensible default?</b> Use <code>?:</code>.</li>
+    <li><b>Only act when present?</b> Use a null check or <code>?.let { }</code>.</li>
+    <li><b>Should never be null?</b> Fix the declaration or the Java annotation upstream.</li>
+    <li><b>Absolutely certain it's non-null here?</b> <code>!!</code> exists — but treat it as a last resort you can justify, not a reflex.</li>
+  </ul>
+
+  <p class="note">Variable and value names above are illustrative — apply the pattern to your own code.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-kotlin-unresolved-reference">Unresolved reference (not a typo)</a> · <a href="/debug-release-crash-proguard-r8-keep-rules">Debug works, release crashes</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

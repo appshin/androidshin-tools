@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Could not find method ... for arguments" in Gradle | Mr.AndroidShin</title>
+<meta name="description" content="Gradle failed with 'Could not find method implementation() for arguments'. It almost always means the DSL syntax is wrong for your build file — Groovy vs Kotlin, the wrong block, or a plugin that isn't applied yet. How to tell which.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-could-not-find-method-gradle">
+<meta property="og:title" content="Debugging log: 'Could not find method ... for arguments' in Gradle">
+<meta property="og:description" content="It means the DSL syntax is wrong for your build file — Groovy vs Kotlin, wrong block, or an unapplied plugin.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"Could not find method implementation() for arguments"</h1>
+
+  <p>I pasted a dependency line from a README, synced, and Gradle rejected it — not with "unknown library" but with something stranger: it couldn't find the <i>method</i> <code>implementation()</code>. A method I use in every project. The build file wasn't broken so much as I'd written the right idea in the wrong dialect, or in the wrong place.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> this means Gradle doesn't recognize the function you called <i>in that spot</i>. Three usual reasons: you mixed Groovy and Kotlin DSL syntax, you put the call in the wrong block, or the plugin that defines the method hasn't been applied yet. The fix is matching syntax and placement to your build file.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Could not find method implementation() for arguments
+[androidx.core:core-ktx:1.x.x] on object of type
+org.gradle.api.internal.artifacts.dsl.dependencies...</pre>
+  <p>The wording is generic and applies to many methods — <code>implementation</code>, <code>android</code>, <code>kotlinOptions</code>, and others. Whatever method it names, the diagnosis is the same: it's not available where you called it.</p>
+
+  <h2>Cause 1 — Groovy vs Kotlin DSL syntax</h2>
+  <p>Gradle build files come in two flavors, and they don't share punctuation. Groovy (<code>build.gradle</code>) and Kotlin (<code>build.gradle.kts</code>) write the same dependency differently:</p>
+<pre>// Groovy — build.gradle
+implementation 'androidx.core:core-ktx:1.12.0'
+
+// Kotlin — build.gradle.kts
+implementation("androidx.core:core-ktx:1.12.0")</pre>
+  <p>Paste a Groovy line (no parentheses, single quotes) into a <code>.kts</code> file and Kotlin can't parse the call — hence "could not find method". Check your file's extension first and match the snippet to it. This is the single most common cause, because snippets online come in both styles and rarely say which.</p>
+
+  <h2>Cause 2 — the call is in the wrong block</h2>
+  <p><code>implementation()</code> only exists inside a <code>dependencies { }</code> block. Drop it at the top level of the file, or inside <code>android { }</code>, and the method genuinely isn't defined there. The same is true for other methods: <code>kotlinOptions</code> belongs inside <code>android { }</code>, repositories inside <code>repositories { }</code>. If the error names a method you know exists, check that it's nested in the block that provides it.</p>
+
+  <h2>Cause 3 — the plugin isn't applied</h2>
+  <p>Many methods are contributed by plugins. The whole <code>android { }</code> block, for instance, only exists once the Android Gradle Plugin is applied. If you call something before (or without) applying the plugin that defines it, Gradle can't find the method. Make sure the <code>plugins { }</code> block at the top applies what you need:</p>
+<pre>plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}</pre>
+  <p>Order matters here too — the plugin has to be applied before the block or method it provides is used.</p>
+
+  <div class="callout">
+    <p>Before rewriting anything, glance at the file name in the tab. Half of these errors are solved the instant you notice you're editing a <code>.kts</code> file with Groovy syntax, or vice versa. The extension tells you which punctuation the whole file expects.</p>
+  </div>
+
+  <h2>A quick way to place the blame</h2>
+  <ul>
+    <li><b>Is the file <code>.gradle</code> or <code>.gradle.kts</code>?</b> Match quotes and parentheses to it.</li>
+    <li><b>Is the call inside the right block?</b> <code>implementation</code> → <code>dependencies</code>; <code>kotlinOptions</code> → <code>android</code>.</li>
+    <li><b>Is the plugin that defines it applied,</b> and applied before the call?</li>
+    <li><b>Did you copy from a different Gradle era?</b> Very old snippets use <code>compile</code> instead of <code>implementation</code> — a related "method not found" once <code>compile</code> was removed.</li>
+  </ul>
+
+  <p class="note">Library names and versions above are examples — use your own.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-inconsistent-jvm-target-compatibility">Inconsistent JVM-target compatibility</a> · <a href="/debug-kotlin-metadata-version-firebase-bom">Firebase broke my build with a Kotlin error</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
