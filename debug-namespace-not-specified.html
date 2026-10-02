@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Namespace not specified" after an AGP upgrade | Mr.AndroidShin</title>
+<meta name="description" content="After upgrading the Android Gradle Plugin, the build failed with 'Namespace not specified. Specify a namespace in the module's build file'. What the namespace is, why AGP 8 requires it, and how to set it or migrate it from the manifest.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-namespace-not-specified">
+<meta property="og:title" content="Debugging log: 'Namespace not specified' after an AGP upgrade">
+<meta property="og:description" content="Why AGP 8 requires a namespace, and how to set it or migrate it out of the manifest.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"Namespace not specified" after an AGP upgrade</h1>
+
+  <p>I bumped the Android Gradle Plugin on an older project, synced, and the build stopped with a flat demand for a <b>namespace</b> — something I'd never had to set before. The project had built for years without it. What changed is that newer AGP made explicit a value that used to be inferred quietly from the manifest, and now it wants you to state it.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> AGP 8+ requires each module to declare a <code>namespace</code> in its <code>build.gradle</code>. It used to be taken from the <code>package</code> attribute in <code>AndroidManifest.xml</code>; now you set it in Gradle and remove it from the manifest. Android Studio can migrate it for you in one click.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Namespace not specified. Specify a namespace in the module's
+build file. See https://... for information about setting
+the namespace.</pre>
+
+  <h2>What the namespace is</h2>
+  <p>The namespace is the package name used for your module's generated <code>R</code> class and <code>BuildConfig</code> — the internal identity of your code. Historically this came from the <code>package</code> attribute at the top of <code>AndroidManifest.xml</code>, and AGP inferred everything from there. Newer AGP separates two ideas that were tangled together: the <b>namespace</b> (where your <code>R</code>/<code>BuildConfig</code> live) and the <b>applicationId</b> (your app's identity on the device and Play). Pulling the namespace into Gradle makes that split explicit.</p>
+
+  <h2>The fix — set it in build.gradle</h2>
+  <p>Add a <code>namespace</code> to the <code>android { }</code> block of the module:</p>
+<pre>android {
+    namespace = "com.example.myapp"
+    compileSdk = 34
+    // ...
+}</pre>
+  <p>Use the value that was in your manifest's <code>package</code> attribute, so your existing <code>R</code> references keep resolving. Then <b>remove the <code>package</code> attribute</b> from <code>AndroidManifest.xml</code> — leaving it there alongside the Gradle namespace causes its own warnings/errors:</p>
+<pre>&lt;!-- before --&gt;
+&lt;manifest xmlns:android="..." package="com.example.myapp"&gt;
+
+&lt;!-- after --&gt;
+&lt;manifest xmlns:android="..."&gt;</pre>
+
+  <h2>Let Android Studio do it</h2>
+  <p>You usually don't have to edit by hand. Android Studio offers a migration: <b>Refactor → Migrate to Namespace</b> (or the quick-fix in the sync error) moves the package to the Gradle namespace and cleans the manifest across your modules. On a multi-module project this is far safer than doing each by hand, because every module needs its own namespace and they must stay unique.</p>
+
+  <h2>Gotchas on multi-module projects</h2>
+  <ul>
+    <li><b>Every module needs one.</b> Each library module requires its own <code>namespace</code>, and two modules must not share the same value.</li>
+    <li><b>Namespace vs applicationId.</b> Only the app module has an <code>applicationId</code>; library modules have a namespace but no applicationId. Don't add one to a library.</li>
+    <li><b>Old libraries without a namespace.</b> A very old dependency that still relies on a manifest package can trip the same error indirectly — update it if so.</li>
+    <li><b>Keep the namespace stable.</b> Changing it moves your <code>R</code>/<code>BuildConfig</code> package, which breaks imports across your code. Match the old package exactly unless you intend a wider refactor.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Namespace and applicationId can be the same string, and often are — but they're now independent settings. If you ever want to ship under a different applicationId than your code's package, this separation is what makes it clean rather than a hack.</p>
+  </div>
+
+  <p class="note">The package name above is an example — use your project's own.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-could-not-find-method-gradle">Could not find method for arguments</a> · <a href="/debug-kotlin-unresolved-reference">Unresolved reference (not a typo)</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
