@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "SecurityException: Permission Denial" at runtime | Mr.AndroidShin</title>
+<meta name="description" content="The app crashed with SecurityException: Permission Denial. Declaring a permission in the manifest isn't enough since Android 6 — dangerous permissions must be requested and granted at runtime. How the two-part system works and how to fix it.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-securityexception-permission-denial">
+<meta property="og:title" content="Debugging log: 'SecurityException: Permission Denial' at runtime">
+<meta property="og:description" content="Declaring a permission isn't enough since Android 6 — dangerous permissions need a runtime request. How to fix it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Permissions</p>
+  <h1>"SecurityException: Permission Denial" at runtime</h1>
+
+  <p>I added the permission to the manifest, ran the app, called the API — and it crashed with <code>SecurityException: Permission Denial</code>. My first reaction was "but I declared it!" And that's the exact misunderstanding the modern permission model is built around: for sensitive permissions, declaring is only half the job. The user has to actually grant it, at runtime, and until they do, the call fails.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> since Android 6 (API 23), "dangerous" permissions need two things — a manifest declaration <b>and</b> a runtime grant from the user. Declaring alone isn't enough. Check at call time, request if needed, and only act once granted.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>java.lang.SecurityException: Permission Denial: ...
+requires android.permission.CAMERA</pre>
+
+  <h2>Two kinds of permission</h2>
+  <p>Android splits permissions into two groups. <b>Normal</b> permissions (internet access, for example) are granted automatically just by declaring them in the manifest. <b>Dangerous</b> permissions — camera, location, microphone, contacts, and others that touch private data or hardware — require the user's explicit consent at runtime. The manifest line is still required, but it only makes the permission <i>requestable</i>; it doesn't grant it. Call a protected API without the runtime grant and you get this SecurityException.</p>
+
+  <h2>The fix — declare, check, request, then act</h2>
+
+  <h3>1. Declare it in the manifest</h3>
+<pre>&lt;uses-permission android:name="android.permission.CAMERA" /&gt;</pre>
+
+  <h3>2. Check before you use it</h3>
+<pre>if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        == PackageManager.PERMISSION_GRANTED) {
+    openCamera()           // already granted
+} else {
+    requestCameraLauncher.launch(Manifest.permission.CAMERA)
+}</pre>
+
+  <h3>3. Request it, and react to the result</h3>
+<pre>val requestCameraLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestPermission()
+) { granted -&gt;
+    if (granted) openCamera()
+    else showWhyWeNeedIt()   // handle denial gracefully
+}</pre>
+  <p>The key discipline: never assume the permission is held. Check at the moment you need it, request if it isn't, and run the protected code only from the "granted" path.</p>
+
+  <h2>Things that cause this even when you "did it right"</h2>
+  <ul>
+    <li><b>The user denied it,</b> or revoked it later in Settings. A grant isn't permanent — check every time, not once.</li>
+    <li><b>Special permissions aren't normal runtime ones.</b> Overlay, all-files access, exact alarms and similar need their own dedicated settings flow, not <code>requestPermissions</code>.</li>
+    <li><b>Background location</b> is a separate, stricter request from foreground location — granting one doesn't grant the other.</li>
+    <li><b>A new API level narrowed a permission.</b> Storage and others were split into more granular permissions over releases; the old one may no longer cover what you're doing.</li>
+  </ul>
+
+  <div class="callout">
+    <p>Handle denial as a real path, not an afterthought. If the user says no, the app shouldn't crash or loop the dialog — explain what the feature needs and let them continue without it, or send them to Settings if they want to enable it later.</p>
+  </div>
+
+  <p class="note">Permission names above use the camera as an example — the same pattern applies to any dangerous permission.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-cleartext-http-traffic-not-permitted">Cleartext HTTP traffic not permitted</a> · <a href="/debug-classnotfoundexception-didnt-find-class">ClassNotFoundException at runtime</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

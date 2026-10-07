@@ -70,4 +70,7 @@
   <url><loc>https://androidshin.dev/debug-namespace-not-specified</loc><lastmod>2026-10-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-network-on-main-thread-exception</loc><lastmod>2026-10-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://androidshin.dev/debug-need-theme-appcompat</loc><lastmod>2026-10-02</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-default-activity-not-found</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-classnotfoundexception-didnt-find-class</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://androidshin.dev/debug-securityexception-permission-denial</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

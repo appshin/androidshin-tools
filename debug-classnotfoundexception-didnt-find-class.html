@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: ClassNotFoundException "Didn't find class" at runtime | Mr.AndroidShin</title>
+<meta name="description" content="The app crashed at launch with ClassNotFoundException: Didn't find class. The class compiled fine but wasn't on the device at runtime — missing multidex, an R8-stripped class, or a wrong manifest name. How to tell which.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-classnotfoundexception-didnt-find-class">
+<meta property="og:title" content="Debugging log: ClassNotFoundException 'Didn't find class' at runtime">
+<meta property="og:description" content="Compiled fine but missing at runtime: multidex, an R8-stripped class, or a wrong manifest name.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Runtime</p>
+  <h1>ClassNotFoundException: "Didn't find class" at runtime</h1>
+
+  <p>The app built without a single warning and then crashed the instant it launched: <code>ClassNotFoundException: Didn't find class</code>, naming a class I could see right there in my source. The contradiction is the clue — it compiled, so the class exists; it crashed looking for it, so the class wasn't <i>on the device</i> when the app ran. Those are two different moments, and something between them dropped the class.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the class was present at compile time but missing at runtime. The usual reasons: the app exceeded the single-dex limit without multidex, R8 stripped or renamed the class, or the manifest names a class that doesn't match. Match the cause to the symptom below.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>java.lang.ClassNotFoundException: Didn't find class
+"com.example.app.MainActivity" on path: DexPathList[...]</pre>
+  <p>Note whether the named class is one of <b>yours</b> or from a <b>library</b>, and whether it's referenced from the <b>manifest</b> — those details point at different causes.</p>
+
+  <h2>Cause 1 — multidex not enabled (older minSdk)</h2>
+  <p>A single dex file can hold a limited number of methods. A large app on an older <code>minSdk</code> can exceed that and split into multiple dex files — but on API levels below 21, the device only loads the first one at startup, so classes in the others go missing at runtime. If your app is large and <code>minSdk</code> is low, enable multidex:</p>
+<pre>android {
+    defaultConfig { multiDexEnabled = true }
+}
+dependencies { implementation("androidx.multidex:multidex:2.0.1") }</pre>
+  <p>This is the classic "crashes only on old devices" version — it runs fine on anything API 21+ and dies on older hardware.</p>
+
+  <h2>Cause 2 — R8 stripped or renamed the class</h2>
+  <p>In a release build, R8 removes code it believes is unused and renames the rest. A class only referenced by reflection or by name from the manifest can be deleted or renamed, so it's gone at runtime. If the crash happens in <b>release but not debug</b>, this is almost certainly it — add a keep rule for the class and build again. This is the same trap behind many release-only crashes.</p>
+
+  <h2>Cause 3 — a wrong name in the manifest</h2>
+  <p>If the missing class is one the <b>manifest</b> references — an activity, service, or custom Application — check the spelling and package. A renamed or moved class whose manifest entry wasn't updated, or a relative name (<code>.MainActivity</code>) that no longer matches the package, produces exactly this crash. The manifest string and the real class path have to agree.</p>
+
+  <h2>Cause 4 — a stale or partial install</h2>
+  <p>Occasionally the device is simply running an older APK, or an install went wrong. Uninstall the app from the device, clean the project, and reinstall:</p>
+<pre>adb uninstall com.example.app
+./gradlew clean installDebug</pre>
+  <p>This clears the case where your code is correct but the device never received the new class.</p>
+
+  <div class="callout">
+    <p>The fastest triage question: <b>does it crash in debug too, or only in release?</b> Only release → R8 (add a keep rule). Both, on old devices only → multidex. Both, everywhere, for a manifest-named class → a name mismatch. That one question usually names the cause.</p>
+  </div>
+
+  <p class="note">Class and package names above are placeholders — use the exact name in your own crash.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-release-crash-proguard-r8-keep-rules">Debug works, release crashes</a> · <a href="/debug-cannot-fit-classes-single-dex">Cannot fit classes in a single dex</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
