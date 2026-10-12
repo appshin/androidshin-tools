@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: can't publish — App content declarations incomplete | Mr.AndroidShin</title>
+<meta name="description" content="The build was fine but Play Console wouldn't let me publish: the App content section had unfinished declarations — Data safety, privacy policy, target audience, ads. Why these block release and how to clear each one.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-app-content-declarations-incomplete">
+<meta property="og:title" content="Can't publish — App content declarations incomplete">
+<meta property="og:description" content="Unfinished Data safety, privacy policy, target audience or ads declarations block release. How to clear each.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Play Console</p>
+  <h1>Can't publish — "App content" declarations incomplete</h1>
+
+  <p>The AAB uploaded cleanly, the release looked ready, and the publish button was still greyed out — or the review kept coming back "not compliant." The code wasn't the issue at all. Play Console won't release an app until a set of <b>declarations</b> about the app are filled in, and a half-finished one quietly blocks the whole thing. For a first app, this is one of the most common "why can't I ship?" walls.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the <b>App content</b> section (and Store settings) holds required declarations — Data safety, privacy policy, target audience, ads, content rating and a few others. Any one left incomplete blocks release. Work through the list until every item shows complete.</p>
+  </div>
+
+  <h2>Where to look</h2>
+  <p>In Play Console, open <b>Policy → App content</b> (and check <b>Store settings</b>). Each item shows a status. Anything not marked complete is a potential blocker, and the dashboard usually surfaces the offending one as a task you must finish before publishing. The fix is rarely hard — it's that these are easy to skip past when you're focused on the build.</p>
+
+  <h2>The declarations that trip people up</h2>
+
+  <h3>Data safety</h3>
+  <p>You declare what data your app collects and shares, and how it's handled. This must match what your app <i>actually</i> does — including data pulled in by SDKs you added (ads, analytics, crash reporting). A mismatch between your declaration and real behavior is a policy problem, not just a blank form, so answer it against what your dependencies collect, not just your own code.</p>
+
+  <h3>Privacy policy</h3>
+  <p>Most apps need a privacy policy URL, and it must be a live, reachable page — especially if you collect any data or use ads. A missing or dead link blocks release. A simple hosted page that states what you collect and why is enough to satisfy the requirement.</p>
+
+  <h3>Target audience and content</h3>
+  <p>You declare the age groups your app targets. If you indicate children are in the audience, a stricter set of requirements and policies kicks in. Answer this honestly — claiming a children's audience you didn't build for creates obligations you'll fail, and the opposite can be a policy issue too.</p>
+
+  <h3>Ads declaration</h3>
+  <p>If your app contains ads (AdMob counts), you must declare it. Forgetting this while shipping an ad-supported app is a classic mismatch that surfaces at review rather than upload.</p>
+
+  <h3>Content rating</h3>
+  <p>You complete a questionnaire and Play assigns a rating. Until it's done, the app can't go out. It's quick, but it's mandatory.</p>
+
+  <div class="callout">
+    <p>These aren't busywork — they're the declarations Google shows users and regulators about your app. Answer them to match reality, including what your third-party SDKs do. The fastest way to fail is to rush them or guess; the fastest way to pass is to fill each one in truthfully and completely.</p>
+  </div>
+
+  <h2>How to clear it, in order</h2>
+  <ol>
+    <li>Open <b>Policy → App content</b> and note every item not marked complete.</li>
+    <li>Finish each one, answering against what your app and its SDKs actually do.</li>
+    <li>Add a reachable privacy-policy URL if any item requires it.</li>
+    <li>Complete the content-rating questionnaire.</li>
+    <li>Return to your release — the publish block tied to those items should now be gone.</li>
+  </ol>
+
+  <p class="note">Play Console's section names and the exact set of required declarations change over time; the pattern — incomplete declarations block release, and they must match real behavior — is the stable part.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-production-rejected-testers-not-using-app">Production rejected: testers didn't really use the app</a> · <a href="/google-play-app-signing-explained">Play App Signing explained</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

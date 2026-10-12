@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Version code already used" on Play upload | Mr.AndroidShin</title>
+<meta name="description" content="Play Console refused the upload: 'Version code N has already been used.' Every upload needs a higher versionCode than anything you've sent before, to any track. Why, and how to set and automate it so it never blocks you again.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-version-code-already-used">
+<meta property="og:title" content="Debugging log: 'Version code already used' on Play upload">
+<meta property="og:description" content="Every upload needs a higher versionCode than anything sent before, to any track. How to set and automate it.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Play Console</p>
+  <h1>"Version code already used" on a Play upload</h1>
+
+  <p>I built a release, went to upload the AAB, and Play Console bounced it immediately: the <b>version code has already been used</b>. The build was fine — I'd just forgotten the one number Play uses to tell two builds apart. It's a thirty-second fix, but it's confusing the first time because the number it complains about isn't the version your users see.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> every build you upload must have a <code>versionCode</code> higher than any you've uploaded before — to <b>any</b> track, including ones you deleted. Bump the number and re-upload. Then automate it so you never hit this again.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Version code 7 has already been used. Try another version
+code.</pre>
+
+  <h2>versionCode vs versionName</h2>
+  <p>Your app has two version values and they do different jobs:</p>
+  <ul>
+    <li><b><code>versionCode</code></b> — an integer Play and the system use internally to order builds. Users never see it. It must strictly increase with every upload.</li>
+    <li><b><code>versionName</code></b> — the human string (<code>1.4.2</code>) shown on the store listing. It can be anything and isn't what this error is about.</li>
+  </ul>
+  <p>The error is purely about the integer. You can ship the same <code>versionName</code> twice if you really want, but never the same <code>versionCode</code>.</p>
+
+  <h2>The fix — bump the integer</h2>
+  <p>In your module's <code>build.gradle</code>, raise <code>versionCode</code> to something higher than anything you've uploaded:</p>
+<pre>android {
+    defaultConfig {
+        versionCode = 8      // was 7
+        versionName = "1.4.2"
+    }
+}</pre>
+  <p>Rebuild and re-upload. That's the whole fix for the immediate block.</p>
+
+  <h2>Why "but I deleted that release"</h2>
+  <p>The number that trips people: a version code is burned <b>permanently</b> the moment it's uploaded, even to a closed or internal track, and even if you later delete that release or that track. Play remembers every code it has ever seen for your app and refuses to reuse one. So "I removed that build, why is 7 still taken?" has a simple answer — uploading, not publishing, is what consumes the number. Always move <i>up</i>, never try to reclaim a code.</p>
+
+  <h2>Stop hitting it — automate the bump</h2>
+  <p>Forgetting to increment is the actual root cause, so remove the manual step. A common approach ties the code to something that always moves, like a CI build number:</p>
+<pre>versionCode = (System.getenv("BUILD_NUMBER")?.toInt()) ?: 1</pre>
+  <p>Or keep a simple incrementing integer you bump as part of your release routine. The method matters less than making "the number always goes up" automatic rather than a thing to remember at the worst moment — right when you're trying to ship.</p>
+
+  <div class="callout">
+    <p>Pick a scheme and stick to it. Mixing a manual code on one release and a CI-derived one on the next can accidentally produce a <i>lower</i> number, which fails the same way. Whatever generates the code, make sure it only ever increases.</p>
+  </div>
+
+  <h2>Related gotchas</h2>
+  <ul>
+    <li><b>Multiple AABs / split configs:</b> each artifact in a release needs its own ascending code if you ship more than one.</li>
+    <li><b>Flavors:</b> different product flavors can share the version logic but still must not collide on the same uploaded code.</li>
+    <li><b>Downgrades:</b> you can't upload a code lower than the current production one and expect it to roll out — it's the same strictly-increasing rule.</li>
+  </ul>
+
+  <p class="note">Version numbers above are examples — set your own, higher than your last upload.</p>
+
+  <div class="related">
+    <p>Related: <a href="/aab-vs-apk-android-app-bundle-explained">AAB vs APK, explained</a> · <a href="/google-play-app-signing-explained">Play App Signing explained</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>

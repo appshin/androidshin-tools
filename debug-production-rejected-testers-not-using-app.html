@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: production rejected even after 14 days — testers never really used the app | Mr.AndroidShin</title>
+<meta name="description" content="You waited the full 14 days with 12 testers and production access was still rejected. Often it's not a technical problem at all — the testers opted in but never actually used the app, so Google saw no genuine testing. How to fix the engagement, not the code.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-production-rejected-testers-not-using-app">
+<meta property="og:title" content="Production rejected even after 14 days — testers never really used the app">
+<meta property="og:description" content="Often not a technical problem: testers opted in but never used the app. Fix the engagement, not the code.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Play Console</p>
+  <h1>Rejected after the full 14 days — because the testing wasn't real</h1>
+
+  <p>This is the rejection that makes no sense at first. You did everything right: 12 testers opted in, the counter sat on green, you waited the complete 14 days, and production access was <i>still</i> refused. You start combing the app for a technical fault — and there often isn't one. The problem isn't your code. It's that your testers never actually <b>used</b> the app, and Google could tell.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> closed testing isn't a checkbox for "12 people installed it." Google looks for signs of <b>genuine testing</b> — people opening the app, using it over days, on real devices. If your testers opted in and then never launched it, the review reads the period as not-really-tested and rejects, no matter what the counter said. The fix is engagement, not debugging.</p>
+  </div>
+
+  <h2>Why a green counter can still fail</h2>
+  <p>The "12 testers for 14 days" gate is the visible rule, so it's natural to treat it as the whole requirement. But it's a proxy for the real goal: that a new developer has actually exercised their app with real users before reaching the public. The reviewer (and the automated signals behind them) can distinguish between twelve accounts that tapped "join" once and twelve people who opened the app across several days. An opt-in is not a session. If the usage behind the count is empty, the period looks staged — and that's a rejection even with a perfect-looking counter.</p>
+
+  <h2>The trap: opt-in is permanent, usage is not</h2>
+  <p>Here's what fools people. When a tester installs, opts in, and then deletes the app, <b>the opt-in stays</b>. Your tester count still reads 12. Everything on the dashboard looks healthy. But behind that number, nobody has launched the app in twelve days. The count measures enrollment, not activity — so you can satisfy the visible rule completely while failing the thing it's standing in for.</p>
+
+  <h2>How to actually pass it</h2>
+  <ul>
+    <li><b>Ask testers to open the app, more than once.</b> Not just install — launch it, tap around, come back another day. A handful of real sessions per tester across the window is the signal you want to generate.</li>
+    <li><b>Spread activity across the 14 days,</b> not all on day one. Testing that happens on a single afternoon and then goes silent looks thinner than the same usage spread out.</li>
+    <li><b>Recruit more than 12.</b> Keep a buffer so that if a few go quiet, enough genuinely-active testers remain. A dozen enrolled with three active is weaker than twenty enrolled with twelve active.</li>
+    <li><b>Ship a small update mid-window.</b> A fresh build during the period shows the app is being worked on and tested, not frozen.</li>
+    <li><b>Give testers a reason to open it.</b> A short "please try X and tell me what breaks" message produces real sessions; a silent invite produces installs that never run.</li>
+  </ul>
+
+  <h2>Answer the application honestly and specifically</h2>
+  <p>When you apply, the questionnaire asks what you tested and what you changed. If your testers actually used the app, you'll have real answers — a bug someone hit, a confusing screen you fixed, feedback you acted on. "Everything worked, no issues" is both unconvincing and, usually, untrue — and it's a common trigger for rejection. Concrete answers are only possible if the testing was concrete, which is the whole point.</p>
+
+  <div class="callout">
+    <p>Before you go hunting for a technical cause after a full-term rejection, ask a blunter question: did my testers actually use the app, on more than one day? If the honest answer is "they installed it and that was it," you've found the problem — and it's fixed with people, not code.</p>
+  </div>
+
+  <h2>What this is not</h2>
+  <p>This isn't about faking activity or gaming the system — that's the opposite of the intent and risks your account. The requirement exists because real testing genuinely shrinks the number of broken apps reaching users, and a little real usage from a dozen willing people clears it. The reframe that saves you: closed testing is something your testers <i>do</i>, over time, not a number you <i>reach</i>.</p>
+
+  <p class="note">Play Console's exact wording and checklist labels change over time; the principle — genuine, sustained testing, not just enrollment — is the stable part.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-closed-testing-production-access-rejected">Production access rejected: the 14-day clock</a> · <a href="/google-play-closed-testing-12-testers">Closed testing: 12 testers for 14 days</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
