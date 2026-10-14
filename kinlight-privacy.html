@@ -69,7 +69,7 @@
       <tr><td>주소 변환용 좌표</td><td>위치 카드에 주소 표시</td><td>안드로이드 기기의 주소 변환 기능(Geocoder)이 Google 등 위치 서비스 제공자에게 좌표를 보내 주소를 받아옴</td></tr>
       <tr><td>이름(호칭), 보호자 전화번호(최대 3개), 집 주소, 안심 구역</td><td>홈 화면 표시, SOS 전화, 메시지 문구</td><td>기기 내부에만 저장</td></tr>
       <tr><td>배터리 잔량</td><td>메시지에 표시, 배터리 부족 알림</td><td>위치 메시지에 포함되어 본인 카카오톡으로 전송</td></tr>
-      <tr><td>신체 활동(걷기·정지 상태)</td><td>이동 중/휴식 중 전송 간격 조절</td><td>기기 내부에서만 사용, 전송·저장하지 않음</td></tr>
+      <tr><td>움직임 감지(휴대폰 ‘큰 움직임’ 센서)</td><td>이동 중/휴식 중 전송 간격 조절</td><td>기기 내부에서만 사용, 전송·저장하지 않음. 별도 권한 없음</td></tr>
       <tr><td>전화 권한</td><td>SOS 버튼으로 보호자에게 전화 연결</td><td>통화 기록을 읽거나 저장하지 않음</td></tr>
       <tr><td>카카오 로그인 토큰</td><td>‘나에게 보내기’ 메시지 전송</td><td>Kakao SDK가 기기 내부에 보관. 개발자는 카카오 계정 정보(닉네임·이메일 등)를 요청하지 않음</td></tr>
     </table></div>
@@ -79,7 +79,7 @@
       <li><b>Kakao Corp.</b> – 카카오 로그인 및 카카오톡 메시지 전송. 전송된 메시지는 사용자 본인의 카카오 계정에 보관되며 <a href="https://www.kakao.com/policy/privacy" rel="noopener">카카오 개인정보처리방침</a>을 따릅니다.</li>
       <li><b>Google AdMob</b> – 보호자 설정 화면 하단 광고(어르신 홈 화면에는 광고 없음). 광고 ID 등 기기 정보가 처리될 수 있으며, 유럽 등에서는 동의 화면(UMP)을 표시합니다. <a href="https://policies.google.com/privacy" rel="noopener">Google 개인정보처리방침</a></li>
       <li><b>Google Play 결제</b> – Kinlight Plus 구독 처리. 결제 정보는 Google이 처리하며 개발자는 받지 않습니다.</li>
-      <li><b>Google Play 서비스</b> – 위치 제공, 신체 활동 인식, 인앱 업데이트.</li>
+      <li><b>Google Play 서비스</b> – 위치 제공, 인앱 업데이트.</li>
     </ul>
     <p>개발자는 위 서비스 외의 제3자에게 정보를 판매하거나 제공하지 않습니다.</p>
 
@@ -95,7 +95,7 @@
     <ul>
       <li>위치 전송은 첫 실행 시 동의 화면에서 <b>본인 또는 법정대리인(보호의무자)</b>의 동의를 받은 후에만 시작됩니다.</li>
       <li>전송 중에는 항상 알림이 표시되며, 보호자 메뉴에서 언제든지 전송을 중지할 수 있습니다.</li>
-      <li>휴대폰 설정에서 위치·신체 활동·전화·알림 권한을 언제든지 철회할 수 있습니다.</li>
+      <li>휴대폰 설정에서 위치·전화·알림 권한을 언제든지 철회할 수 있습니다.</li>
       <li>앱은 숨겨진 상태로 동작하지 않으며 아이콘을 숨기지 않습니다.</li>
     </ul>
 
@@ -128,7 +128,7 @@
       <tr><td>Coordinates for address lookup</td><td>Showing an address on the location card</td><td>Android's Geocoder sends coordinates to a location service provider (e.g. Google) to return an address</td></tr>
       <tr><td>Name, guardian phone numbers (up to 3), home address, safe zones</td><td>Home screen, SOS calls, message text</td><td>Stored only on the device</td></tr>
       <tr><td>Battery level</td><td>Shown in messages, low-battery alert</td><td>Included in messages to the user's own KakaoTalk</td></tr>
-      <tr><td>Physical activity (walking / still)</td><td>Adjusting the sending interval</td><td>Used on the device only; not sent or stored</td></tr>
+      <tr><td>Motion detection (phone's significant-motion sensor)</td><td>Adjusting the sending interval</td><td>Used on the device only; not sent or stored. No permission required</td></tr>
       <tr><td>Phone permission</td><td>SOS button calls a guardian</td><td>Call logs are never read or stored</td></tr>
       <tr><td>Kakao login token</td><td>Sending “Send to me” messages</td><td>Kept on the device by the Kakao SDK. The developer does not request Kakao profile data (nickname, email, etc.)</td></tr>
     </table></div>
@@ -138,7 +138,7 @@
       <li><b>Kakao Corp.</b> – Kakao Login and KakaoTalk messaging. Messages are kept in the user's own Kakao account under <a href="https://www.kakao.com/policy/privacy" rel="noopener">Kakao's privacy policy</a>.</li>
       <li><b>Google AdMob</b> – a banner on the guardian settings screen only (no ads on the senior's home screen). Device data such as the advertising ID may be processed; a consent form (UMP) is shown where required. <a href="https://policies.google.com/privacy" rel="noopener">Google Privacy Policy</a></li>
       <li><b>Google Play Billing</b> – Kinlight Plus subscriptions. Payment data is handled by Google, not the developer.</li>
-      <li><b>Google Play services</b> – location, activity recognition and in-app updates.</li>
+      <li><b>Google Play services</b> – location and in-app updates.</li>
     </ul>
     <p>The developer does not sell or share data with any other third party.</p>
 
@@ -154,7 +154,7 @@
     <ul>
       <li>Location sharing starts only after consent from the user or their legal guardian on the first-run consent screen.</li>
       <li>A notification is always shown while sending, and sending can be stopped at any time from the guardian menu.</li>
-      <li>Location, activity, phone and notification permissions can be revoked at any time in the phone's settings.</li>
+      <li>Location, phone and notification permissions can be revoked at any time in the phone's settings.</li>
       <li>The app never runs hidden and never hides its icon.</li>
     </ul>
 
