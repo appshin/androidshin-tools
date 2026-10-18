@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.appshin.tourcall",
+      "sha256_cert_fingerprints": [
+        "XX:XX:...  ← Play Console > 설정 > 앱 무결성 > 앱 서명 키 인증서 SHA-256",
+        "XX:XX:...  ← (선택) 디버그/업로드 키 SHA-256"
+      ]
+    }
+  }
+]

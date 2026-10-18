@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TourCall</title>
+<style>
+:root{--bg:#EEF5F6;--fg:#13315C;--card:#fff;--accent:#0E7C7B;--flag:#FFB400}
+@media (prefers-color-scheme:dark){:root{--bg:#0F1716;--fg:#E6F1F1;--card:#172120;--accent:#6FD3D1}}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--fg);display:grid;place-items:center;min-height:100vh}
+.c{background:var(--card);border-radius:20px;padding:28px;max-width:360px;margin:16px;text-align:center}
+a.b{display:block;margin:14px 0;padding:14px;border-radius:14px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
+a.b.alt{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+small{opacity:.75;line-height:1.5}
+</style></head><body><div class="c">
+<h2>🚩 투어콜 TourCall</h2>
+<p>단체관광 인원 체크 앱<br><small>Group tour headcount app</small></p>
+<a class="b" id="install" href="https://play.google.com/store/apps/details?id=com.appshin.tourcall">앱 설치하고 참가하기<br><small>Install &amp; join</small></a>
+<a class="b alt" id="open" href="#">이미 설치했어요 · Open in app</a>
+<small>설치가 끝나면 <b>'열기'</b>를 누르세요. 투어 참가 화면이 자동으로 열립니다.<br>
+After installing, tap <b>Open</b> — the tour opens automatically.</small>
+</div>
+<script>
+var link = location.href;
+document.getElementById('install').href =
+  'https://play.google.com/store/apps/details?id=com.appshin.tourcall&referrer=' + encodeURIComponent(link);
+document.getElementById('open').href =
+  'tourcall://' + location.pathname.replace(/^\/tc\//,'').replace(/\/$/,'') + location.search;
+</script></body></html>
