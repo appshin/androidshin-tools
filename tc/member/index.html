@@ -19,9 +19,10 @@ small{opacity:.75;line-height:1.5}
 After installing, tap <b>Open</b> — the tour opens automatically.</small>
 </div>
 <script>
+// 투어 정보는 주소의 '#' 뒤에 있어 이 서버로 전송되지 않습니다. 이 페이지는 아무 데이터도 수집·전송하지 않습니다.
 var link = location.href;
 document.getElementById('install').href =
   'https://play.google.com/store/apps/details?id=com.appshin.tourcall&referrer=' + encodeURIComponent(link);
 document.getElementById('open').href =
-  'tourcall://' + location.pathname.replace(/^\/tc\//,'').replace(/\/$/,'') + location.search;
+  'tourcall://' + location.pathname.replace(/^\/tc\//,'').replace(/\/$/,'') + location.search + location.hash;
 </script></body></html>
