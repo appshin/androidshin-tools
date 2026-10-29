@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: AdMob suspended my account for "invalid traffic" | Mr.AndroidShin</title>
+<meta name="description" content="AdMob flagged invalid traffic and suspended ad serving. Usually it's not sabotage — it's testing with real ad unit IDs, tapping your own ads, or asking users to click. What counts as invalid traffic, how to stop causing it, and how an appeal works.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-admob-invalid-traffic-suspended">
+<meta property="og:title" content="Debugging log: AdMob suspended my account for 'invalid traffic'">
+<meta property="og:description" content="Usually self-inflicted: real ad IDs in testing, self-clicks, or asking users to click. How to stop and appeal.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Monetization</p>
+  <h1>AdMob suspended my account for "invalid traffic"</h1>
+
+  <p>One day the ads stopped and a message said my account was flagged for <b>invalid traffic</b> — ad serving limited or suspended. The instinct is to suspect a competitor or a bot attack, and occasionally that's real. But far more often, for a solo developer, the invalid traffic came from <i>us</i>: testing an ad-supported app the wrong way. This one is worth understanding before it happens, because prevention is far easier than appeal.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> "invalid traffic" means clicks or impressions Google's systems don't trust. The most common self-inflicted causes are testing with your <b>real</b> ad unit IDs, tapping your own ads, and asking users to click. Use test ads during development, never touch your own live ads, and never encourage clicks.</p>
+  </div>
+
+  <h2>What "invalid traffic" means</h2>
+  <p>AdMob pays advertisers' money for clicks and impressions, so it aggressively filters anything that looks inflated or non-genuine: a developer clicking their own ads, repetitive clicks from one device, bots, or users nudged to tap. When the filters decide a meaningful share of your traffic isn't trustworthy, they limit or suspend serving to protect advertisers. It isn't a judgment that you're malicious — it's the system refusing to bill advertisers for traffic it can't trust, and a new or low-volume account trips it more easily because there's little history to weigh against a burst of odd activity.</p>
+
+  <h2>The self-inflicted causes (most common)</h2>
+  <ul>
+    <li><b>Testing with real ad unit IDs.</b> Every time you run your app in development and an ad loads, that's a real impression on your live unit — and if you tap it, a real self-click. This is the number-one cause for solo devs.</li>
+    <li><b>Clicking your own ads,</b> even "just to check it works." Don't, ever, on live units.</li>
+    <li><b>Asking or incentivizing users to click</b> — "tap the ad to support me," or placing ads where accidental taps are likely. Both count as invalid.</li>
+    <li><b>Repeated impressions from one device</b> during heavy testing on a live unit.</li>
+  </ul>
+
+  <h2>How to never cause it</h2>
+  <ul>
+    <li><b>Use Google's test ad unit IDs</b> during all development. They return real-looking ads you can tap freely with zero risk to your account.</li>
+    <li><b>Register your dev devices as test devices</b> so any real units in a build serve test ads to them instead of billable ones.</li>
+    <li><b>Keep live ad IDs out of debug builds.</b> Wire test IDs to debug and real IDs to release, so you physically can't generate live impressions while developing. (There's a companion write-up on this exact setup.)</li>
+    <li><b>Never click your own ads,</b> and never ask users to. Design placements so accidental taps are unlikely.</li>
+  </ul>
+
+  <h2>If you're already flagged</h2>
+  <ul>
+    <li><b>Stop the cause immediately</b> — switch all testing to test ads and test devices, and remove any click-encouraging text or risky placements.</li>
+    <li><b>Read the policy notice</b> in your AdMob account; it names the issue category and whether serving is limited or suspended.</li>
+    <li><b>File the appeal</b> if one is offered, honestly: explain what likely caused it and what you've changed to prevent recurrence. Vague or defensive appeals fare worse than a straightforward "I was testing with live IDs; I've moved to test ads and test devices."</li>
+    <li><b>Be patient.</b> Limited serving can lift after a review period if the invalid activity stops; wait it out rather than generating more odd traffic trying to test whether it's back.</li>
+  </ul>
+
+  <div class="callout">
+    <p>The honest framing: treat your own live ad units as untouchable. If you never load or tap them outside of real users, the most common path to this suspension simply can't happen. Test ads exist precisely so you can develop freely — use them from day one.</p>
+  </div>
+
+  <p class="note">AdMob's policy wording and appeal flow change over time; the principle — only genuine, un-encouraged user traffic on live units — is the stable part. This is general developer guidance, not account-specific advice.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-real-admob-ids-in-testing">Don't ship real AdMob IDs in a closed test</a> · <a href="/admob-ecpm-calculator">AdMob eCPM calculator</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
