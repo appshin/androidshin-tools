@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: "Could not resolve" a dependency in Gradle | Mr.AndroidShin</title>
+<meta name="description" content="Gradle sync failed with 'Could not resolve com.example:library:1.0.0'. It couldn't find or download the dependency — a missing repository, a typo in the coordinates, a version that doesn't exist, or a network/proxy block. How to tell which.">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-could-not-resolve-dependency">
+<meta property="og:title" content="Debugging log: 'Could not resolve' a dependency in Gradle">
+<meta property="og:description" content="Missing repository, typo'd coordinates, a non-existent version, or a network block — how to tell which.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Gradle</p>
+  <h1>"Could not resolve" a dependency</h1>
+
+  <p>Gradle sync stopped with <b>Could not resolve com.example:library:1.0.0</b>. It had compiled yesterday; today it couldn't even find the library. "Resolve" here means "locate and download," and when it fails, the library either isn't where Gradle is looking, isn't named what you typed, or Gradle couldn't reach the internet to fetch it. Four causes, each with a quick check.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> Gradle looked for the artifact in your declared repositories and didn't get it. Check, in order: is the repository declared, are the coordinates and version exactly right, does that version exist, and can your machine actually reach the repository. One of those four is almost always it.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>Could not resolve com.example:library:1.0.0.
+  Required by: project :app
+&gt; Could not find com.example:library:1.0.0.
+  Searched in the following locations: ...</pre>
+  <p>That "Searched in the following locations" list is gold — it shows exactly which repositories Gradle checked. If the repository that hosts your library isn't in that list, you've found the cause immediately.</p>
+
+  <h2>Cause 1 — the repository isn't declared</h2>
+  <p>Gradle only searches repositories you've told it about. Most libraries live in Maven Central or Google's Maven; a few live elsewhere (a vendor's own Maven, JitPack). If the hosting repository isn't declared, the artifact can't be found. In a modern project, repositories are usually in <code>settings.gradle</code>:</p>
+<pre>dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        // maven { url = uri("https://jitpack.io") }  // if the lib needs it
+    }
+}</pre>
+  <p>Add the repository the library actually lives in. A JitPack-hosted dependency, for instance, fails with this exact error until you add the JitPack repo.</p>
+
+  <h2>Cause 2 — a typo in the coordinates</h2>
+  <p>The coordinates are <code>group:artifact:version</code>, and a single wrong character makes the artifact unfindable. Copy the exact line from the library's official docs rather than typing it. Watch for a wrong group, a misspelled artifact name, or <code>-ktx</code> / platform suffixes that do or don't belong. "Could not find" with correct-looking coordinates is very often a subtle typo.</p>
+
+  <h2>Cause 3 — that version doesn't exist</h2>
+  <p>The group and artifact are right but the <i>version</i> isn't published — a number you guessed, a typo, or a version yanked from the repository. Check the library's releases for a version that actually exists and use that. Pinning to a version that was never published fails the same way as a typo.</p>
+
+  <h2>Cause 4 — a network or proxy block</h2>
+  <p>If everything is declared and spelled correctly, Gradle may simply not be reaching the repository. Behind a corporate proxy or firewall, or offline, downloads fail and surface as "could not resolve." Confirm you have internet, that you're not in Gradle <b>offline mode</b> (a toggle that's easy to leave on), and that any proxy is configured. On a locked-down network this is frequently the real cause, not your build file.</p>
+
+  <div class="callout">
+    <p>Read the "Searched in the following locations" list before changing anything. It tells you whether the problem is <i>where</i> Gradle looked (repository) or <i>what</i> it looked for (coordinates/version) — which cuts the four causes down to the one you actually have.</p>
+  </div>
+
+  <h2>A quick decision path</h2>
+  <ul>
+    <li><b>Hosting repo not in the searched list?</b> → declare it.</li>
+    <li><b>Repo is listed but artifact missing?</b> → check coordinates, then version, against the official docs.</li>
+    <li><b>Everything correct and still failing?</b> → check network, proxy, and offline mode.</li>
+    <li><b>Worked before, broke with no change?</b> → often a transient repo/network hiccup; retry, then check offline mode.</li>
+  </ul>
+
+  <p class="note">Coordinates and versions above are examples — use the exact ones from your library's documentation.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-could-not-find-method-gradle">Could not find method for arguments</a> · <a href="/debug-duplicate-class-dependency-conflict">"Duplicate class" found in modules</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='\u25C9 '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
