@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "datasets": [
+    {
+      "id": "kr_public",
+      "name": "행정안전부 전국공중화장실표준데이터",
+      "license": "공공누리(출처표시)",
+      "bbox": [
+        33.0,
+        124.5,
+        38.7,
+        131.0
+      ],
+      "type": "json",
+      "url": "https://androidshin.dev/wcradar/kr_public_toilets.json",
+      "ttlDays": 30,
+      "fields": {
+        "lat": "la",
+        "lng": "lo",
+        "name": "n",
+        "address": "a",
+        "hours": "h",
+        "wheelchair": "w",
+        "baby": "b",
+        "bell": "e",
+        "cctv": "c"
+      },
+      "defaults": {
+        "fee": "FREE"
+      }
+    },
+    {
+      "id": "au_nptm",
+      "name": "National Public Toilet Map (Australian Government)",
+      "license": "CC BY 3.0 AU",
+      "bbox": [
+        -44.0,
+        112.0,
+        -9.0,
+        154.5
+      ],
+      "type": "ckan_csv",
+      "portal": "https://data.gov.au/data",
+      "resource_id": "34076296-6692-4e30-b627-67b7c4eb1027",
+      "ttlDays": 30,
+      "fields": {
+        "lat": "Latitude",
+        "lng": "Longitude",
+        "name": "Name",
+        "address": [
+          "Address1",
+          "Town",
+          "State"
+        ],
+        "hours": [
+          "OpeningHours",
+          "IsOpen"
+        ],
+        "wheelchair": [
+          "Accessible",
+          "AccessibleMale",
+          "AccessibleFemale",
+          "AccessibleUnisex"
+        ],
+        "baby": [
+          "BabyChange",
+          "BabyCareRoom"
+        ],
+        "unisex": [
+          "Unisex",
+          "AllGender"
+        ],
+        "fee": "PaymentRequired"
+      }
+    },
+    {
+      "id": "jp_tokyo",
+      "name": "東京都オープンデータカタログ (区市町村 公衆トイレ一覧)",
+      "license": "CC BY",
+      "bbox": [
+        35.45,
+        138.9,
+        35.92,
+        139.95
+      ],
+      "type": "ckan_search",
+      "portal": "https://catalog.data.metro.tokyo.lg.jp",
+      "query": "公衆トイレ",
+      "titleContains": "トイレ",
+      "ttlDays": 30,
+      "fields": {
+        "lat": "緯度",
+        "lng": "経度",
+        "name": [
+          "名称",
+          "名称_英語"
+        ],
+        "address": "所在地_連結標記",
+        "hours": "利用可能時間特記事項",
+        "hoursStart": "利用開始時間",
+        "hoursEnd": "利用終了時間",
+        "wheelchair": [
+          "車椅子使用者用トイレ有無",
+          "バリアフリートイレ数"
+        ],
+        "baby": "乳幼児用設備設置トイレ有無",
+        "unisex": "男女共用トイレ総数"
+      },
+      "defaults": {
+        "fee": "FREE"
+      }
+    },
+    {
+      "id": "jp_ishikawa",
+      "name": "石川県オープンデータカタログ (公衆トイレ一覧)",
+      "license": "CC BY",
+      "bbox": [
+        36.05,
+        136.2,
+        37.6,
+        137.4
+      ],
+      "type": "ckan_search",
+      "portal": "https://ckan.opendata.pref.ishikawa.lg.jp",
+      "query": "公衆トイレ",
+      "titleContains": "トイレ",
+      "ttlDays": 30,
+      "fields": {
+        "lat": "緯度",
+        "lng": "経度",
+        "name": [
+          "名称",
+          "名称_英語"
+        ],
+        "address": "所在地_連結標記",
+        "hours": "利用可能時間特記事項",
+        "hoursStart": "利用開始時間",
+        "hoursEnd": "利用終了時間",
+        "wheelchair": [
+          "車椅子使用者用トイレ有無",
+          "バリアフリートイレ数"
+        ],
+        "baby": "乳幼児用設備設置トイレ有無",
+        "unisex": "男女共用トイレ総数"
+      },
+      "defaults": {
+        "fee": "FREE"
+      }
+    },
+    {
+      "id": "us_nyc",
+      "name": "NYC Open Data — Public Restrooms",
+      "license": "NYC Open Data Terms of Use",
+      "bbox": [
+        40.47,
+        -74.27,
+        40.93,
+        -73.68
+      ],
+      "type": "json",
+      "url": "https://data.cityofnewyork.us/resource/i7jb-7jku.json?$limit=5000",
+      "ttlDays": 14,
+      "fields": {
+        "lat": "latitude",
+        "lng": "longitude",
+        "name": "facility_name",
+        "address": "location_type",
+        "hours": "hours_of_operation",
+        "wheelchair": "accessibility",
+        "baby": "changing_stations"
+      },
+      "exclude": {
+        "status": [
+          "not operational",
+          "closed"
+        ]
+      },
+      "defaults": {
+        "fee": "FREE"
+      }
+    },
+    {
+      "id": "fr_paris",
+      "name": "Ville de Paris — Sanisettes",
+      "license": "ODbL",
+      "bbox": [
+        48.81,
+        2.22,
+        48.91,
+        2.47
+      ],
+      "type": "json",
+      "url": "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/sanisettesparis/exports/json",
+      "ttlDays": 14,
+      "fields": {
+        "geo": "geo_point_2d",
+        "name": "type",
+        "address": "adresse",
+        "hours": "horaire",
+        "wheelchair": "acces_pmr",
+        "baby": "relais_bebe"
+      },
+      "exclude": {
+        "statut": [
+          "hors service",
+          "fermé"
+        ]
+      },
+      "defaults": {
+        "fee": "FREE"
+      }
+    }
+  ]
+}
