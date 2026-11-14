@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2538545944696357" crossorigin="anonymous"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debugging log: SSLHandshakeException / "Trust anchor for certification path not found" | Mr.AndroidShin</title>
+<meta name="description" content="A network call failed with SSLHandshakeException: Trust anchor for certification path not found. The server's certificate chain didn't validate on the device — a missing intermediate, a private CA, or an old device. Why, and the right fix (not disabling TLS).">
+<meta name="theme-color" content="#0B0E14">
+<link rel="canonical" href="https://androidshin.dev/debug-ssl-handshake-certpath-failed">
+<meta property="og:title" content="Debugging log: SSLHandshakeException / Trust anchor not found">
+<meta property="og:description" content="The server's certificate chain didn't validate on the device. Why — and the right fix, not disabling TLS.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;--surface:#151A24;--surface2:#1E2531;--line:#2A3444;
+    --text:#E7EAF0;--muted:#8B94A7;--accent:#FFB454;--accent-2:#7CC5FF;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.68;font-size:16px}
+  a{color:var(--accent-2);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{font-family:var(--disp);font-weight:700;letter-spacing:-.02em;font-size:1.05rem;color:var(--text)}
+  .brand span{color:var(--accent)}
+  nav a{color:var(--muted);font-size:.9rem;margin-left:18px}nav a:hover{color:var(--text);text-decoration:none}
+  main{padding:44px 0 20px}
+  .eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.12;margin:0 0 18px}
+  h2{font-family:var(--disp);font-weight:600;font-size:1.35rem;margin:34px 0 8px;letter-spacing:-.01em}
+  h3{font-family:var(--disp);font-weight:600;font-size:1.08rem;margin:22px 0 6px}
+  p,li{color:#C7CDDA;margin:0 0 16px}
+  ul,ol{padding-left:20px}li{margin-bottom:8px}
+  code{font-family:var(--mono);background:var(--surface);border:1px solid var(--line);padding:2px 6px;border-radius:6px;font-size:.88em;color:var(--accent)}
+  pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-family:var(--mono);font-size:.9rem;color:#D7DCE6;line-height:1.55}
+  .callout{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);padding:14px 16px;margin:18px 0}
+  .callout p{margin:0;color:var(--text)}
+  .callout p + p{margin-top:8px}
+  .note{color:var(--muted);font-size:.9rem}
+  .related{border-top:1px solid var(--line);margin-top:30px;padding-top:18px}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/" style="text-decoration:none">Mr<span>.</span>AndroidShin <span style="color:var(--muted);font-weight:500">/ Dev Tools</span></a>
+    <nav><a href="/#tools">Tools</a><a href="/#log">Log</a><a href="/about">About</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="eyebrow">Debugging log · Networking</p>
+  <h1>SSLHandshakeException: "Trust anchor for certification path not found"</h1>
+
+  <p>An HTTPS call failed before it sent anything, with <code>SSLHandshakeException</code> and <b>Trust anchor for certification path not found</b>. The URL worked fine in my laptop's browser, which made it baffling. The device couldn't <i>verify</i> the server's certificate — not because the server is insecure, but because the chain that proves its certificate didn't fully reach a certificate authority the device trusts.</p>
+
+  <div class="callout">
+    <p><b>The short version:</b> the device couldn't build a trusted chain from the server's certificate up to a root CA it knows. Usually the server is missing an intermediate certificate, or it uses a private/self-signed CA, or the device is too old to know a newer root. Fix the server's chain or trust the right CA properly — never disable certificate checking.</p>
+  </div>
+
+  <h2>The error</h2>
+<pre>javax.net.ssl.SSLHandshakeException:
+  java.security.cert.CertPathValidatorException:
+  Trust anchor for certification path not found.</pre>
+
+  <h2>How certificate validation works (briefly)</h2>
+  <p>When your app connects over HTTPS, the server presents a certificate. The device trusts it only if it can build a chain from that certificate, through any intermediate certificates, up to a <b>root CA</b> in the device's trust store. If any link is missing or untrusted, the chain can't be completed and validation fails — that's the "trust anchor not found." It's a safety feature: it's what stops an attacker from presenting a fake certificate.</p>
+
+  <h2>Cause 1 — the server is missing an intermediate certificate</h2>
+  <p>This is the most common and most misleading one. Browsers often <i>fetch</i> a missing intermediate automatically or cache it, so the site looks fine in a browser — but Android doesn't, so the chain breaks on device. Test the server's chain with an SSL checker (SSL Labs or similar); if it reports an incomplete chain, the fix is on the <b>server</b>: configure it to serve the full chain including intermediates. This resolves it for every client, not just your app.</p>
+
+  <h2>Cause 2 — a private or self-signed CA</h2>
+  <p>If you're hitting an internal server with a self-signed certificate or a company CA the device doesn't know, validation correctly fails. The right fix is to <b>trust that CA explicitly</b>, scoped to that domain, via a network security config — not to turn off checking:</p>
+<pre>&lt;!-- res/xml/network_security_config.xml --&gt;
+&lt;network-security-config&gt;
+    &lt;domain-config&gt;
+        &lt;domain includeSubdomains="true"&gt;internal.example.com&lt;/domain&gt;
+        &lt;trust-anchors&gt;
+            &lt;certificates src="@raw/my_ca" /&gt;
+        &lt;/trust-anchors&gt;
+    &lt;/domain-config&gt;
+&lt;/network-security-config&gt;</pre>
+  <p>This trusts your CA for that host only, leaving normal validation intact everywhere else.</p>
+
+  <h2>Cause 3 — an old device missing a newer root</h2>
+  <p>Root CAs change, and older devices that stopped getting updates may not have a newer root your server's certificate chains to. If it fails only on old devices, that's the cause. Options: make sure the server serves intermediates (sometimes enough), or use a certificate from a CA with broader legacy device coverage.</p>
+
+  <div class="callout">
+    <p><b>Never "fix" this by trusting all certificates</b> or installing a blank <code>TrustManager</code> that accepts anything. It's the most-copied dangerous answer online, it defeats HTTPS entirely, it exposes your users to interception, and Google Play rejects apps that ship an insecure TrustManager. Fix the chain or trust a specific CA for a specific domain instead.</p>
+  </div>
+
+  <h2>How to pin down which cause</h2>
+  <ul>
+    <li><b>Works in a browser but not on device?</b> Strongly suggests a missing intermediate — check the server chain with an external SSL test.</li>
+    <li><b>Hitting an internal/self-signed server?</b> Trust the CA via network security config, scoped to the domain.</li>
+    <li><b>Fails only on old devices?</b> Missing newer root — fix intermediates or change CA.</li>
+    <li><b>Confirm the real cause before coding</b> — most of the time the fix belongs on the server, not in your app.</li>
+  </ul>
+
+  <p class="note">Domain and resource names above are examples — use your own, and prefer fixing the server chain where that's the cause.</p>
+
+  <div class="related">
+    <p>Related: <a href="/debug-cleartext-http-traffic-not-permitted">Cleartext HTTP traffic not permitted</a> · <a href="/debug-network-on-main-thread-exception">NetworkOnMainThreadException</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© <span id="yr"></span> Mr.AndroidShin · Dev Tools</div>
+    <div><a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<!-- GoatCounter analytics + total visitor counter -->
+<script data-goatcounter="https://androidshin.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  fetch("https://androidshin.goatcounter.com/counter/TOTAL.json")
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d) return;
+      var n = d.count_unique || d.count; if(!n) return;
+      var el=document.createElement('div');
+      el.style.cssText='text-align:center;color:#8B94A7;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;letter-spacing:.04em;padding:4px 0 26px';
+      el.textContent='◉ '+n+' total visitors';
+      document.body.appendChild(el);
+    }).catch(function(){});
+})();
+</script>
+</body>
+</html>
